@@ -51,10 +51,14 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = main.cpp \
-		window.cpp moc_window.cpp
+		window.cpp \
+		ProjectView.cpp moc_window.cpp \
+		moc_ProjectView.cpp
 OBJECTS       = main.o \
 		window.o \
-		moc_window.o
+		ProjectView.o \
+		moc_window.o \
+		moc_ProjectView.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -129,8 +133,10 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		461DrawingProject.pro window.h main.cpp \
-		window.cpp
+		461DrawingProject.pro window.h \
+		ProjectView.h main.cpp \
+		window.cpp \
+		ProjectView.cpp
 QMAKE_TARGET  = 461DrawingProject
 DESTDIR       = 
 TARGET        = 461DrawingProject
@@ -314,8 +320,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents window.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp window.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents window.h ProjectView.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp window.cpp ProjectView.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -347,13 +353,19 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_window.cpp
+compiler_moc_header_make_all: moc_window.cpp moc_ProjectView.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_window.cpp
-moc_window.cpp: window.h \
+	-$(DEL_FILE) moc_window.cpp moc_ProjectView.cpp
+moc_window.cpp: ProjectView.h \
+		window.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/wizardofchaos/Longwood/461DrawingProject -I/home/wizardofchaos/Longwood/461DrawingProject -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include window.h -o moc_window.cpp
+
+moc_ProjectView.cpp: ProjectView.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/wizardofchaos/Longwood/461DrawingProject -I/home/wizardofchaos/Longwood/461DrawingProject -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ProjectView.h -o moc_ProjectView.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -369,14 +381,22 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ####### Compile
 
-main.o: main.cpp window.h
+main.o: main.cpp window.h \
+		ProjectView.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
-window.o: window.cpp window.h
+window.o: window.cpp window.h \
+		ProjectView.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o window.o window.cpp
+
+ProjectView.o: ProjectView.cpp ProjectView.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ProjectView.o ProjectView.cpp
 
 moc_window.o: moc_window.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_window.o moc_window.cpp
+
+moc_ProjectView.o: moc_ProjectView.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ProjectView.o moc_ProjectView.cpp
 
 ####### Install
 
