@@ -12,9 +12,10 @@ class ProjectView : public QGraphicsView
 	private:
 		int m_tool;
 	private slots:
+
+	public:
 		void change_tool(int tool);
 		void rect_tool(qreal x, qreal y);
-	public:
 		void mousePressEvent(QMouseEvent* event);
 		ProjectView();
 		~ProjectView();
