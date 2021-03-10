@@ -1,0 +1,5 @@
+461DrawingProject
+compile_commands.json
+*.o
+.cache/*
+moc_*
