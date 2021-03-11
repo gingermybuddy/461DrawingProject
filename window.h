@@ -3,6 +3,7 @@
 #include <QToolBar>
 #include <QAction>
 #include "ProjectView.h"
+#include "ProjectScene.h"
 
 #ifndef __WINDOW_H
 #define __WINDOW_H
@@ -12,7 +13,7 @@ class Window : public QMainWindow //Extension on the base QMainWindow class
 	Q_OBJECT //Must be included for qmake to recognize this
 
 	private: //Menus and features of the window
-		QGraphicsScene* m_scene;
+		ProjectScene* m_scene;
 		ProjectView* m_view;
 		QToolBar* m_toolbar;
 		QAction* m_testoption;
