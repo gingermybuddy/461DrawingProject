@@ -49,16 +49,3 @@ void ProjectView::mousePressEvent(QMouseEvent *event)
 	//Set up color selection so it takes a color parameter (or takes whatever color is currently selected according to some var in ProjectView)
 
 }
-
-
- //not sure yet what goes in the parameters
- //This is a starter for sending a request to the server. It is not complete yet. 
-/*void ProjectView::postRequest( ){
-	QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-	connect(manager, &NetworkAccessManager::finished, this, &MyClass::replyFinished);
-	QNetworkRequest request((QUrl("localhost:50000")));
-	
-	//have to figure out what data is
-	QNetwork *reply = manager.post(request, data);
-}
-*/
