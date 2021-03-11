@@ -10,11 +10,12 @@ class ProjectScene : public QGraphicsScene
 {
 	Q_OBJECT
 	private:
-	private slots:
+	public slots:
+		void sceneChanged(const QList<QRectF> &region);
+	signals:	
 	public:
 		ProjectScene();
 		~ProjectScene();
-		void changed(QList<QRectF> &region);
-}; //Not much to see here yet, but this is where network code goes
+};
 
 #endif

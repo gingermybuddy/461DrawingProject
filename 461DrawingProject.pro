@@ -20,4 +20,4 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # Input
 HEADERS += ProjectView.h ProjectScene.h window.h
 SOURCES += main.cpp ProjectView.cpp ProjectScene.cpp window.cpp
-QT += widgets
+QT += gui widgets 
