@@ -2,6 +2,7 @@
 #include <QNetworkAccessManager>
 #include <QUrlQuery>
 #include <QNetworkRequest>
+#include <QRectF>
 
 ProjectScene::ProjectScene() { }
 
@@ -20,15 +21,14 @@ ProjectScene::~ProjectScene() { } void ProjectScene::sceneChanged(const
 	params.addQueryItem("id", "?");
 
 /*
-	QList<QRectF> data =region->items();
-	for(QRectF* i : data){
-		qreal height = i->boundingRect().height();
-		qreal width = i->boundingRect().width(); 
-		
-		QGraphicsRectItem* rect = dynamic_cast<QGraphicsRectItem *>(i);
-		int x = rect->rect().x();
-		int y = rect->rect().y();
-	}
+    QList<QRectF> data = region->items();
+    for(QRectF i : data){
+        int x = i.x();
+        int y = i.y();
+
+       // QGraphicsRectItem* rect = dynamic_cast<QGraphicsRectItem *>(i);
+
+    }
 */
 
 	connect(manager, SIGNAL(finished(QNetworkReply*)),this, SLOT(replyFinished(QNetworkReply*)));
