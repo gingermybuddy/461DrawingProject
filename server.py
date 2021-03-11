@@ -1,10 +1,9 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask import request
 import json
 
 app = Flask(__name__)
 
-@app.route('/', methods = ['POST', 'GET'])
 def getJsonFile():
     jsonFile = request.get_json()
     data = json.loads(jsonFile)
@@ -15,6 +14,7 @@ def addCircle(r,x,y): #Creates JSON-formatted circle data
 def addLine(x1,y1,x2,y2): #Creates JSON-formatted line data
 	return jsonify({'shape' : 'line', 'data' : {'start' : {'x' : x1, 'y' : y1}, 'end' : {'x' : x2, 'y' : y2}}})
 
+@app.route('/', methods = ['POST', 'GET'])
 def shapeType(): #Checks shape type received and calls matching function
 	shape = request.args.get('shape')
 	if shape == 'circle':
