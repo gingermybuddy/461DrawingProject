@@ -3,10 +3,14 @@
 #include <QUrlQuery>
 #include <QNetworkRequest>
 #include <QRectF>
+#include <QString>
+#include <QGraphicsItem>
 
 ProjectScene::ProjectScene() { }
 
-ProjectScene::~ProjectScene() { } void ProjectScene::sceneChanged(const
+ProjectScene::~ProjectScene() { } 
+
+void ProjectScene::sceneChanged(const
 		QList<QRectF> &region) {
 
 //This is a starter for sending a request to the server. It is not complete
@@ -18,7 +22,19 @@ ProjectScene::~ProjectScene() { } void ProjectScene::sceneChanged(const
 	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
 	QUrlQuery params;
-	params.addQueryItem("id", "?");
+    params.addQueryItem(tr("id"), tr("?"));
+
+        QList<QGraphicsItem*> changed_items;
+        for (QRectF r : region) {
+          changed_items = items(r);
+        }
+
+    for (QGraphicsItem* i : changed_items) {
+        params.addQueryItem(tr("x"), QString::number(i->scenePos().x()));
+        params.addQueryItem(tr("y"), QString::number(i->scenePos().y()));
+    }
+
+
 
 /*
     QList<QRectF> data = region->items();
