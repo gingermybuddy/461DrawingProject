@@ -23,6 +23,7 @@ Window::Window() : QMainWindow()
 	m_view->setScene(m_scene);
 	
 	connect(m_testoption, SIGNAL(triggered()), this, SLOT(popup()));
+	connect(m_scene, SIGNAL(changed(const QList<QRectF>&)), m_scene, SLOT(sceneChanged(const QList<QRectF>&)));
 	//connect(), as shown, will connect a given action (or button) with a function in private slots. This just sets it so when you actually click on it, something happens.
 	
 	this->layout()->setMenuBar(m_toolbar);
@@ -49,3 +50,5 @@ void Window::popup()
 void Window::place_rectangle()
 {
 }
+
+

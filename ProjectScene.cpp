@@ -7,7 +7,7 @@ ProjectScene::ProjectScene()
 ProjectScene::~ProjectScene()
 {
 }
-
-void ProjectScene::changed(QList<QRectF> &region)
+void ProjectScene::sceneChanged(const QList<QRectF> &region)
 {
-}
+} //Network code and such goes here!
+
