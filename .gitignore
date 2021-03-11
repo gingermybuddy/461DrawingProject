@@ -3,3 +3,11 @@ compile_commands.json
 *.o
 .cache/*
 moc_*
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+_minted-documentation
