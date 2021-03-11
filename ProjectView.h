@@ -15,7 +15,7 @@ class ProjectView : public QGraphicsView
 
 	public:
 		void change_tool(int tool);
-		void rect_tool(qreal x, qreal y);
+        void circle_tool(qreal x, qreal y);
 		void mousePressEvent(QMouseEvent* event);
 		ProjectView();
 		~ProjectView();

@@ -30,6 +30,7 @@ void ProjectScene::sceneChanged(const
         }
 
     for (QGraphicsItem* i : changed_items) {
+        params.addQueryItem(tr("shape"), i->data(1).toString());
         params.addQueryItem(tr("x"), QString::number(i->scenePos().x()));
         params.addQueryItem(tr("y"), QString::number(i->scenePos().y()));
     }

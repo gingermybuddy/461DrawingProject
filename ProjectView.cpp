@@ -13,19 +13,19 @@ void ProjectView::change_tool(int tool)
 	m_tool = tool;
 }
 
-void ProjectView::rect_tool(qreal x, qreal y)
+void ProjectView::circle_tool(qreal x, qreal y)
 {		
 	QPen pen(Qt::black); //Sets up a basic pen
 	pen.setWidth(2);
 
 	//Draws a rectangle where the coordinates were
-	QRectF rect(x-60, y-40, 120, 80);
-	QGraphicsRectItem* r = scene()->addRect(rect, pen, QBrush(Qt::transparent));
+    QRectF rect(x-40, y-40, 120, 120);
+    QGraphicsEllipseItem* r = scene()->addEllipse(rect, pen, QBrush(Qt::transparent));
 	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
 	r->setCursor(Qt::PointingHandCursor);
 	r->setData(0, 0);
-	r->setData(1, "rect");
+    r->setData(1, "circle");
 	//This is some extra data we're adding to the item. Ideally the 'id' parameter
 	//iterates, but that hasn't been implemented yet. Probably track how many items are on the scene.
 	//The 'setData' function takes in an int as a key and a QVariant (any sort of variable) as parameters.
@@ -41,7 +41,7 @@ void ProjectView::mousePressEvent(QMouseEvent *event)
 	qreal x = q.x();
 	qreal y = q.y(); 
 	
-	rect_tool(x, y); //Currently just calls the one function, should throw something to a tool class that calls the correct function.
+    circle_tool(x, y); //Currently just calls the one function, should throw something to a tool class that calls the correct function.
 
 	//TO-DO LIST:
 	//Implement some sort of class that tracks what tool is being used and uses it on a mousePressEvent
