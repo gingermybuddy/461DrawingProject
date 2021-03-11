@@ -1,5 +1,7 @@
-\documentclass{book}
+\documentclass{report}
 
+
+\usepackage{minted}
 \usepackage{Typocaps,lettrine}
 \usepackage{graphicx,float}
 \usepackage{subfig}
@@ -17,11 +19,6 @@
 	linkcolor = blue,
 }
 
-\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
-\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
-
-
-
 \title{Documentation of 461 Drawing Project}
 \author{Longwood Spring 2021 CS Senior Seminar Students}
 
@@ -31,7 +28,8 @@
 
 \section*{Preface}
 This compilation of documentation exists as a reference for students in the CMSC 461 Senior Seminar course at Longwood University. The Following code has been created by all the students of the class, and an attempt has been made to make a cross platform application that is useful and simple, and document it in a detailed manner.
+\newpage
 
-\input{JsonProtocol.tex}
+\input{JsonProtocol}
 
 \end{document}
