@@ -18,7 +18,7 @@ Window::Window() : QMainWindow()
 	m_toolbar->addAction(m_testoption);
 	//Separators are just decorative.
 	
-	m_scene = new QGraphicsScene(this);
+	m_scene = new ProjectScene();
 	m_view = new ProjectView; //Custom graphics scene where we can overload stuff
 	m_view->setScene(m_scene);
 	
