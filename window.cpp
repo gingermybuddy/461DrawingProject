@@ -60,7 +60,7 @@ void Window::popup()
 void Window::set_line()
 {
     m_view->change_tool(1);
-    std::cout << "Changing tool" << std::endl;
+    // std::cout << "Changing tool" << std::endl;
 }
 
 void Window::set_circle()
