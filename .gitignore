@@ -11,3 +11,4 @@ moc_*
 *.synctex.gz
 *.toc
 _minted-documentation
+*.pyc
