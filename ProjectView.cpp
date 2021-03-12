@@ -1,6 +1,7 @@
 #include "ProjectView.h"
 #include <QPointF>
 #include <QGraphicsItem>
+#include <iostream>
 
 ProjectView::ProjectView() : QGraphicsView(), m_tool{0}
 {}
@@ -61,8 +62,17 @@ void ProjectView::mousePressEvent(QMouseEvent *event)
 	qreal x = q.x();
 	qreal y = q.y(); 
 	
-    // circle_tool(x, y); //Currently just calls the one function, should throw something to a tool class that calls the correct function.
-    line_tool(x, y);
+    switch(m_tool){
+        case 1:
+            line_tool(x, y);
+            break;
+        case 2:
+            circle_tool(x, y);
+            break;
+        default:
+            std::cout << "error" << std::endl;
+
+    }
 
 	//TO-DO LIST:
 	//Implement some sort of class that tracks what tool is being used and uses it on a mousePressEvent
