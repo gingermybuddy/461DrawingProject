@@ -1,4 +1,4 @@
-#include "ProjectView.h"
+#include "projectView.h"
 #include <QPointF>
 #include <QGraphicsItem>
 #include <iostream>

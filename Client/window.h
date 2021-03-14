@@ -2,8 +2,8 @@
 #include <QWidget>
 #include <QToolBar>
 #include <QAction>
-#include "ProjectView.h"
-#include "ProjectScene.h"
+#include "projectView.h"
+#include "projectScene.h"
 
 #ifndef __WINDOW_H
 #define __WINDOW_H
