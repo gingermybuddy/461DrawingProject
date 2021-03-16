@@ -5,6 +5,7 @@
 #include <QRectF>
 #include <QString>
 #include <QGraphicsItem>
+#include <iostream>
 
 ProjectScene::ProjectScene() 
 {
@@ -21,8 +22,6 @@ ProjectScene::~ProjectScene()
 //sends the data about the object that was on the scene to the server. 
 void ProjectScene::sceneChanged(const QList<QRectF> &region) 
 {
-	QNetworkRequest request(m_url);
-	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
 	QUrlQuery params;
 //	params.addQueryItem(tr("id"), tr("?"));
@@ -37,9 +36,9 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 	if(i->data(1).toString() == "circle") {
 
 		QGraphicsEllipseItem* c = (QGraphicsEllipseItem*)i;
-    		params.addQueryItem(tr("radius"), QString::number(c->scenePos().x()/2));
-  		params.addQueryItem(tr("x"), QString::number(c->scenePos().x()));
-        	params.addQueryItem(tr("y"), QString::number(c->scenePos().y()));
+    		params.addQueryItem(tr("radius"), QString::number(c->rect().x()/2));
+  		params.addQueryItem(tr("x"), QString::number(c->rect().x()));
+        	params.addQueryItem(tr("y"), QString::number(c->rect().y()));
 
 	} else if (i->data(1).toString() == "line") {
 
@@ -52,14 +51,17 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 	} else if (i->data(1).toString() == "rect") {
 
 		QGraphicsRectItem* r = (QGraphicsRectItem*)i;
-		params.addQueryItem(tr("x"), QString::number(r->scenePos().x()));
-		params.addQueryItem(tr("y"), QString::number(r->scenePos().y()));
+		params.addQueryItem(tr("x"), QString::number(r->rect().x()));
+		params.addQueryItem(tr("y"), QString::number(r->rect().y()));
 		params.addQueryItem(tr("width"), QString::number(r->rect().width()));
 		params.addQueryItem(tr("height"), QString::number(r->rect().height()));
 	}
     }
-
-	m_manager->post(request, params.query(QUrl::FullyEncoded).toUtf8());
+    	QUrl url(m_url);
+	url.setQuery(params.query());
+	QNetworkRequest request(url);
+	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+	m_manager->get(request);
 	
 
 }
