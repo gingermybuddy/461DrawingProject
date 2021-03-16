@@ -16,12 +16,13 @@ class Window : public QMainWindow //Extension on the base QMainWindow class
 		ProjectScene* m_scene;
 		ProjectView* m_view;
 		QToolBar* m_toolbar;
-		QAction* m_rect_placer;
+		//QAction* m_rect_placer;
         QAction* m_circle_button;
         QAction* m_line_button;
+		QAction* m_rect_button;
 	private slots: //Where functions attached to buttons go
 		void popup();
-		void place_rectangle();
+        void place_rectangle();
         void set_line();
         void set_circle();
 	public:
