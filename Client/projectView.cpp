@@ -39,7 +39,6 @@ void ProjectView::line_tool(qreal x, qreal y)
 	QPen pen(Qt::red); //Sets up a basic pen
 	pen.setWidth(2);
 
-	//Draws a rectangle where the coordinates were
     QLineF liner(x, y, x+100, y+100);
     QGraphicsLineItem* line = scene()->addLine(liner, pen);
 	line->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -47,11 +46,6 @@ void ProjectView::line_tool(qreal x, qreal y)
 	line->setCursor(Qt::PointingHandCursor);
 	line->setData(0, 0);
     line->setData(1, "line");
-	//This is some extra data we're adding to the item. Ideally the 'id' parameter
-	//iterates, but that hasn't been implemented yet. Probably track how many items are on the scene.
-	//The 'setData' function takes in an int as a key and a QVariant (any sort of variable) as parameters.
-	//In this case, we're using '0' as the key for the item's id.
-	//'1' is the key for the item's type.
 }
 
 void ProjectView::mousePressEvent(QMouseEvent *event)
