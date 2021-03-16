@@ -14,12 +14,14 @@ Window::Window() : QMainWindow()
 	m_circle_button = new QAction(tr("Circle"));
 	m_line_button = new QAction(tr("Line"));
     	m_rect_button = new QAction(tr("Rectangle"));
+	m_default_button = new QAction(tr("Select"));
 	//This sets up an action that you can place on the toolbar.
 	//The tr() function translates a regular C++ string into Qt's internal string (QString).
 
 	m_toolbar->addSeparator();
 	m_toolbar->setMovable(false);
 	// m_toolbar->addAction(m_testoption);
+	m_toolbar->addAction(m_default_button);
 	m_toolbar->addAction(m_circle_button);
 	m_toolbar->addAction(m_line_button);
 	m_toolbar->addAction(m_rect_button);
@@ -31,6 +33,7 @@ Window::Window() : QMainWindow()
 	m_view->setScene(m_scene);
 	
 	// connect(m_testoption, SIGNAL(triggered()), this, SLOT(popup()));
+	connect(m_default_button, SIGNAL(triggered()), this, SLOT(set_default()));
 	connect(m_circle_button, SIGNAL(triggered()), this, SLOT(set_circle()));
 	connect(m_line_button, SIGNAL(triggered()), this, SLOT(set_line()));
     	connect(m_rect_button, SIGNAL(triggered()), this, SLOT(place_rectangle()));
@@ -59,6 +62,11 @@ void Window::popup()
 	popup.setText("I'm distracting!");
 	popup.exec();
 	//Pretty much what it says on the tin.
+}
+
+void Window::set_default()
+{
+	m_view->change_tool(0);
 }
 
 void Window::set_line()

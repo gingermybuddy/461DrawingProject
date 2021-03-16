@@ -71,6 +71,8 @@ void ProjectView::mousePressEvent(QMouseEvent *event)
 	qreal y = q.y(); 
 	
     switch(m_tool){
+	case 0:
+	    break; //Default selection tool that intentionally does literally nothing
         case 1:
             line_tool(x, y);
             break;
@@ -79,7 +81,7 @@ void ProjectView::mousePressEvent(QMouseEvent *event)
             break;
 	case 3:
 	    rect_tool(x, y);
-	    break; 
+	    break;
         default:
             std::cout << "error" << std::endl;
 
