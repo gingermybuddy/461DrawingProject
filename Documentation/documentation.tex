@@ -2,6 +2,8 @@
 
 
 \usepackage{minted}
+\usepackage{geometry}
+\geometry{tmargin=0.5in}
 \usepackage{Typocaps,lettrine}
 \usepackage{graphicx,float}
 \usepackage{subfig}
@@ -26,10 +28,11 @@
 \maketitle
 \tableofcontents
 
-\section*{Preface}
+\section{Preface}
 This compilation of documentation exists as a reference for students in the CMSC 461 Senior Seminar course at Longwood University. The Following code has been created by all the students of the class, and an attempt has been made to make a cross platform application that is useful and simple, and document it in a detailed manner.
 \newpage
+\input{systemRequirements}
+\input{jsonProtocol}
 
-\input{JsonProtocol}
 
 \end{document}
