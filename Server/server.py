@@ -9,24 +9,34 @@ import json
 import sqlite3 # Library used for the databases
 import drawSvg as draw # Library used to generate an SVG image 
 
+shapes = []
+
 app = Flask(__name__)
+
+def fullUpdate():
+    return jsonify(shapes)
 
 def getJsonFile():
     jsonFile = request.get_json()
     data = json.loads(jsonFile)
 
-
 #Creates JSON-formatted circle data
 def addCircle(r,x,y):
-    return jsonify({'shape' : 'circle', 'data' : {'radius' : r, 'x' : x, 'y' : y}})
+    circle = jsonify({'shape' : 'circle', 'data' : {'radius' : r, 'x' : x, 'y' : y}})
+    shapes += circle
+    return circle
 
 #Creates JSON-formatted line data
 def addLine(x1,y1,x2,y2):
-    return jsonify({'shape' : 'line', 'data' : {'start' : {'x' : x1, 'y' : y1}, 'end' : {'x' : x2, 'y' : y2}}})
+    line = jsonify({'shape' : 'line', 'data' : {'start' : {'x' : x1, 'y' : y1}, 'end' : {'x' : x2, 'y' : y2}}})
+    shapes += line
+    return line
 
 #Creates JSON-formatted rectangle data
 def addRect (x,y,w,h):
-    return jsonify({'shape' : 'rect', 'data' : {'x' : x, 'y' : y, 'w' : w, 'h' : h}})
+    rectangle = jsonify({'shape' : 'rect', 'data' : {'x' : x, 'y' : y, 'w' : w, 'h' : h}})
+    shapes += rectangle
+    return rectangle
 
 #Checks shape type received and calls matching function
 @app.route('/addShape', methods = ['POST', 'GET'])
