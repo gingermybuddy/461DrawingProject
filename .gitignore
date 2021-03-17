@@ -19,5 +19,5 @@ build-461DrawingProject-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/debug/461DrawingPro
 build-461DrawingProject-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/Makefile.Debug
 build-461DrawingProject-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/Makefile.Release
 Client/461DrawingProject.pro.user
-461DrawingProject.app
-Makefile
+build-461DrawingProject-Desktop_Qt_5_15_2_clang_64bit-Debug
+Client/461DrawingProject.app
