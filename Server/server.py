@@ -50,5 +50,11 @@ def shapeType():
     else:
         return jsonify({'error' : 'Bad Shape Type'})
 
+# A implementation of saveFile which allows the user to save the board that they are currently using.
+# User will send this url to the server and server will reply back with an SVG file
+@app.route('/saveFile', methods = ['POST', 'GET'])
+def saveFile():
+    barf = 5
+
 if __name__ == '__main__':
     app.run(debug=True)
