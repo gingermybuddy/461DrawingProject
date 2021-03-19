@@ -12,7 +12,9 @@ ProjectScene::ProjectScene()
 	m_manager = new QNetworkAccessManager(this);
 	m_url = QUrl("http://127.0.0.1:5000/");
 	connect(m_manager, SIGNAL(finished(QNetworkReply*)),this, SLOT(replyFinished(QNetworkReply*)));
-
+	m_timer = new QTimer(this);
+	connect(m_timer, SIGNAL(timeout()), this, SLOT(fullUpdate()));
+	m_timer->start(2000);
 }
 ProjectScene::~ProjectScene() 
 {
@@ -71,3 +73,13 @@ void ProjectScene::replyFinished(QNetworkReply* response)
 
 }
 
+void ProjectScene::fullUpdate()
+{
+	std::cout << "Sending request... (2 second timer)" << std::endl;
+	QUrl url(m_url);
+	url.setPath(tr("/fullUpdate"));
+	QNetworkRequest request(url);
+	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+	QNetworkReply* data = m_manager->get(request);
+
+}
