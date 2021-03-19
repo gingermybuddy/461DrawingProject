@@ -81,17 +81,17 @@ void ProjectView::mousePressEvent(QMouseEvent *event)
     switch(m_tool){
 	case 0:
 	    break; //Default selection tool that intentionally does literally nothing
-        case 1:
-            line_tool(x, y);
-            break;
-        case 2:
-            circle_tool(x, y);
-            break;
+    case 1:
+        line_tool(x, y);
+        break;
+    case 2:
+        circle_tool(x, y);
+        break;
 	case 3:
 	    rect_tool(x, y);
 	    break;
-        default:
-            std::cout << "error" << std::endl;
+    default:
+        std::cout << "error" << std::endl;
 
     }
 
