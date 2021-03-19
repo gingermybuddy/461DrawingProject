@@ -1,4 +1,5 @@
 #include "projectView.h"
+#include "qevent.h"
 #include <QPointF>
 #include <QGraphicsItem>
 #include <iostream>
@@ -40,14 +41,13 @@ void ProjectView::circle_tool(qreal x, qreal y)
 	//'1' is the key for the item's type.
 }
 
-void ProjectView::line_tool(qreal x, qreal y)
+void ProjectView::line_tool(qreal x, qreal y, qreal x2, qreal y2)
 {		
-    // XXX set color
-    // XXX change pen color
 	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
 	pen.setWidth(2);
 
-    QLineF liner(x, y, x+100, y+100);
+    QLineF liner(x, y, x2, y2);
+    // std::cout << "Making a line! \n";
     QGraphicsLineItem* line = scene()->addLine(liner, pen);
 	line->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	line->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -56,12 +56,13 @@ void ProjectView::line_tool(qreal x, qreal y)
     line->setData(1, "line");
 }
 
-void ProjectView::rect_tool(qreal x, qreal y){
+void ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
+{
 	
 	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
 	pen.setWidth(2);
 
-	QRectF rect(x-60, y-40, 120, 80);
+	QRectF rect(x, y, x2, y2);
 	QGraphicsRectItem* r = scene()->addRect(rect, pen, QBrush(Qt::transparent));
 	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -72,23 +73,34 @@ void ProjectView::rect_tool(qreal x, qreal y){
 
 void ProjectView::mousePressEvent(QMouseEvent *event)
 {
+    QPoint temp = event->pos();
+	firstClick = mapToScene(temp);
+    // std::cout << "Mouse pressed!\n";
+}
+
+void ProjectView::mouseReleaseEvent(QMouseEvent *event)
+{
 	//Grabs some useful information based on where the mouse was clicked.
-	QPoint start = event->pos();
-	QPointF q = mapToScene(start);
+    // std::cout << "Mouse released!\n";
+	QPoint end = event->pos();
+	QPointF q = mapToScene(end);
 	qreal x = q.x();
 	qreal y = q.y(); 
 	
+	qreal x2 = firstClick.x();
+	qreal y2 = firstClick.y(); 
+
     switch(m_tool){
 	case 0:
 	    break; //Default selection tool that intentionally does literally nothing
     case 1:
-        line_tool(x, y);
+        line_tool(x, y, x2, y2);
         break;
     case 2:
         circle_tool(x, y);
         break;
 	case 3:
-	    rect_tool(x, y);
+	    rect_tool(x, y, x2, y2);
 	    break;
     default:
         std::cout << "error" << std::endl;
