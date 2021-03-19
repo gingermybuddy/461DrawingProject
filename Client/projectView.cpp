@@ -13,20 +13,26 @@ void ProjectView::change_tool(int tool)
 {
 	m_tool = tool;
 }
+void ProjectView::change_color(int r, int g, int b)
+{
+	m_color_r = r;
+	m_color_g = g;
+	m_color_b = b;
+}
 
 void ProjectView::circle_tool(qreal x, qreal y)
 {		
-	QPen pen(Qt::black); //Sets up a basic pen
+	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
 	pen.setWidth(2);
 
 	//Draws a circle where the coordinates were
-    	QRectF rect(x-40, y-40, 120, 120);
-    	QGraphicsEllipseItem* r = scene()->addEllipse(rect, pen, QBrush(Qt::transparent));
+    QRectF rect(x-40, y-40, 120, 120);
+    QGraphicsEllipseItem* r = scene()->addEllipse(rect, pen, QBrush(Qt::transparent));
 	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
 	r->setCursor(Qt::PointingHandCursor);
 	r->setData(0, -1);
-    	r->setData(1, "circle");
+    r->setData(1, "circle");
 	//This is some extra data we're adding to the item. Ideally the 'id' parameter
 	//iterates, but that hasn't been implemented yet. Probably track how many items are on the scene.
 	//The 'setData' function takes in an int as a key and a QVariant (any sort of variable) as parameters.
@@ -36,21 +42,23 @@ void ProjectView::circle_tool(qreal x, qreal y)
 
 void ProjectView::line_tool(qreal x, qreal y)
 {		
-	QPen pen(Qt::red); //Sets up a basic pen
+    // XXX set color
+    // XXX change pen color
+	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
 	pen.setWidth(2);
 
-    	QLineF liner(x, y, x+100, y+100);
-    	QGraphicsLineItem* line = scene()->addLine(liner, pen);
+    QLineF liner(x, y, x+100, y+100);
+    QGraphicsLineItem* line = scene()->addLine(liner, pen);
 	line->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	line->setFlag(QGraphicsItem::ItemIsMovable, true);
 	line->setCursor(Qt::PointingHandCursor);
 	line->setData(0, -1);
-    	line->setData(1, "line");
+    line->setData(1, "line");
 }
 
 void ProjectView::rect_tool(qreal x, qreal y){
 	
-	QPen pen(Qt::black);
+	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
 	pen.setWidth(2);
 
 	QRectF rect(x-60, y-40, 120, 80);
