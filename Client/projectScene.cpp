@@ -26,7 +26,6 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 {
 
 	QUrlQuery params;
-//	params.addQueryItem(tr("id"), tr("?"));
 
         QList<QGraphicsItem*> changed_items;
         for (QRectF r : region) {
@@ -34,10 +33,27 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
         }
 
     for (QGraphicsItem* i : changed_items) {
+
 	if(i->data(0) == -1) {
-		params.addQueryItem(tr("id"), tr("none"));
+		params.addQueryItem(tr("id"), tr("none")); //Checks if it has an ID sig
 	} else {
-		params.addQueryItem(tr("id"), QString::number(i->data(1).toInt()));
+		params.addQueryItem(tr("id"), QString::number(i->data(0).toInt()));
+
+		QRectF chk = i->sceneBoundingRect();
+		itemStats checker;
+		for(itemStats j : m_tracked_items) {
+			if(j.id == i->data(0).toInt()) {
+				checker = j;
+				break;
+			} //Finds the item with a matching ID from the internally tracked things.
+		}
+
+		//This if statement is going to be nasty. All it's going to do is check the item's current state with its last-known state. It does this by checking every variable in the itemStats class against what it presently is in the scene.
+		//It should be accurate to find out which item is changed.
+		if((chk.x() == checker.x) && (chk.y() == checker.y) && (chk.height() == checker.height) && (chk.width() == checker.width)) { //If nothing changed... 
+			continue;
+		}
+
 	}
         params.addQueryItem(tr("shape"), i->data(1).toString());
 	if(i->data(1).toString() == "circle") {
@@ -69,8 +85,8 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 	QNetworkRequest request(url);
 	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 	m_manager->get(request);
-	
 
+	//After this it needs to look at the json file it gets back, and if it got a fresh ID it needs to throw it into the tracked items vector
 }
 
 void ProjectScene::replyFinished(QNetworkReply* response)
