@@ -49,6 +49,7 @@ Window::Window() : QMainWindow()
     m_colorbar->addAction(m_color_picker);
 	
 	m_scene = new ProjectScene();
+    m_scene->setBackgroundBrush(Qt::white);
 	m_view = new ProjectView; //Custom graphics scene where we can overload stuff
 	m_view->change_tool(1); // set default tool to line
 	m_view->change_color(255,0,0); // set default color to black
@@ -125,7 +126,7 @@ void Window::set_color_green()
 }
 void Window::set_color_yellow()
 {
-    m_view->change_color(128,128,0);
+    m_view->change_color(255,255,0);
 }
 void Window::set_color_blue()
 {

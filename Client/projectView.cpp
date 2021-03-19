@@ -21,14 +21,14 @@ void ProjectView::change_color(int r, int g, int b)
 	m_color_b = b;
 }
 
-void ProjectView::circle_tool(qreal x, qreal y)
+void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 {		
 	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
 	pen.setWidth(2);
 
 	//Draws a circle where the coordinates were
-    QRectF rect(x-40, y-40, 120, 120);
-    QGraphicsEllipseItem* r = scene()->addEllipse(rect, pen, QBrush(Qt::transparent));
+    QRectF circ(x, y, x2-x, y2-y);
+    QGraphicsEllipseItem* r = scene()->addEllipse(circ, pen, QBrush(Qt::transparent));
 	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
 	r->setCursor(Qt::PointingHandCursor);
@@ -62,7 +62,7 @@ void ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
 	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
 	pen.setWidth(2);
 
-	QRectF rect(x, y, x2, y2);
+	QRectF rect(x, y, x2-x, y2-y);
 	QGraphicsRectItem* r = scene()->addRect(rect, pen, QBrush(Qt::transparent));
 	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -97,10 +97,10 @@ void ProjectView::mouseReleaseEvent(QMouseEvent *event)
         line_tool(x, y, x2, y2);
         break;
     case 2:
-        circle_tool(x, y);
+        circle_tool(x, y, x2, y2);
         break;
 	case 3:
-	    rect_tool(x, y, x2, y2);
+	    rect_tool(x2, y2, x, y);
 	    break;
     default:
         std::cout << "error" << std::endl;
