@@ -34,6 +34,11 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
         }
 
     for (QGraphicsItem* i : changed_items) {
+	if(i->data(0) == -1) {
+		params.addQueryItem(tr("id"), tr("none"));
+	} else {
+		params.addQueryItem(tr("id"), QString::number(i->data(1).toInt()));
+	}
         params.addQueryItem(tr("shape"), i->data(1).toString());
 	if(i->data(1).toString() == "circle") {
 

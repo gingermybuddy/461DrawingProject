@@ -25,7 +25,7 @@ void ProjectView::circle_tool(qreal x, qreal y)
 	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
 	r->setCursor(Qt::PointingHandCursor);
-	r->setData(0, 0);
+	r->setData(0, -1);
     	r->setData(1, "circle");
 	//This is some extra data we're adding to the item. Ideally the 'id' parameter
 	//iterates, but that hasn't been implemented yet. Probably track how many items are on the scene.
@@ -44,7 +44,7 @@ void ProjectView::line_tool(qreal x, qreal y)
 	line->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	line->setFlag(QGraphicsItem::ItemIsMovable, true);
 	line->setCursor(Qt::PointingHandCursor);
-	line->setData(0, 0);
+	line->setData(0, -1);
     	line->setData(1, "line");
 }
 
@@ -58,7 +58,7 @@ void ProjectView::rect_tool(qreal x, qreal y){
 	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
 	r->setCursor(Qt::PointingHandCursor);
-	r->setData(0,0);
+	r->setData(0,-1);
 	r->setData(1, "rect");
 }
 
