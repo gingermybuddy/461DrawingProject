@@ -86,10 +86,12 @@ def saveFile():
     boardId = request.args.get('id')
     boardDBName = "board" + str(boardId) + ".db"
 
-    connection = sqlite3.connect(boardName)
+    connection = sqlite3.connect(boardDBName)
     cur = connection.cursor()
 
     sqlCommand = """STUFF"""
+
+    svgImageSaveFile = -1
 
     return svgImageSaveFile
 
