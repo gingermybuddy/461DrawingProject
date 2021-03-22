@@ -5,6 +5,7 @@
 #include <QRectF>
 #include <QString>
 #include <QGraphicsItem>
+#include <QPen>
 #include <iostream>
 
 ProjectScene::ProjectScene() 
@@ -55,29 +56,48 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 		}
 
 	}
+
+
         params.addQueryItem(tr("shape"), i->data(1).toString());
 	if(i->data(1).toString() == "circle") {
 
 		QGraphicsEllipseItem* c = (QGraphicsEllipseItem*)i;
+
+                QString color = c->pen().color().name();
+
     		params.addQueryItem(tr("radius"), QString::number(c->rect().x()/2));
   		params.addQueryItem(tr("x"), QString::number(c->rect().x()));
         	params.addQueryItem(tr("y"), QString::number(c->rect().y()));
+                params.addQueryItem(tr("color"),  color);
+
+
 
 	} else if (i->data(1).toString() == "line") {
 
 		QGraphicsLineItem* l = (QGraphicsLineItem*)i;
-		params.addQueryItem(tr("x1"), QString::number(l->line().x1()));
+
+                QString color = l->pen().color().name();
+
+                params.addQueryItem(tr("x1"), QString::number(l->line().x1()));
 		params.addQueryItem(tr("y2"), QString::number(l->line().y1()));
 		params.addQueryItem(tr("x2"), QString::number(l->line().x2()));
 		params.addQueryItem(tr("y2"), QString::number(l->line().x2()));
+                params.addQueryItem(tr("color"),  color);
+
+
 
 	} else if (i->data(1).toString() == "rect") {
 
 		QGraphicsRectItem* r = (QGraphicsRectItem*)i;
+
+                QString color = r->pen().color().name();
+
 		params.addQueryItem(tr("x"), QString::number(r->rect().x()));
 		params.addQueryItem(tr("y"), QString::number(r->rect().y()));
 		params.addQueryItem(tr("width"), QString::number(r->rect().width()));
 		params.addQueryItem(tr("height"), QString::number(r->rect().height()));
+                params.addQueryItem(tr("color"),  color);
+
 	}
     }
     	QUrl url(m_url);
@@ -91,7 +111,8 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 
 void ProjectScene::replyFinished(QNetworkReply* response)
 {
-
+	QByteArray reply = response->readAll();
+	//qDebug << "reply " << endl; 
 }
 
 void ProjectScene::fullUpdate()
