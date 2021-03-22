@@ -111,8 +111,10 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 
 void ProjectScene::replyFinished(QNetworkReply* response)
 {
+	//QJsonArray json_array = json.response.array();
+
 	QByteArray reply = response->readAll();
-	//qDebug << "reply " << endl; 
+        std::cout << "reply " << std::endl;
 }
 
 void ProjectScene::fullUpdate()
