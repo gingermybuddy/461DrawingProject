@@ -5,14 +5,23 @@
 
 from flask import Flask, jsonify
 from flask import request
+from flask_socketio import SocketIO
 import json
 
 app = Flask(__name__)
+socketio = SocketIO(app)
+
+@socketio.on('connect')
+def connectTest():
+    print('Connection Found')
+
+@socketio.on('message')
+def handleMessage(data):
+    print('received message: ' + data)
 
 def getJsonFile():
     jsonFile = request.get_json()
     data = json.loads(jsonFile)
-
 
 #Creates JSON-formatted circle data
 def addCircle(r,x,y):
@@ -51,4 +60,5 @@ def shapeType():
         return jsonify({'error' : 'Bad Shape Type'})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app)
+    #app.run(debug=True)
