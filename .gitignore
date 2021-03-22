@@ -9,6 +9,7 @@ moc_*
 *.log
 *.out
 *.synctex.gz
+Server/*.db
 *.toc
 _minted-documentation
 *.pyc
