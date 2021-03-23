@@ -8,8 +8,11 @@ from flask import request
 import json
 import sqlite3 # Library used for the databases
 import drawSvg as draw # Library used to generate an SVG image 
+import sys
 
 app = Flask(__name__)
+
+PORT = 5000
 
 def getJsonFile():
     jsonFile = request.get_json()
@@ -126,4 +129,6 @@ def createBoard():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    if len(sys.argv) >= 2:
+        PORT = sys.argv[1]
+    app.run(debug=True, port = PORT)
