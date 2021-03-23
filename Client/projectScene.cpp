@@ -16,6 +16,8 @@ ProjectScene::ProjectScene()
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(fullUpdate()));
 	m_timer->start(2000);
+
+	setSceneRect(0, 0, 800, 800);
 }
 ProjectScene::~ProjectScene() 
 {
