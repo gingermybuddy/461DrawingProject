@@ -16,20 +16,20 @@ Window::Window() : QMainWindow()
 	addToolBar(m_toolbar); // Adds it to the display
 	addToolBar(m_colorbar); // add the colorbar to the display
 
-	m_circle_button = new QAction(tr("Circle"));
-	m_line_button = new QAction(tr("Line"));
-    m_rect_button = new QAction(tr("Rectangle"));
-	m_default_button = new QAction(tr("Select"));
+	m_circle_button = new QAction(QIcon("./icons/tool_circle.png"), tr("Circle"));
+	m_line_button = new QAction(QIcon("./icons/tool_line.png"), tr("Line"));
+    m_rect_button = new QAction(QIcon("./icons/tool_rect.png"), tr("Rectangle"));
+	m_default_button = new QAction(QIcon("./icons/tool_select.png"), tr("Select"));
 	//This sets up an action that you can place on the toolbar.
 	//The tr() function translates a regular C++ string into Qt's internal string (QString).
 
     // add color buttons
-	m_color_black = new QAction(tr("Black"));
-	m_color_red = new QAction(tr("Red"));
-	m_color_green = new QAction(tr("Green"));
-	m_color_yellow = new QAction(tr("Yellow"));
-	m_color_blue = new QAction(tr("Blue"));
-	m_color_picker = new QAction(tr("Custom"));
+	m_color_black = new QAction(QIcon("./icons/black.png"), tr("Black"));
+	m_color_red = new QAction(QIcon("./icons/red.png"), tr("Red"));
+	m_color_green = new QAction(QIcon("./icons/green.png"), tr("Green"));
+	m_color_yellow = new QAction(QIcon("./icons/yellow.png"), tr("Yellow"));
+	m_color_blue = new QAction(QIcon("./icons/blue.png"), tr("Blue"));
+	m_color_picker = new QAction(QIcon("./icons/colorPicker.png"), tr("Color Picker"));
 
 	m_toolbar->addSeparator();
 	m_toolbar->setMovable(false);
