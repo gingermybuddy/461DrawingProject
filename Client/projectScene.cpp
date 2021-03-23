@@ -15,7 +15,7 @@ ProjectScene::ProjectScene()
 	connect(m_manager, SIGNAL(finished(QNetworkReply*)),this, SLOT(replyFinished(QNetworkReply*)));
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(fullUpdate()));
-	m_timer->start(2000);
+	m_timer->start(200000);
 
 	setSceneRect(0, 0, 800, 800);
 }
@@ -100,7 +100,7 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
     }
 
     QUrl url(m_url);
-	url.setPath(tr("/fullUpdate"));
+	url.setPath(tr("/"));
 	url.setQuery(params.query());
 	QNetworkRequest request(url);
 	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
@@ -115,6 +115,7 @@ void ProjectScene::replyFinished(QNetworkReply* response)
 
 	QByteArray reply = response->readAll();
         std::cout << "reply " << std::endl;
+	std::cout << "Data: " << reply.toStdString() << std::endl;
 }
 
 void ProjectScene::fullUpdate()
