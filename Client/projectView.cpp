@@ -5,7 +5,9 @@
 #include <iostream>
 
 ProjectView::ProjectView() : QGraphicsView(), m_tool{0}
-{}
+{
+	setSceneRect(0,0,800,800);
+}
 
 ProjectView::~ProjectView()
 {
