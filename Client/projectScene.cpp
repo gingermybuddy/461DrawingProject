@@ -7,6 +7,7 @@
 #include <QGraphicsItem>
 #include <QPen>
 #include <iostream>
+#include <QHostAddress>
 
 ProjectScene::ProjectScene() 
 {
@@ -18,11 +19,31 @@ ProjectScene::ProjectScene()
 	m_timer->start(200000);
 
 	setSceneRect(0, 0, 800, 800);
+
+        m_socket = new QTcpSocket(this);
+	connect(m_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
+	connect(m_socket, SIGNAL(disconnected()), this, SLOT(disconnect()));
+
+        m_socket->connectToHost(QHostAddress::LocalHost, 5000);
+        if(m_socket->waitForConnected()){
+                std::cout << "Connected." << std::endl;
+        }
+
+
 }
 ProjectScene::~ProjectScene() 
 {
        delete m_manager;	
-} 
+}
+
+void ProjectScene::readSocket()
+{
+}
+
+void ProjectScene::disconnect()
+{
+}
+
 
 //sends the data about the object that was on the scene to the server. 
 void ProjectScene::sceneChanged(const QList<QRectF> &region) 
@@ -66,7 +87,7 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
             QGraphicsEllipseItem* c = (QGraphicsEllipseItem*)i;
 
             QString color = c->pen().color().name();
-
+	    
             params.addQueryItem(tr("radius"), QString::number(c->rect().x()/2));
             params.addQueryItem(tr("x"), QString::number(c->rect().x()));
             params.addQueryItem(tr("y"), QString::number(c->rect().y()));
@@ -97,6 +118,12 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
             params.addQueryItem(tr("color"),  color);
 
         }
+	QString str = tr("Data would go here, if we HAD any!");
+	QByteArray data = str.toUtf8();
+
+	QDataStream socketstream(m_socket);
+	socketstream << data;
+
     }
 
     QUrl url(m_url);

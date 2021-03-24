@@ -9,6 +9,7 @@
 #include <QGraphicsItem>
 #include <QNetworkReply>
 #include <QTimer>
+#include <QTcpSocket>
 
 #ifndef __PROJECTSCENE_H
 #define __PROJECTSCENE_H
@@ -30,11 +31,15 @@ class ProjectScene : public QGraphicsScene
 		QNetworkAccessManager* m_manager;
 		QUrl m_url; 
 		QTimer* m_timer;
+		QTcpSocket* m_socket;
 		std::vector<itemStats> m_tracked_items;
 	public slots:
 		void sceneChanged(const QList<QRectF> &region);
 		void replyFinished(QNetworkReply* response);
 		void fullUpdate();
+
+		void readSocket();
+		void disconnect();
 	signals:	
 	public:
 		ProjectScene();

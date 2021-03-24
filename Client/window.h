@@ -5,6 +5,8 @@
 #include "projectView.h"
 #include "projectScene.h"
 #include "toolBar.h"
+#include <QTcpSocket>
+
 #ifndef __WINDOW_H
 #define __WINDOW_H
 
