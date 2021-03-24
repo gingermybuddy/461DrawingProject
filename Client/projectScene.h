@@ -28,9 +28,6 @@ class ProjectScene : public QGraphicsScene
 {
 	Q_OBJECT
 	private:
-		QNetworkAccessManager* m_manager;
-		QUrl m_url; 
-		QTimer* m_timer;
 		QTcpSocket* m_socket;
 		std::vector<itemStats> m_tracked_items;
 	public slots:
