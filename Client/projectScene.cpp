@@ -8,6 +8,9 @@
 #include <QPen>
 #include <iostream>
 #include <cmath>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonValue>
 
 ProjectScene::ProjectScene() 
 {
@@ -18,7 +21,7 @@ ProjectScene::ProjectScene()
     QUrl url(m_url);
     url.setPath(tr("/createBoard"));
     QUrlQuery params;
-    params.addQueryItem(tr("bid"), tr("461Board"));
+    params.addQueryItem(tr("bid"), tr("None"));
     url.setQuery(params);
     QNetworkRequest request(url);
     m_manager->get(request);
@@ -67,7 +70,7 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 {
 
 	QUrlQuery params;
-    params.addQueryItem(tr("bid"), tr("461Board"));
+    params.addQueryItem(tr("bid"), tr("None"));
     // get a list of the items we need to update?
     QList<QGraphicsItem*> changed_items;
     for (QRectF r : region) {
@@ -119,7 +122,7 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
             params.addQueryItem(tr("x1"), QString::number(l->line().x1()));
             params.addQueryItem(tr("y2"), QString::number(l->line().y1()));
             params.addQueryItem(tr("x2"), QString::number(l->line().x2()));
-            params.addQueryItem(tr("y2"), QString::number(l->line().x2()));
+            params.addQueryItem(tr("y2"), QString::number(l->line().y2()));
             params.addQueryItem(tr("color"),  color);
 
         } else if (i->data(1).toString() == "rect") {
@@ -153,7 +156,18 @@ void ProjectScene::replyFinished(QNetworkReply* response)
 
 	QByteArray reply = response->readAll();
     std::cout << "reply received" << std::endl;
-	std::cout << "Data: " << reply.toStdString() << std::endl;
+	//std::cout << "Data: " << reply.toStdString() << std::endl;
+	QString data(reply);
+	QJsonObject obj;
+	QJsonDocument doc = QJsonDocument::fromJson(data.toUtf8());
+	obj = doc.object();
+
+	for(QString key : obj.keys()) {
+		if(key == "data" || key == "shape") return;
+		std::cout << "Key: " << key.toStdString() << "Val: " << obj.value(key).toString().toStdString() << std::endl;
+	}
+
+
 }
 
 void ProjectScene::fullUpdate()
@@ -163,7 +177,7 @@ void ProjectScene::fullUpdate()
 	url.setPath(tr("/fullUpdate"));
 	QNetworkRequest request(url);
     QUrlQuery params;
-    params.addQueryItem(tr("bid"), tr("461Board"));
+    params.addQueryItem(tr("bid"), tr("None"));
 	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     m_manager->get(request);
 
