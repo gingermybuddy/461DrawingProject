@@ -5,12 +5,17 @@
 #include <QRectF>
 #include <QString>
 #include <QGraphicsItem>
+#include <QGraphicsRectItem>
+#include <QGraphicsLineItem>
+#include <QGraphicsEllipseItem>
 #include <QPen>
 #include <iostream>
 #include <cmath>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonValue>
+#include <QGraphicsView>
+#include <QMouseEvent>
 
 ProjectScene::ProjectScene() 
 {
@@ -30,19 +35,7 @@ ProjectScene::ProjectScene()
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(fullUpdate()));
     m_timer->start(2000);
 
-    //EXPERIMENTAL SOCKETY THINGS
-    m_socket = new QTcpSocket(this);
-    connect(m_socket, SIGNAL(connected()), this, SLOT(socketConnected()));
-    connect(m_socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
-    connect(m_socket, SIGNAL(bytesWritten()), this, SLOT(bytesWritten(qint64)));
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(socketReady()));
-
-    std::cout << "Attempting to connect the socket." << std::endl;
-    m_socket->connectToHost("127.0.0.1", 5000);
-    if(!m_socket->waitForConnected(5000)) {
-        std::cout << "Error: " << m_socket->errorString().toStdString() << std::endl;
-    }
-	m_timer->start(200000);
+	m_timer->start(2000);
 
 	setSceneRect(0, 0, 800, 800);
 }
@@ -78,24 +71,6 @@ int ProjectScene::trackItem(QGraphicsItem* item)
     return tracker.id;
 }
 
-void ProjectScene::socketConnected()
-{
-    std::cout << "Ladies and gentlemen... we got 'em." << std::endl;
-}
-
-void ProjectScene::socketDisconnected()
-{
-
-}
-
-void ProjectScene::bytesWritten(qint64 bytes)
-{
-
-}
-
-void ProjectScene::socketReady()
-{
-}
 //sends the data about the object that was on the scene to the server. 
 void ProjectScene::sceneChanged(const QList<QRectF> &region) 
 {
@@ -193,9 +168,65 @@ void ProjectScene::replyFinished(QNetworkReply* response)
 	QJsonDocument doc = QJsonDocument::fromJson(data.toUtf8());
 	obj = doc.object();
 
+	std::vector<QJsonObject> newitems;
+
 	for(QString key : obj.keys()) {
-		if(key == "data" || key == "shape") return;
-		std::cout << "Key: " << key.toStdString() << "Val: " << obj.value(key).toString().toStdString() << std::endl;
+		if(key == "error" || key == "data" || key == "shape") return;
+		std::cout << "Key: " << key.toStdString() << " Val: " << obj.value(key).toString().toStdString() << std::endl;
+		newitems.push_back(obj.value(key).toObject());
+	}
+
+	for(QGraphicsItem* i : items()) {
+		delete i;
+	}
+
+	for(QJsonObject j : newitems) {
+		QJsonValue v = j.value("shapeType");
+		QString type = v.toString();
+		QColor color(j.value("color").toString());
+		QPen pen(color);
+		pen.setWidth(2);
+
+		if (type == "rect") {
+			double x = j.value("x").toString().toDouble();
+			double y = j.value("y").toString().toDouble();
+			double height = j.value("h").toString().toDouble();
+			double width = j.value("w").toString().toDouble();
+			QRectF rect(x,y,width,height);
+			QGraphicsRectItem* r = addRect(rect,pen,QBrush(Qt::transparent));
+			r->setFlag(QGraphicsItem::ItemIsSelectable,true);
+			r->setFlag(QGraphicsItem::ItemIsMovable,true);
+			r->setCursor(Qt::PointingHandCursor);
+			r->setData(0, QVariant(j.value("shapeId").toString()));
+			r->setData(1, "rect");
+		} else if (type == "circle") {
+
+			double x = j.value("x").toString().toDouble();
+			double y = j.value("y").toString().toDouble();
+			double rad = j.value("r").toString().toDouble();
+			double height = rad*2;
+			double width = rad*2;
+			QRectF rect(x,y,width,height);
+			QGraphicsEllipseItem* r = addEllipse(rect,pen,QBrush(Qt::transparent));
+			r->setFlag(QGraphicsItem::ItemIsSelectable,true);
+			r->setFlag(QGraphicsItem::ItemIsMovable,true);
+			r->setCursor(Qt::PointingHandCursor);
+			r->setData(0, QVariant(j.value("shapeId").toString()));
+			r->setData(1, "circle");
+		} else if(type == "line") {
+			double x = j.value("x1").toString().toDouble();
+			double y = j.value("y1").toString().toDouble();
+			double x2 = j.value("x2").toString().toDouble();
+			double y2 = j.value("y2").toString().toDouble();
+			QLineF line(x,y,x2,y2);
+			QGraphicsLineItem* l = addLine(line,pen);
+			l->setFlag(QGraphicsItem::ItemIsSelectable,true);
+			l->setFlag(QGraphicsItem::ItemIsMovable,true);
+			l->setCursor(Qt::PointingHandCursor);
+			l->setData(0, QVariant(j.value("shapeId").toString()));
+			l->setData(1, "line");
+		}
+
 	}
 
 

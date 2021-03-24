@@ -32,17 +32,11 @@ class ProjectScene : public QGraphicsScene
 		QUrl m_url; 
 		QTimer* m_timer;
 		std::vector<itemStats> m_tracked_items;
-        QTcpSocket* m_socket;
 
 	public slots:
 		void sceneChanged(const QList<QRectF> &region);
 		void replyFinished(QNetworkReply* response);
 		void fullUpdate();
-        //SOCKET STUFF
-        void socketConnected();
-        void socketDisconnected();
-        void bytesWritten(qint64 bytes);
-        void socketReady();
 	signals:	
 	public:
         int trackItem(QGraphicsItem* item);

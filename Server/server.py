@@ -164,6 +164,7 @@ def fullUpdate():
     cur.execute("SELECT * FROM Circle")
     for row in cur:
         #for each row, grab the values then place in strings
+        shapeType = "shapeType : circle"
         boardId = "boardId : " + str(row[0])
         shapeId = "shapeId : " + str(row[1])
         r = "r : " + str(row[2])
@@ -171,12 +172,13 @@ def fullUpdate():
         y = "y : " + str(row[4])
         color = "color : " + str(row[5])
         #create json string
-        temp = "{" + boardId + ", " + shapeId + ", " + r + ", " + x + ", " + y + "," + color + "}"
+        temp = "{" + shapeType + ", " + boardId + ", " + shapeId + ", " + r + ", " + x + ", " + y + "," + color + "}"
         #use shape id as key in the shapes dictionary
         shapes[str(row[1])] = temp
 
     cur.execute("SELECT * FROM Rect")
     for row in cur:
+        shapeType = "shapeType : rect"
         boardId = "boardId : " + str(row[0])
         shapeId = "shapeId : " + str(row[1])
         x = "x : " + str(row[2])
@@ -184,11 +186,12 @@ def fullUpdate():
         w = "w : " + str(row[4])
         h = "h : " + str(row[5])
         color = "color : " + str(row[6])
-        temp = "{" + boardId + ", " + shapeId + ", " + x + ", " + y + ", " + w + ", " +  h + "," + color + "}"
+        temp = "{" + shapeType + ", " + boardId + ", " + shapeId + ", " + x + ", " + y + ", " + w + ", " +  h + "," + color + "}"
         shapes[str(row[1])] = temp
   
     cur.execute("SELECT * FROM Line")
     for row in cur:
+        shapeType = "shapeType : line"
         boardId = "boardId : " + str(row[0])
         shapeId = "shapeId : " + str(row[1])
         x1 = "x1 : " + str(row[2])
@@ -196,7 +199,7 @@ def fullUpdate():
         x2 = "x2 : " + str(row[4])
         y2 = "y2 : " + str(row[5])
         color = "color : " + str(row[6])
-        temp = "{" + boardId + ", " + shapeId + ", " + x1 + ", " + y1 + ", " + x2 + ", " + y2 + "," + color + "}"
+        temp = "{" + shapeType + ", " + boardId + ", " + shapeId + ", " + x1 + ", " + y1 + ", " + x2 + ", " + y2 + "," + color + "}"
         shapes[str(row[1])] = temp
 
     cur.close()
