@@ -9,6 +9,9 @@ import json
 import sqlite3 # Library used for the databases
 import drawSvg as draw # Library used to generate an SVG image 
 import sys
+import os.path
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__)
 
@@ -107,7 +110,8 @@ def fullUpdate():
     shapes = {}
     boardId = request.args.get('bid')
     boardDBName = "board" + str(boardId) + ".db"
-    connection = sqlite3.connect(boardDBName)
+    db_path = os.path.join(BASE_DIR, boardDBName)
+    connection = sqlite3.connect(db_path)
     cur = connection.cursor()
 
     #dump shape tables
@@ -179,7 +183,7 @@ def createBoard():
 
     cur.close()
     connection.close()
-    
+    return "Board created."
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:

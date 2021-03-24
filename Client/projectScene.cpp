@@ -7,6 +7,7 @@
 #include <QGraphicsItem>
 #include <QPen>
 #include <iostream>
+#include <cmath>
 
 ProjectScene::ProjectScene() 
 {
@@ -18,6 +19,9 @@ ProjectScene::ProjectScene()
     url.setPath(tr("/createBoard"));
     QUrlQuery params;
     params.addQueryItem(tr("bid"), tr("461Board"));
+    url.setQuery(params);
+    QNetworkRequest request(url);
+    m_manager->get(request);
 
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(fullUpdate()));
@@ -54,6 +58,7 @@ int ProjectScene::trackItem(QGraphicsItem* item)
         tracker.rgb = l->pen().color();
     }
     m_tracked_items.push_back(tracker);
+    std:: cout << "Tracking item " << tracker.id << std::endl;
     return tracker.id;
 }
 
@@ -72,9 +77,9 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
     for (QGraphicsItem* i : changed_items) {
 
         if(i->data(0) == -1) {
-            params.addQueryItem(tr("id"), QString::number(trackItem(i))); //Checks if it has an ID sig
+            params.addQueryItem(tr("sid"), QString::number(trackItem(i))); //Checks if it has an ID sig
         } else {
-            params.addQueryItem(tr("id"), QString::number(i->data(0).toInt()));
+            params.addQueryItem(tr("sid"), QString::number(i->data(0).toInt()));
 
             QRectF chk = i->sceneBoundingRect();
             itemStats checker;
@@ -100,7 +105,7 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 
             QString color = c->pen().color().name();
 
-            params.addQueryItem(tr("radius"), QString::number(c->rect().width()/2));
+            params.addQueryItem(tr("radius"), QString::number(std::abs(c->rect().width()/2)));
             params.addQueryItem(tr("x"), QString::number(c->rect().x()));
             params.addQueryItem(tr("y"), QString::number(c->rect().y()));
             params.addQueryItem(tr("color"),  color);
