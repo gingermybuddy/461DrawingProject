@@ -85,13 +85,13 @@ def shapeType():
         color = request.args.get('color')
         boardId = request.args.get('bid')
         ctr = 0
-        cur.execute("SELECT DISTINCT radius,x,y FROM Circle")
+        cur.execute("SELECT DISTINCT radius,x,y,color FROM Circle")
         for row in cur:
             ctr = ctr + 1
-        cur.execute("SELECT DISTINCT x1,y1,x2,y2 FROM Line")
+        cur.execute("SELECT DISTINCT x1,y1,x2,y2,color FROM Line")
         for row in cur:
             ctr = ctr + 1
-        cur.execute("SELECT DISTINCT x,y,width,height FROM Rect")
+        cur.execute("SELECT DISTINCT x,y,width,height,color FROM Rect")
         for row in cur:
             ctr = ctr + 1
         shapeId = ctr
@@ -108,13 +108,13 @@ def shapeType():
         color = request.args.get('color')
         boardId = request.args.get('bid')
         ctr = 0
-        cur.execute("SELECT DISTINCT radius,x,y FROM Circle")
+        cur.execute("SELECT DISTINCT radius,x,y,color FROM Circle")
         for row in cur:
             ctr = ctr + 1
-        cur.execute("SELECT DISTINCT x1,y1,x2,y2 FROM Line")
+        cur.execute("SELECT DISTINCT x1,y1,x2,y2,color FROM Line")
         for row in cur:
             ctr = ctr + 1
-        cur.execute("SELECT DISTINCT x,y,width,height FROM Rect")
+        cur.execute("SELECT DISTINCT x,y,width,height,color FROM Rect")
         for row in cur:
             ctr = ctr + 1
         shapeId = ctr
