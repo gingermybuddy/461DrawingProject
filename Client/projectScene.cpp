@@ -173,7 +173,17 @@ void ProjectScene::replyFinished(QNetworkReply* response)
 	for(QString key : obj.keys()) {
 		if(key == "error" || key == "data" || key == "shape") return;
 		std::cout << "Key: " << key.toStdString() << " Val: " << obj.value(key).toString().toStdString() << std::endl;
-		newitems.push_back(obj.value(key).toObject());
+		QString keydat = obj.value(key).toString();
+		std::cout << keydat.toStdString() << std::endl;
+		QJsonParseError* err = new QJsonParseError;
+		QJsonDocument d = QJsonDocument::fromJson(keydat.toUtf8(), err);
+		if (d.isNull()) {
+			std::cout << "Empty. " << std::endl;
+			std::cout << err->errorString().toStdString() << std::endl;
+		}
+		QJsonObject newob;
+		newob = d.object();
+		newitems.push_back(newob);
 	}
 
 	for(QGraphicsItem* i : items()) {
@@ -192,6 +202,7 @@ void ProjectScene::replyFinished(QNetworkReply* response)
 			double y = j.value("y").toString().toDouble();
 			double height = j.value("h").toString().toDouble();
 			double width = j.value("w").toString().toDouble();
+			std::cout << x << " " << y << " " << height << " " << width << std::endl;
 			QRectF rect(x,y,width,height);
 			QGraphicsRectItem* r = addRect(rect,pen,QBrush(Qt::transparent));
 			r->setFlag(QGraphicsItem::ItemIsSelectable,true);
@@ -228,6 +239,7 @@ void ProjectScene::replyFinished(QNetworkReply* response)
 		}
 
 	}
+
 
 
 }
