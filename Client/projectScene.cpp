@@ -13,9 +13,16 @@ ProjectScene::ProjectScene()
 	m_manager = new QNetworkAccessManager(this);
 	m_url = QUrl("http://127.0.0.1:5000/");
 	connect(m_manager, SIGNAL(finished(QNetworkReply*)),this, SLOT(replyFinished(QNetworkReply*)));
+
+    QUrl url(m_url);
+    url.setPath(tr("/createBoard"));
+    QUrlQuery params;
+    params.addQueryItem(tr("bid"), tr("461Board"));
+
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(fullUpdate()));
-	m_timer->start(200000);
+    m_timer->start(2000);
+
 
 	setSceneRect(0, 0, 800, 800);
 }
@@ -24,12 +31,38 @@ ProjectScene::~ProjectScene()
        delete m_manager;	
 } 
 
+int ProjectScene::trackItem(QGraphicsItem* item)
+{
+    QString type = item->data(1).toString();
+    itemStats tracker;
+    tracker.id = m_tracked_items.size();
+    item->data(0) = tracker.id;
+    tracker.type = type.toStdString();
+    if(type != "line") {
+        QGraphicsRectItem* c = (QGraphicsRectItem*)item;
+        tracker.x = c->rect().x();
+        tracker.y = c->rect().y();
+        tracker.height = c->rect().height();
+        tracker.width = c->rect().width();
+        tracker.rgb = c->pen().color();
+    } else {
+        QGraphicsLineItem* l = (QGraphicsLineItem*)item;
+        tracker.x = l->sceneBoundingRect().x();
+        tracker.y = l->sceneBoundingRect().y();
+        tracker.height = l->sceneBoundingRect().height();
+        tracker.width = l->sceneBoundingRect().width();
+        tracker.rgb = l->pen().color();
+    }
+    m_tracked_items.push_back(tracker);
+    return tracker.id;
+}
+
 //sends the data about the object that was on the scene to the server. 
 void ProjectScene::sceneChanged(const QList<QRectF> &region) 
 {
 
 	QUrlQuery params;
-
+    params.addQueryItem(tr("bid"), tr("461Board"));
     // get a list of the items we need to update?
     QList<QGraphicsItem*> changed_items;
     for (QRectF r : region) {
@@ -39,7 +72,7 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
     for (QGraphicsItem* i : changed_items) {
 
         if(i->data(0) == -1) {
-            params.addQueryItem(tr("id"), tr("none")); //Checks if it has an ID sig
+            params.addQueryItem(tr("id"), QString::number(trackItem(i))); //Checks if it has an ID sig
         } else {
             params.addQueryItem(tr("id"), QString::number(i->data(0).toInt()));
 
@@ -67,7 +100,7 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 
             QString color = c->pen().color().name();
 
-            params.addQueryItem(tr("radius"), QString::number(c->rect().x()/2));
+            params.addQueryItem(tr("radius"), QString::number(c->rect().width()/2));
             params.addQueryItem(tr("x"), QString::number(c->rect().x()));
             params.addQueryItem(tr("y"), QString::number(c->rect().y()));
             params.addQueryItem(tr("color"),  color);
@@ -100,7 +133,7 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
     }
 
     QUrl url(m_url);
-	url.setPath(tr("/"));
+    url.setPath(tr("/addShape"));
 	url.setQuery(params.query());
 	QNetworkRequest request(url);
 	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
@@ -114,7 +147,7 @@ void ProjectScene::replyFinished(QNetworkReply* response)
 	//QJsonArray json_array = json.response.array();
 
 	QByteArray reply = response->readAll();
-        std::cout << "reply " << std::endl;
+    std::cout << "reply received" << std::endl;
 	std::cout << "Data: " << reply.toStdString() << std::endl;
 }
 
@@ -124,7 +157,9 @@ void ProjectScene::fullUpdate()
 	QUrl url(m_url);
 	url.setPath(tr("/fullUpdate"));
 	QNetworkRequest request(url);
+    QUrlQuery params;
+    params.addQueryItem(tr("bid"), tr("461Board"));
 	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-	QNetworkReply* data = m_manager->get(request);
+    m_manager->get(request);
 
 }

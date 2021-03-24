@@ -37,6 +37,7 @@ class ProjectScene : public QGraphicsScene
 		void fullUpdate();
 	signals:	
 	public:
+        int trackItem(QGraphicsItem* item);
 		ProjectScene();
 		~ProjectScene();
 };
