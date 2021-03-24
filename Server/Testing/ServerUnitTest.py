@@ -1,11 +1,15 @@
-import unittest 
+import unittest
 #import server
 import subprocess
 
-wget = "curl http://127.0.0.1:5000/addShape?shape=line&bid=test&sid=1&x1=10&y1=10&x2=20&y2=20&color=00000F"
-
+#check wget output
+wget = "wget http://127.0.0.1:5000/addShape?shape=line&bid=test&sid=1&x1=10&y1=10&x2=20&y2=20&color=00000F"
 result = subprocess.check_output(wget, shell=True)
+print(result)
 
+#check curl output
+curl = "curl http://127.0.0.1:5000/addShape?shape=line&bid=test&sid=1&x1=10&y1=10&x2=20&y2=20&color=00000F"
+result = subprocess.check_output(curl, shell=True)
 print(result)
 
 #class TestSum(unittest.TestCase):
@@ -20,4 +24,3 @@ print(result)
 
 #if __name__ == '__main__':
  #   unittest.main()
-
