@@ -23,6 +23,19 @@ ProjectScene::ProjectScene()
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(fullUpdate()));
     m_timer->start(2000);
 
+    //EXPERIMENTAL SOCKETY THINGS
+    m_socket = new QTcpSocket(this);
+    connect(m_socket, SIGNAL(connected()), this, SLOT(socketConnected()));
+    connect(m_socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
+    connect(m_socket, SIGNAL(bytesWritten()), this, SLOT(bytesWritten(qint64)));
+    connect(m_socket, SIGNAL(readyRead()), this, SLOT(socketReady()));
+
+    std::cout << "Attempting to connect the socket." << std::endl;
+    m_socket->connectToHost("127.0.0.1", 5000);
+    if(!m_socket->waitForConnected(5000)) {
+        std::cout << "Error: " << m_socket->errorString().toStdString() << std::endl;
+    }
+	m_timer->start(200000);
 
 	setSceneRect(0, 0, 800, 800);
 }
@@ -57,6 +70,24 @@ int ProjectScene::trackItem(QGraphicsItem* item)
     return tracker.id;
 }
 
+void ProjectScene::socketConnected()
+{
+    std::cout << "Ladies and gentlemen... we got 'em." << std::endl;
+}
+
+void ProjectScene::socketDisconnected()
+{
+
+}
+
+void ProjectScene::bytesWritten(qint64 bytes)
+{
+
+}
+
+void ProjectScene::socketReady()
+{
+}
 //sends the data about the object that was on the scene to the server. 
 void ProjectScene::sceneChanged(const QList<QRectF> &region) 
 {
