@@ -6,6 +6,10 @@
 #include <QString>
 #include <QGraphicsItem>
 #include <QPen>
+#include <QByteArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <iostream>
 
 ProjectScene::ProjectScene() 
@@ -111,11 +115,19 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 
 void ProjectScene::replyFinished(QNetworkReply* response)
 {
-	//QJsonArray json_array = json.response.array();
-
+//reads the contents of the reply
 	QByteArray reply = response->readAll();
-        std::cout << "reply " << std::endl;
-	std::cout << "Data: " << reply.toStdString() << std::endl;
+       	// std::cout << "reply " << std::endl;
+       	// std::cout << "Data: " << reply.toStdString() << std::endl;
+
+//converts the response into a json object
+        QJsonDocument doc = QJsonDocument::fromJson(reply);
+        QJsonObject obj = doc.object();
+
+        QByteArray ba = doc.toJson();
+        std::cout << "reply" << std::endl;
+        std::cout << "Data" << ba.toStdString() << std::endl;
+
 }
 
 void ProjectScene::fullUpdate()
