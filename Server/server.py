@@ -58,8 +58,19 @@ def shapeType():
         y = request.args.get('y')
         color = request.args.get('color')
         boardId = request.args.get('bid')
+        ctr = 0
+        cur.execute("SELECT DISTINCT radius,x,y,color FROM Circle")
+        for row in cur:
+            ctr = ctr + 1
+        cur.execute("SELECT DISTINCT x1,y1,x2,y2,color FROM Line")
+        for row in cur:
+            ctr = ctr + 1
+        cur.execute("SELECT DISTINCT x,y,width,height,color FROM Rect")
+        for row in cur:
+            ctr = ctr + 1
+        shapeId = ctr
+        print(shapeId)
         #shapeId = request.args.get('sid')
-        shapeId = cur.execute("SELECT * FROM Circle") + cur.execute("SELECT * FROM Line") + cur.execute("SELECT * FROM Rect")
         cur.execute("INSERT INTO Circle VALUES(?,?,?,?,?,?);", (boardId, shapeId, r, x, y, color)) # adds the shape into the database 
         connection.commit()
         return addCircle(boardId,shapeId,r,x,y,color)
@@ -70,8 +81,19 @@ def shapeType():
         y2 = request.args.get('y2')
         color = request.args.get('color')
         boardId = request.args.get('bid')
+        ctr = 0
+        cur.execute("SELECT DISTINCT radius,x,y FROM Circle")
+        for row in cur:
+            ctr = ctr + 1
+        cur.execute("SELECT DISTINCT x1,y1,x2,y2 FROM Line")
+        for row in cur:
+            ctr = ctr + 1
+        cur.execute("SELECT DISTINCT x,y,width,height FROM Rect")
+        for row in cur:
+            ctr = ctr + 1
+        shapeId = ctr
+        print(shapeId)
         #shapeId = request.args.get('sid')
-        shapeId = cur.execute("SELECT * FROM Circle") + cur.execute("SELECT * FROM Line") + cur.execute("SELECT * FROM Rect")
         cur.execute("INSERT INTO Line VALUES(?,?,?,?,?,?,?)", (boardId, shapeId, x1, x2, y1, y2, color)) # adds the shape into the database 
         connection.commit()
         return addLine(boardId,shapeId,x1,y1,x2,y2,color)
@@ -82,8 +104,19 @@ def shapeType():
         h = request.args.get('height')
         color = request.args.get('color')
         boardId = request.args.get('bid')
+        ctr = 0
+        cur.execute("SELECT DISTINCT radius,x,y FROM Circle")
+        for row in cur:
+            ctr = ctr + 1
+        cur.execute("SELECT DISTINCT x1,y1,x2,y2 FROM Line")
+        for row in cur:
+            ctr = ctr + 1
+        cur.execute("SELECT DISTINCT x,y,width,height FROM Rect")
+        for row in cur:
+            ctr = ctr + 1
+        shapeId = ctr
+        print(shapeId)
         #shapeId = request.args.get('sid')
-        shapeId = cur.execute("SELECT * FROM Circle") + cur.execute("SELECT * FROM Line") + cur.execute("SELECT * FROM Rect")
         cur.execute("INSERT INTO Rect VALUES(?,?,?,?,?,?,?)", (boardId, shapeId, x, y, w, h, color)) # adds the shape into the database 
         connection.commit()
         return addRect(boardId,shapeId,x,y,w,h,color)
