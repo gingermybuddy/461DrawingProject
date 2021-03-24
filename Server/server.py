@@ -56,17 +56,14 @@ def shapeType():
         r = request.args.get('radius')
         x = request.args.get('x')
         y = request.args.get('y')
-<<<<<<< Updated upstream
         boardId = request.args.get('id')
         userId = request.args.get('uid')
         cur.execute("INSERT INTO Circle VALUES(?,?,?,?,?);", (boardId, userId, r, x, y)) # adds the shape into the database 
-=======
         color = request.args.get('color')
         boardId = request.args.get('bid')
         #shapeId = request.args.get('sid')
         shapeId = cur.execute("SELECT * FROM Circle") + cur.execute("SELECT * FROM Line") + cur.execute("SELECT * FROM Rect")
         cur.execute("INSERT INTO Circle VALUES(?,?,?,?,?,?);", (boardId, shapeId, r, x, y, color)) # adds the shape into the database 
->>>>>>> Stashed changes
         connection.commit()
         return addCircle(r,x,y)
     elif shape == 'line':
@@ -74,17 +71,14 @@ def shapeType():
         y1 = request.args.get('y1')
         x2 = request.args.get('x2')
         y2 = request.args.get('y2')
-<<<<<<< Updated upstream
         boardId = request.args.get('id')
         userId = request.args.get('uid')
         cur.execute("INSERT INTO Line VALUES(?,?,?,?,?,?)", (boardId, userId, x1, x2, y1, y2)) # adds the shape into the database 
-=======
         color = request.args.get('color')
         boardId = request.args.get('bid')
         #shapeId = request.args.get('sid')
         shapeId = cur.execute("SELECT * FROM Circle") + cur.execute("SELECT * FROM Line") + cur.execute("SELECT * FROM Rect")
         cur.execute("INSERT INTO Line VALUES(?,?,?,?,?,?,?)", (boardId, shapeId, x1, x2, y1, y2, color)) # adds the shape into the database 
->>>>>>> Stashed changes
         connection.commit()
         return addLine(x1,y1,x2,y2)
     elif shape == 'rect':
@@ -92,17 +86,14 @@ def shapeType():
         y = request.args.get('y')
         w = request.args.get('width')
         h = request.args.get('height')
-<<<<<<< Updated upstream
         boardId = request.args.get('id')
         userId = request.args.get('uid')
         cur.execute("INSERT INTO Circle VALUES(?,?,?,?,?,?)", (boardId, userId, x, y, w, h)) # adds the shape into the database 
-=======
         color = request.args.get('color')
         boardId = request.args.get('bid')
         #shapeId = request.args.get('sid')
         shapeId = cur.execute("SELECT * FROM Circle") + cur.execute("SELECT * FROM Line") + cur.execute("SELECT * FROM Rect")
         cur.execute("INSERT INTO Rect VALUES(?,?,?,?,?,?,?)", (boardId, shapeId, x, y, w, h, color)) # adds the shape into the database 
->>>>>>> Stashed changes
         connection.commit()
         return addRect(x,y,w,h)
     else:
