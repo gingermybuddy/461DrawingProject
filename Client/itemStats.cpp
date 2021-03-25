@@ -77,6 +77,9 @@ QJsonObject itemStats::toJson()
 	returnval.insert("data", QJsonValue(data));
 	returnval.insert("shape", QJsonValue(QString::fromStdString(type)));
 
+	//For the 'end' parameter, it uses the width and height as x and y coordinates.
+	//If the thing's a line, the end is just what it says on the tin - the ending coordinates of the line.
+	//
 	return returnval;
 }
 
