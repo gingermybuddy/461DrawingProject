@@ -1,0 +1,16 @@
+{
+  "data": {
+    "bid": "<board ID>", 
+    "color": "<a color in HEX>", 
+    "end": {
+      "x": "<x2; end x>", 
+      "y": "<y2; end y>"
+    }, 
+    "sid": <shape ID>, 
+    "start": {
+      "x": "<x1; start x>", 
+      "y": "<y1; start y>"
+    }
+  }, 
+  "shape": "line"
+}
