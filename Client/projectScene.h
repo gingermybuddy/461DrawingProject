@@ -10,10 +10,8 @@
 #include <QNetworkReply>
 #include <QTimer>
 #include <QTcpSocket>
-<<<<<<< HEAD
+#include <string>
 #include "itemStats.h"
-=======
->>>>>>> main
 
 #ifndef __PROJECTSCENE_H
 #define __PROJECTSCENE_H
@@ -24,17 +22,15 @@ class ProjectScene : public QGraphicsScene
 	private:
 		QTcpSocket* m_socket;
 		std::vector<itemStats> m_tracked_items;
+		std::string m_board_id;
 
 	public slots:
 		void sceneChanged(const QList<QRectF> &region);
-		void replyFinished(QNetworkReply* response);
-		void fullUpdate();
-
 		void readSocket();
 		void disconnect();
 	signals:	
 	public:
-        int trackItem(QGraphicsItem* item);
+                int trackItem(QGraphicsItem* item);
 		ProjectScene();
 		~ProjectScene();
 };
