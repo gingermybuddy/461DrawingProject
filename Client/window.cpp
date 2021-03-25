@@ -5,7 +5,6 @@
 #include <QColorDialog>
 #include <iostream>
 
-
 Window::Window() : QMainWindow()
 {
 	//Anything new you add to the window is going to be a pointer to whatever object you're throwing in.
@@ -28,7 +27,6 @@ Window::Window() : QMainWindow()
 	connect(m_scene, SIGNAL(changed(const QList<QRectF>&)), m_scene, SLOT(sceneChanged(const QList<QRectF>&)));
 
 	//connect(), as shown, will connect a given action (or button) with a function in private slots. This just sets it so when you actually click on it, something happens.
-	
 	setCentralWidget(m_view);
 	addDockWidget(Qt::LeftDockWidgetArea, m_tool_dock);
 	this->show();
