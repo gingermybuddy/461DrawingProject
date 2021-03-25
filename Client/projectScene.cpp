@@ -24,14 +24,26 @@ ProjectScene::ProjectScene()
 }
 ProjectScene::~ProjectScene() 
 {
+	delete m_socket;
 }
 
 void ProjectScene::readSocket()
 {
+	QByteArray buf;
+	QDataStream sockstream(m_socket);
+	sockstream.startTransaction();
+	sockstream >> buf;
+	if(!sockstream.commitTransaction()) {
+		std::cout << "Awaiting additional data." << std::endl;
+		return;
+	}
+	std::cout << "Received " << buf.toStdString() << std::endl;
 }
 
 void ProjectScene::disconnect()
 {
+	m_socket -> deleteLater();
+	m_socket = nullptr;
 }
 
 

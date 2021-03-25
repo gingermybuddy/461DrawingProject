@@ -10,19 +10,10 @@
 #include <QNetworkReply>
 #include <QTimer>
 #include <QTcpSocket>
+#include "itemStats.h"
 
 #ifndef __PROJECTSCENE_H
 #define __PROJECTSCENE_H
-struct itemStats 
-{
-	std::string type;
-	int id;
-	double x;
-	double y;
-	double height;
-	double width;
-	QColor rgb;
-};
 
 class ProjectScene : public QGraphicsScene
 {
