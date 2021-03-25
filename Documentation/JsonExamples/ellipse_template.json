@@ -1,0 +1,16 @@
+{
+  "data": {
+    "bid": "<board ID>", 
+    "color": "<a color in HEX>", 
+    "end": {
+      "x": "<x2; end x; second corner>", 
+      "y": "<y2; end y; second corner>"
+    }, 
+    "sid": <shape ID>, 
+    "start": {
+      "x": "<x1; start x; first corner>", 
+      "y": "<y2; start y; first corner>"
+    } 
+  }, 
+  "shape": "ellipse"
+}
