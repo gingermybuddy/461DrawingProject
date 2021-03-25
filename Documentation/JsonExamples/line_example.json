@@ -1,0 +1,16 @@
+{
+  "data": {
+    "bid": "None", 
+    "color": "ffffff", 
+    "end": {
+      "x": "100", 
+      "y": "100"
+    }, 
+    "sid": 2, 
+    "start": {
+      "x": "10", 
+      "y": "10"
+    }
+  }, 
+  "shape": "line"
+}
