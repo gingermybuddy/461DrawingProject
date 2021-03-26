@@ -20,4 +20,4 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # Input
 HEADERS += ../Client/itemStats.h Server.h
 SOURCES += ../Client/itemStats.cpp Server.cpp main.cpp
-QT += network widgets gui
+QT += network widgets gui sql
