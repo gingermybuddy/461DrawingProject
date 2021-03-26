@@ -25,6 +25,7 @@ class Server : public QMainWindow
 		void newConnection();
 		void readSocket();
 		void disconnect();
+		void fullUpdate();
 	public:
 		Server();
 		~Server();

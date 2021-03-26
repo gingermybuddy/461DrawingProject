@@ -1,6 +1,7 @@
 #include "Server.h"
 #include <iostream>
 #include <QDataStream>
+#include <QtSql>
 
 Server::Server() : QMainWindow()
 {
@@ -107,5 +108,45 @@ void Server::readSocket()
 	QJsonDocument doc = QJsonDocument::fromJson(buf);
 	QJsonObject obj = doc.object();
 
+}
+
+void Server::fullUpdate()
+{
+	db.open();
+	
+	QByteArray buf; 
+    QVector<QJsonObject> shapes;
+
+    QSqlQuery *circle_query = new QSqlQuery;
+	circle_query->exec("SELECT * FROM Ellipse");
+    circle_query->first();
+	
+    std::string bid = circle_query->value(0).toString().toStdString();
+	std::string shape = "ellipse";
+
+	int sid = circle_query->value(1).toInt();
+	double x1 = circle_query->value(2).toDouble();
+	double x2 = circle_query->value(3).toDouble();
+	double y1 = circle_query->value(4).toDouble();
+	double y2 = circle_query->value(5).toDouble();
+	QColor color = QColor(circle_query->value(6).toString());
+
+	itemStats temp(bid, shape, sid, x1, y1, x2, y2, color);
+	QJsonObject cir = temp.toJson();
+	shapes.push_back(cir);
+
+    while(circle_query->next()){
+        std::string bid = circle_query->value(0).toString().toStdString();
+		std::string shape = "ellipse";
+		int sid = circle_query->value(1).toInt();
+		double x1 = circle_query->value(2).toDouble();
+		double x2 = circle_query->value(3).toDouble();
+		double y1 = circle_query->value(4).toDouble();
+		double y2 = circle_query->value(5).toDouble();
+		QColor color = QColor(circle_query->value(6).toString());
+		itemStats temp(bid, shape, sid, x1, y1, x2, y2, color);
+		QJsonObject cir = temp.toJson();
+		shapes.push_back(cir);
+	}
 }
 
