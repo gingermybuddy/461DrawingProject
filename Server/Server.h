@@ -4,6 +4,8 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <string>
+#include <QSqlDatabase>
+
 
 #include "../Client/itemStats.h"
 //Take a look at this file; it includes some tools to
@@ -14,6 +16,12 @@
 
 //The window is kind of decorative. Doesn't have anything in it.
 //But it could!
+
+struct ownedDB{
+    int id;
+    QSqlDatabase db;
+} newDB;
+
 class Server : public QMainWindow
 {
 	Q_OBJECT
@@ -21,6 +29,8 @@ class Server : public QMainWindow
 		QTcpServer* m_server;
 		QSet<QTcpSocket*> connected;
 		std::string m_board_id;
+        QVector<ownedDB> databases;
+
 	public slots:
 		void newConnection();
 		void readSocket();
@@ -29,5 +39,8 @@ class Server : public QMainWindow
 		Server();
 		~Server();
 		void appendSocket(QTcpSocket* sock);
+        void createBoard(QTcpSocket* socket);
+        void deleteDB(QTcpSocket* socket);
 };
+
 #endif
