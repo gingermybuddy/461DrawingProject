@@ -122,8 +122,6 @@ void Server::readSocket()
 void Server::fullUpdate(QString databaseName)
 {
     QByteArray buf;
-    QVector<QJsonObject> shapes;
-
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(databaseName);
     db.open();
@@ -163,6 +161,12 @@ void Server::fullUpdate(QString databaseName)
 		QJsonObject cir = temp.toJson();
 		shapes.push_back(cir);
 	}
+	
+	QTcpSocket* socket = reinterpret_cast<QTcpSocket*>(sender());
+	QDataStream sockstream(socket);
+	sockstream.startTransaction();
+	//place QVector into buf somehow
+	sockstream >> buf;
 }
 
 void Server::createBoard(QTcpSocket* socket)

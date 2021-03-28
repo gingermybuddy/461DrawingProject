@@ -30,7 +30,7 @@ class Server : public QMainWindow
 		QSet<QTcpSocket*> connected;
 		std::string m_board_id;
         QVector<ownedDB> databases;
-
+		QVector<QJsonObject> shapes;
 	public slots:
 		void newConnection();
 		void readSocket();
