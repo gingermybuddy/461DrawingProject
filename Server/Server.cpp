@@ -2,6 +2,7 @@
 #include <iostream>
 #include <QDataStream>
 #include <QtSql>
+#include <QSqlQuery>
 
 Server::Server() : QMainWindow()
 {
@@ -9,6 +10,8 @@ Server::Server() : QMainWindow()
 	m_server = new QTcpServer();
 
 	//Sets up the address and port number to listen on.
+
+
 	//Both numbers are currently fixed, but we can make it
 	//an input later.
 	if(m_server->listen(QHostAddress::LocalHost, 5000)) {
@@ -42,6 +45,7 @@ void Server::newConnection()
 	}
 }
 
+
 void Server::appendSocket(QTcpSocket* socket)
 {
 	//'connected' is the vector of sockets. All current clients
@@ -63,6 +67,8 @@ void Server::disconnect()
 	//Black voodoo magic with a cast to determine which socket
 	//it was.
 	QTcpSocket* socket = reinterpret_cast<QTcpSocket*>(sender());
+
+    deleteDB(socket);
 
 	//Finds the socket.
 	QSet<QTcpSocket*>::iterator it = connected.find(socket);
@@ -96,6 +102,9 @@ void Server::readSocket()
 		std::cout << "Awaiting additional data." << std::endl;
 		return;
 	}
+    if(buf.toStdString() == "createBoard"){
+        createBoard(socket);
+    }
 	//If it gets to here, the data has been received and is
 	//ready to be parsed. Right now, all it does is turn it into
 	//a string and outputs it to console.
@@ -150,3 +159,35 @@ void Server::fullUpdate()
 	}
 }
 
+void Server::createBoard(QTcpSocket* socket)
+{
+    //Create a QSqlDatabsae named db
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    //either connect to the database named CMSC461.db or create it if it doesn't exist
+    db.setDatabaseName("CMSC461.db");
+    db.open();
+    //Create and QSqlQuery pointer to be used to execute commands
+    QSqlQuery* dbQuery = new QSqlQuery;
+
+
+
+    //bid = Board ID
+    //sid = Shape ID
+    //cid = Client/User ID
+    dbQuery->exec("CREATE TABLE Ellipse (bid int, sid int, x1 int, x2 int, y1 int, y2 int, color string, cid int);");
+    dbQuery->exec("CREATE TABLE Line (bid int, sid int, x1 int, x2 int, y1 int, y2 int, color string, cid int);");
+    dbQuery->exec("CREATE TABLE Rect (bid int, sid int, x int, y int, width int, height int, color string, cid int);");
+
+    newDB.id = socket->socketDescriptor();
+    newDB.db = db;
+
+    databases.push_back(newDB);
+}
+
+void Server::deleteDB(QTcpSocket* socket)
+{
+
+
+
+
+}
