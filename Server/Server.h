@@ -35,13 +35,13 @@ class Server : public QMainWindow
 		void newConnection();
 		void readSocket();
 		void disconnect();
-		void fullUpdate();
 	public:
 		Server();
 		~Server();
 		void appendSocket(QTcpSocket* sock);
         void createBoard(QTcpSocket* socket);
         void deleteDB(QTcpSocket* socket);
+        void fullUpdate(QString databaseName);
 };
 
 #endif

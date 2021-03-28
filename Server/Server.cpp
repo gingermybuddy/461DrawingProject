@@ -119,20 +119,23 @@ void Server::readSocket()
 
 }
 
-void Server::fullUpdate()
+void Server::fullUpdate(QString databaseName)
 {
-	db.open();
-	
-	QByteArray buf; 
+    QByteArray buf;
     QVector<QJsonObject> shapes;
 
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(databaseName);
+    db.open();
+
+    //Initialize QSqlQuery for the Circles table of "db"
     QSqlQuery *circle_query = new QSqlQuery;
 	circle_query->exec("SELECT * FROM Ellipse");
     circle_query->first();
-	
+
+    //Set values to pass into itemStats contstructor
     std::string bid = circle_query->value(0).toString().toStdString();
 	std::string shape = "ellipse";
-
 	int sid = circle_query->value(1).toInt();
 	double x1 = circle_query->value(2).toDouble();
 	double x2 = circle_query->value(3).toDouble();
@@ -140,10 +143,13 @@ void Server::fullUpdate()
 	double y2 = circle_query->value(5).toDouble();
 	QColor color = QColor(circle_query->value(6).toString());
 
+    //Construct itemStats and convert to JSON
 	itemStats temp(bid, shape, sid, x1, y1, x2, y2, color);
 	QJsonObject cir = temp.toJson();
-	shapes.push_back(cir);
+    //Push back into our array of JSON objects
+    shapes.push_back(cir);
 
+    //Loop through and repeat for whole table
     while(circle_query->next()){
         std::string bid = circle_query->value(0).toString().toStdString();
 		std::string shape = "ellipse";
