@@ -43,6 +43,12 @@ ProjectScene::ProjectScene()
 	//Board ID is also fixed right now.
 	m_board_id = "CMSC461";
 
+	QByteArray request;
+	QString fup = "fullUpdate";
+	QDataStream sockstream(m_socket);
+	request = fup.toUtf8();
+	sockstream << request;
+
 
 }
 ProjectScene::~ProjectScene() 
@@ -65,11 +71,15 @@ void ProjectScene::readSocket()
 	//Right now all it does is pass received data into a string and outputs it
 	//to the console.
 	std::cout << "Received " << buf.toStdString() << std::endl;
-
 	//Passes the byte array into some JSON objects that we can use later.
         QJsonDocument doc = QJsonDocument::fromJson(buf);
         QJsonObject obj = doc.object();
 
+	//What the hell kind of JSON is this?
+	QJsonValue fup = obj.value("fullUpdate");
+	if(fup.toString() == "test") {
+		std::cout << "This is a full update; we should parse this." << std::endl;
+	}
 }
 
 void ProjectScene::disconnect()
@@ -89,6 +99,12 @@ int ProjectScene::trackItem(QGraphicsItem* item)
 	m_tracked_items.push_back(itemStats(m_board_id, item));
 	return id;
 	//Returns the id of the newly-tracked item.
+}
+
+void ProjectScene::fullUpdate(QJsonObject data)
+{
+	//This should only be called once, right when the scene boots up, to grab a list of items
+	//from the server itself. That'll catch it up to speed with everything else.
 }
 
 

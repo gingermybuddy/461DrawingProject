@@ -105,7 +105,9 @@ void Server::readSocket()
     if(buf.toStdString() == "createBoard"){
         createBoard(socket);
     } else if (buf.toStdString() == "fullUpdate") {
+	std::cout << "Full update requested!" << std::endl;
 	fullUpdate("CMSC461.db", socket);
+	return;
     }
 	//If it gets to here, the data has been received and is
 	//ready to be parsed. Right now, all it does is turn it into
@@ -118,6 +120,31 @@ void Server::readSocket()
 
 	QJsonDocument doc = QJsonDocument::fromJson(buf);
 	QJsonObject obj = doc.object();
+
+	QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+	db.setDatabaseName("CMSC461.db");
+	db.open();
+	QSqlQuery inserter;
+	QJsonValue type = obj.value("shape");
+	QJsonObject dval  = obj.value("data").toObject();
+	if(type.toString() == "ellipse") {
+		inserter.prepare("INSERT INTO Ellipse VALUES(?,?,?,?,?,?,?,?)");
+	} else if (type.toString() == "line") {	
+		inserter.prepare("INSERT INTO Line VALUES(?,?,?,?,?,?,?,?)");
+	} else if (type.toString() == "rect") {
+
+		inserter.prepare("INSERT INTO Rect VALUES(?,?,?,?,?,?,?,?)");
+	}
+	inserter.bindValue(0, dval.value("bid").toString());
+	inserter.bindValue(1, dval.value("sid").toString());
+	inserter.bindValue(2, dval.value("start").toObject().value("x").toInt());
+	inserter.bindValue(3, dval.value("end").toObject().value("x").toInt());
+	inserter.bindValue(4, dval.value("start").toObject().value("y").toInt());
+	inserter.bindValue(5, dval.value("end").toObject().value("y").toInt());
+	inserter.bindValue(6, dval.value("color").toString());
+	inserter.bindValue(7, socket->socketDescriptor());
+	inserter.exec();
+
 
 }
 
@@ -132,6 +159,7 @@ void Server::fullUpdate(QString databaseName, QTcpSocket* socket)
 	circle_query->exec("SELECT * FROM Ellipse");
     circle_query->first();
 
+    /*
     //Set values to pass into itemStats contstructor
     std::string bid = circle_query->value(0).toString().toStdString();
 	std::string shape = "ellipse";
@@ -147,6 +175,7 @@ void Server::fullUpdate(QString databaseName, QTcpSocket* socket)
 	QJsonObject cir = temp.toJson();
     //Push back into our array of JSON objects
     shapes.push_back(cir);
+	*/
 
     //Loop through and repeat for whole table
     while(circle_query->next()){
@@ -174,6 +203,7 @@ void Server::fullUpdate(QString databaseName, QTcpSocket* socket)
 
 	//Write our JSON object to the socket
 	QByteArray buf = doc.toJson();
+	std::cout << "Sending: " << buf.toStdString() << std::endl;
 	QDataStream sockstream(socket);
 	sockstream.startTransaction();
 	sockstream >> buf;
@@ -196,7 +226,7 @@ void Server::createBoard(QTcpSocket* socket)
     //cid = Client/User ID
     dbQuery->exec("CREATE TABLE Ellipse (bid int, sid int, x1 int, x2 int, y1 int, y2 int, color string, cid int);");
     dbQuery->exec("CREATE TABLE Line (bid int, sid int, x1 int, x2 int, y1 int, y2 int, color string, cid int);");
-    dbQuery->exec("CREATE TABLE Rect (bid int, sid int, x int, y int, width int, height int, color string, cid int);");
+    dbQuery->exec("CREATE TABLE Rect (bid int, sid int, x1 int, x2 int, y1 int, y2 int, color string, cid int);");
 
     ownedDB newDB;
     newDB.id = socket->socketDescriptor();

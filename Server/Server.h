@@ -41,7 +41,7 @@ class Server : public QMainWindow
 		void appendSocket(QTcpSocket* sock);
         void createBoard(QTcpSocket* socket);
         void deleteDB(QTcpSocket* socket);
-        void fullUpdate(QString databaseName);
+        void fullUpdate(QString databaseName, QTcpSocket* socket);
 };
 
 #endif
