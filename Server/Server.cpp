@@ -104,6 +104,8 @@ void Server::readSocket()
 	}
     if(buf.toStdString() == "createBoard"){
         createBoard(socket);
+    } else if (buf.toStdString() == "fullUpdate") {
+	fullUpdate("CMSC461.db", socket);
     }
 	//If it gets to here, the data has been received and is
 	//ready to be parsed. Right now, all it does is turn it into
@@ -119,7 +121,7 @@ void Server::readSocket()
 
 }
 
-void Server::fullUpdate(QString databaseName)
+void Server::fullUpdate(QString databaseName, QTcpSocket* socket)
 {
     QByteArray buf;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
