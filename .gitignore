@@ -35,6 +35,7 @@ build-Server-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/Makefile.Debug
 build-Server-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/debug/Server.exe
 Server/Server.pro.user
 Client/461DrawingProject.pro.user.7f374ac
+Server/461DrawingProject.pro.user
 Client/461DrawingProject.pro.user
 build-Server-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/Makefile.Release
 Client/461DrawingProject.pro.user
