@@ -24,6 +24,11 @@ Server::Server() : QMainWindow()
 	//This is also set on the client.
 	m_board_id = "CMSC461";
 
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    //either connect to the database named CMSC461.db or create it if it doesn't exist
+    db.setDatabaseName("CMSC461.db");
+    db.open();
+
 	//The server will give out a 'signal' when it receives
 	//a new connection. This connects that signal to the
 	//function 'newConnection()'.
@@ -105,9 +110,9 @@ void Server::readSocket()
     if(buf.toStdString() == "createBoard"){
         createBoard(socket);
     } else if (buf.toStdString() == "fullUpdate") {
-	std::cout << "Full update requested!" << std::endl;
-	fullUpdate("CMSC461.db", socket);
-	return;
+        std::cout << "Full update requested!" << std::endl;
+        fullUpdate("CMSC461.db", socket);
+        return;
     }
 	//If it gets to here, the data has been received and is
 	//ready to be parsed. Right now, all it does is turn it into
@@ -121,38 +126,31 @@ void Server::readSocket()
 	QJsonDocument doc = QJsonDocument::fromJson(buf);
 	QJsonObject obj = doc.object();
 
-	QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-	db.setDatabaseName("CMSC461.db");
-	db.open();
 	QSqlQuery inserter;
 	QJsonValue type = obj.value("shape");
 	QJsonObject dval  = obj.value("data").toObject();
 	if(type.toString() == "ellipse") {
-		inserter.prepare("INSERT INTO Ellipse VALUES(?,?,?,?,?,?,?,?)");
+        inserter.prepare("INSERT INTO Ellipse(bid, sid, x1, x2, y1, y2, color, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :color, :cid);");
 	} else if (type.toString() == "line") {	
-		inserter.prepare("INSERT INTO Line VALUES(?,?,?,?,?,?,?,?)");
+        inserter.prepare("INSERT INTO Line(bid, sid, x1, x2, y1, y2, color, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :color, :cid);");
 	} else if (type.toString() == "rect") {
-
-		inserter.prepare("INSERT INTO Rect VALUES(?,?,?,?,?,?,?,?)");
+        inserter.prepare("INSERT INTO Rect(bid, sid, x1, x2, y1, y2, color, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :color, :cid);");
 	}
-	inserter.bindValue(0, dval.value("bid").toString());
-	inserter.bindValue(1, dval.value("sid").toString());
-	inserter.bindValue(2, dval.value("start").toObject().value("x").toInt());
-	inserter.bindValue(3, dval.value("end").toObject().value("x").toInt());
-	inserter.bindValue(4, dval.value("start").toObject().value("y").toInt());
-	inserter.bindValue(5, dval.value("end").toObject().value("y").toInt());
-	inserter.bindValue(6, dval.value("color").toString());
-	inserter.bindValue(7, socket->socketDescriptor());
+    inserter.bindValue(":bid", dval.value("bid").toString());
+    inserter.bindValue(":sid", dval.value("sid").toString());
+    inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
+    inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
+    inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
+    inserter.bindValue(":y2", dval.value("end").toObject().value("y").toInt());
+    inserter.bindValue(":color", dval.value("color").toString());
+    inserter.bindValue(":cid", socket->socketDescriptor());
 	inserter.exec();
-
-
+    std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 }
 
-void Server::fullUpdate(QString databaseName, QTcpSocket* socket)
+void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(databaseName);
-    db.open();
 
     //Initialize QSqlQuery for the Circles table of "db"
     QSqlQuery *circle_query = new QSqlQuery;
@@ -206,12 +204,12 @@ void Server::fullUpdate(QString databaseName, QTcpSocket* socket)
 	std::cout << "Sending: " << buf.toStdString() << std::endl;
 	QDataStream sockstream(socket);
 	sockstream.startTransaction();
-	sockstream >> buf;
+    sockstream << buf;
 }
 
 void Server::createBoard(QTcpSocket* socket)
 {
-    //Create a QSqlDatabsae named db
+    //Create a QSqlDatabase named db
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     //either connect to the database named CMSC461.db or create it if it doesn't exist
     db.setDatabaseName("CMSC461.db");
@@ -233,6 +231,7 @@ void Server::createBoard(QTcpSocket* socket)
     newDB.db = db;
 
     databases.push_back(newDB);
+    delete dbQuery;
 }
 
 void Server::deleteDB(QTcpSocket* socket)

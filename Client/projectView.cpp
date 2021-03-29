@@ -35,7 +35,7 @@ void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
 	r->setCursor(Qt::PointingHandCursor);
 	r->setData(0, -1);
-    r->setData(1, "circle");
+    r->setData(1, "ellipse");
 	//This is some extra data we're adding to the item. Ideally the 'id' parameter
 	//iterates, but that hasn't been implemented yet. Probably track how many items are on the scene.
 	//The 'setData' function takes in an int as a key and a QVariant (any sort of variable) as parameters.
