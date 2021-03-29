@@ -20,7 +20,7 @@
 struct ownedDB{
     int id;
     QSqlDatabase db;
-} newDB;
+};
 
 class Server : public QMainWindow
 {
