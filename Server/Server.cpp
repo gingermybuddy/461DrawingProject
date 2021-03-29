@@ -123,7 +123,6 @@ void Server::readSocket()
 
 void Server::fullUpdate(QString databaseName, QTcpSocket* socket)
 {
-    QByteArray buf;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(databaseName);
     db.open();
@@ -164,10 +163,19 @@ void Server::fullUpdate(QString databaseName, QTcpSocket* socket)
 		shapes.push_back(cir);
 	}
 	
-	QTcpSocket* socket = reinterpret_cast<QTcpSocket*>(sender());
+	//Create a JSON object of all the shapes using their sid as a key
+    QJsonObject full_board;
+	full_board.insert("fullUpdate", "test");
+	for(QJsonObject temp : shapes){
+		full_board.insert(temp.value("sid").toString(), temp);
+	}
+	//Create JSON Document to write to the buffer
+	QJsonDocument doc(full_board);
+
+	//Write our JSON object to the socket
+	QByteArray buf = doc.toJson();
 	QDataStream sockstream(socket);
 	sockstream.startTransaction();
-	//place QVector into buf somehow
 	sockstream >> buf;
 }
 
