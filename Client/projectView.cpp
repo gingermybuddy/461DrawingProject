@@ -29,18 +29,23 @@ void ProjectView::fill(){
 
         QList<QGraphicsItem*> selected = scene()->selectedItems();
         for(QGraphicsItem* i : selected){
+            if(i->data(1).toString() == "line") continue;
+
             //QBrush brush((QColor(m_color_r, m_color_g, m_color_b), Qt::SolidPattern));
             //brush = i->brush().color();
+            QBrush br(QColor(m_color_r, m_color_g, m_color_b), Qt::SolidPattern);
 
-            QGraphicsRectItem *rect = qgraphicsitem_cast<QGraphicsRectItem *>(i);
-            //QGraphicsEllipseItem *circle = qgraphicsitem_cast<QGraphicsEllipseItem *>(circle);
-
-            QBrush br(QBrush(Qt::SolidPattern));
-            br.setColor(QColor(m_color_r, m_color_g, m_color_b));
-            rect->setBrush(br);
-            //circle->setBrush(br);
-            rect->update();
-            //circle->update();
+            if(i->data(1).toString() == "rect") {
+                QGraphicsRectItem *rect = qgraphicsitem_cast<QGraphicsRectItem *>(i);
+                //QGraphicsEllipseItem *circle = qgraphicsitem_cast<QGraphicsEllipseItem *>(circle);
+                rect->setBrush(br);
+                //circle->setBrush(br);
+                rect->update();
+            } else if (i->data(1).toString() == "ellipse") {
+                QGraphicsEllipseItem* e = (QGraphicsEllipseItem*)i;
+                e->setBrush(br);
+                e->update();
+            }
 
      }
 }
