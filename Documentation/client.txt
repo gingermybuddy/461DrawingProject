@@ -1,0 +1,114 @@
+itemStats.h,cpp
+------------------
+itemStats is a struct which contains all of the values which a shape/object
+contains. This is used in other documents and functions to help parse out and
+separate data. 
+
+
+projectScene.h,cpp
+------------------
+projectScene is a class which contains functions that relate to the QGraphicsScene,
+that is, the 'behinds the scenes' of the graphical window.
+
+ProjectScene::ProjectScene()
+    A constructor for the ProjectScene class
+ProjectScene::~ProjectScene()
+    A destructor for the ProjectScene class
+ProjectScene::readSocket()
+    Reads in data that is received from the server into a JSON object
+ProjectScene::disconnect()
+    Deletes the socket from the scene, effectively removing the connection from
+    the server.
+ProjectScene::trackItem()
+    Pushes back all the data from a received graphics item into an internal list
+    of graphics items.
+ProjectScene::sceneChanged()
+   When something in the scene changes, this event is triggered. What we do is
+   get a list of items that have changed (compare between the last update and 
+   our internal list) and then tells the server about it.
+
+
+projectView.h,cpp
+------------------
+projectView is a class which contains the functions which relate to the QGraphicsView,
+that is, the canvas and buttons that we see on the graphical window.
+
+ProjectView::ProjectView()
+    A constructor for the ProjectView class
+ProjectView::~ProjectView()
+    A destructor for the ProjectView class
+ProjectView::change_tool(int tool)
+    Change the current tool based on an integer parameter
+ProjectView::change_color(int r, int g, int b)
+    Change the current tool's color based on 3 integer parameters, r, g, and b.
+ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
+    Draw a circle on the canvas using two points, (x,y) and (x2,y2). This allows
+    us to draw ellipses easily as well as circeles, similarly to how we draw 
+    rectangles.
+    (x,y) is the first location the user clicked, and (x2,y2) is the second.
+ProjectView::line_tool(qreal x, qreal y, qreal x2, qreal y2)
+    Draw a line on the canvas using two points, (x,y) and (x2,y2). 
+    (x,y) is the first location the user clicked, and (x2,y2) is the second.
+ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
+    Draw a rectangle on the canvas using two points, (x,y) and (x2,y2). 
+    (x,y) is the first location the user clicked, and (x2,y2) is the second.
+ProjectView::mousePressEvent()
+     This event is triggered when the user clicks down on the mouse. Technically,
+     it stores this point and doesn't do anything with it until a mouseReleaseEvent.
+ProjectView::mouseReleaseEvent()
+    This event is triggered when the user releases the click on the mouse. This
+    function takes the second point, figures out which action to take based on
+    the selected tool, and calls the appropriate function.
+
+
+toolbar.h,cpp
+------------------
+toolbar is a class which contains the functions to change the different tools in
+the graphical window.
+
+ToolBar::ToolBar()
+    A constructor for the ToolBar class
+ToolBar::~ToolBar()
+    A destructor for the ToolBar class
+ToolBar::set_view(ProjectView* view)
+    Sets the tool's m_view to view
+ToolBar::set_default()
+    Sets the default tool to the select tool
+ToolBar::set_line()
+    Sets the tool to the line tool
+ToolBar::set_circle()
+    Sets the tool to the circle tool
+ToolBar::set_rect()
+    Sets the tool to the rect tool
+ToolBar::set_color_black()
+    Sets the tool's color to be black
+ToolBar::set_color_red()
+    Sets the tool's color to be red
+ToolBar::set_color_green()
+    Sets the tool's color to be green
+ToolBar::set_color_yellow()
+    Sets the tool's color to be yellow
+ToolBar::set_color_blue()
+    Sets the tool's color to be blue
+ToolBar::set_color_custom()
+    Brings up a color picker menu for the user to set their own color using a 
+    graphical interface, rgb, hexadeicimal, or cmyk.
+
+
+window.h,cpp
+------------------
+window is essentially the 'main' of the graphical window, though there is a
+'main' that spawns it.
+
+Window::Window()
+    A constructor for the Window class. Sets up the entire graphical window with
+    toolbars, docks, a canvas, a scene, and a menu.
+Window::~Window()
+    A destructor for the Window class.
+
+
+main.cpp
+------------------
+main is a small file which contains one function: int main. This is the start of
+the entire client, where a new window is created in memory and executed. From
+there, upon returning, the event loop begins.
