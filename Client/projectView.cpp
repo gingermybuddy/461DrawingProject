@@ -25,7 +25,8 @@ void ProjectView::change_color(int r, int g, int b)
 	m_color_g = g;
 	m_color_b = b;
 }
-void ProjectView::fill(){
+void ProjectView::fill()
+{
 
         QList<QGraphicsItem*> selected = scene()->selectedItems();
         for(QGraphicsItem* i : selected){
@@ -56,13 +57,13 @@ void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 	pen.setWidth(2);
 
 	//Draws a circle where the coordinates were
-        QRectF circ(x, y, x2-x, y2-y);
-        QGraphicsEllipseItem* r = scene()->addEllipse(circ, pen, QBrush(Qt::transparent));
+    QRectF circ(x, y, x2-x, y2-y);
+    QGraphicsEllipseItem* r = scene()->addEllipse(circ, pen, QBrush(Qt::transparent));
 	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
 	r->setCursor(Qt::PointingHandCursor);
 	r->setData(0, -1);
-        r->setData(1, "ellipse");
+    r->setData(1, "ellipse");
 	//This is some extra data we're adding to the item. Ideally the 'id' parameter
 	//iterates, but that hasn't been implemented yet. Probably track how many items are on the scene.
 	//The 'setData' function takes in an int as a key and a QVariant (any sort of variable) as parameters.
@@ -75,24 +76,24 @@ void ProjectView::line_tool(qreal x, qreal y, qreal x2, qreal y2)
 	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
 	pen.setWidth(2);
 
-        QLineF liner(x, y, x2, y2);
-        // std::cout << "Making a line! \n";
-        QGraphicsLineItem* line = scene()->addLine(liner, pen);
+    QLineF liner(x, y, x2, y2);
+    // std::cout << "Making a line! \n";
+    QGraphicsLineItem* line = scene()->addLine(liner, pen);
 	line->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	line->setFlag(QGraphicsItem::ItemIsMovable, true);
 	line->setCursor(Qt::PointingHandCursor);
 	line->setData(0, -1);
-        line->setData(1, "line");
+    line->setData(1, "line");
 }
 
 void ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
 {
 
 	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
-        pen.setWidth(2);
+    pen.setWidth(2);
 
-        QRectF rect(x, y, x2-x, y2-y);
-        QGraphicsRectItem* r = scene()->addRect(rect, pen, QBrush(Qt::transparent));
+    QRectF rect(x, y, x2-x, y2-y);
+    QGraphicsRectItem* r = scene()->addRect(rect, pen, QBrush(Qt::transparent));
 	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
 	r->setCursor(Qt::PointingHandCursor);
@@ -102,7 +103,7 @@ void ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
 
 void ProjectView::mousePressEvent(QMouseEvent *event)
 {
-        QPoint temp = event->pos();
+    QPoint temp = event->pos();
 	firstClick = mapToScene(temp);
     // std::cout << "Mouse pressed!\n";
 }
