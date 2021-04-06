@@ -165,8 +165,8 @@ void Server::deleteDB(QTcpSocket* socket)
             break;
         }else{
             newVec.push_back(databases[i]);
-
         }
+        databases = newVec;
     }
     std::remove(name.c_str());
 }
