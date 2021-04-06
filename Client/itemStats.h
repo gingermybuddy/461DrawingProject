@@ -15,12 +15,14 @@ struct itemStats
 	//Set the width/height variables to x2 and y2, respectively.
 	std::string board_id;
     std::string type;
+    std::string text;
     int id;
     double x;
     double y;
     double height;
     double width;
     QColor rgb;
+
 
 	//Functions to turn the thing into a QJsonObject
 	//and a QByteArray that can be sent directly over a socket.
@@ -34,6 +36,7 @@ struct itemStats
 	itemStats();
 	itemStats(std::string board_id, QGraphicsItem* item);
 	itemStats(std::string board_id, std::string type, int id, double x, double y, double height, double width, QColor rgb);
+	itemStats(std::string board_id, std::string type, int id, std::string text); //constructor for text items
 	~itemStats();
 };
 

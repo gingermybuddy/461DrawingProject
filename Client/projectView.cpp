@@ -6,6 +6,7 @@
 #include <QBrush>
 #include <QColor>
 #include <iostream>
+#include <QInputDialog>
 
 ProjectView::ProjectView() : QGraphicsView(), m_tool{0}
 {
@@ -52,15 +53,18 @@ void ProjectView::fill()
 }
 void ProjectView::text_tool(qreal x, qreal y)
 {
-    QString temp = "Test";
+	bool ok;
+    	QString temp = QInputDialog::getText(this, tr("Add Text"), tr("Enter text:"), QLineEdit::Normal, tr("My text"), &ok);
+	if(!ok || temp.isEmpty()) return;
+
 	QGraphicsTextItem* text = scene()->addText(temp);
-    text->setPos(x, y);
+        text->setPos(x, y);
 	// text->setTextInteractionFlags(Qt::TextEditorInteraction);
 	text->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	text->setFlag(QGraphicsItem::ItemIsMovable, true);
 	text->setCursor(Qt::PointingHandCursor);
 	text->setData(0, -1);
-    text->setData(1, "text");
+        text->setData(1, "text");
 }
 void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 {		

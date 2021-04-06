@@ -18,6 +18,14 @@ itemStats::itemStats(std::string nboard_id, std::string ntype, int nid, double n
 	rgb = nrgb;
 }
 
+itemStats::itemStats(std::string nboard_id, std::string ntype,int nid, std::string ntext)
+{
+	board_id = nboard_id;
+	type = ntype;
+	id = nid;
+	text = ntext;
+}
+
 //UPDATE THIS IF YOU ADD THINGS TO THE PLACED ITEMS
 itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 {
@@ -34,6 +42,12 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 		height = i->line().y2();
 		width = i->line().x2();
 		rgb = i->pen().color();
+	} else if(type == "text") { 
+		QGraphicsTextItem* t = (QGraphicsTextItem*)item;
+		x = t->x();
+		y = t->y();
+		rgb = t->defaultTextColor();
+		text = t->toPlainText().toStdString();
 	} else {
 		QGraphicsRectItem* r = (QGraphicsRectItem*)item;
 		x = r->rect().x();
@@ -66,16 +80,23 @@ QJsonObject itemStats::toJson()
 
 	start.insert("x", QJsonValue(x));
 	start.insert("y", QJsonValue(y));
+	
+	if(type == "text") {
+		data.insert("start", QJsonValue(start));
+		data.insert("text", QJsonValue(QString::fromStdString(text)));
+		returnval.insert("data", QJsonValue(data));
+		returnval.insert("shape", QJsonValue(QString::fromStdString(type)));
 
-	end.insert("x", QJsonValue(width));
-	end.insert("y", QJsonValue(height));
+	} else {
+		end.insert("x", QJsonValue(width));
+		end.insert("y", QJsonValue(height));
 
-	data.insert("end", QJsonValue(end));
-	data.insert("sid", QJsonValue(id));
-	data.insert("start", QJsonValue(start));
-
-	returnval.insert("data", QJsonValue(data));
-	returnval.insert("shape", QJsonValue(QString::fromStdString(type)));
+		data.insert("end", QJsonValue(end));
+		data.insert("sid", QJsonValue(id));
+		data.insert("start", QJsonValue(start));
+		returnval.insert("data", QJsonValue(data));
+		returnval.insert("shape", QJsonValue(QString::fromStdString(type)));
+	}
 
 	//For the 'end' parameter, it uses the width and height as x and y coordinates.
 	//If the thing's a line, the end is just what it says on the tin - the ending coordinates of the line.
