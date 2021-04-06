@@ -1,3 +1,5 @@
+Server/Server
+Server/Makefile
 461DrawingProject
 compile_commands.json
 *.o
@@ -36,3 +38,14 @@ build-Server-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/debug/Server.exe
 build-Server-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/CMSC461.db
 build-461DrawingProject-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/object_script.461DrawingProject.Release
 build-461DrawingProject-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/object_script.461DrawingProject.Debug
+.vs/ProjectSettings.json
+.vs/slnx.sqlite
+.vs/VSWorkspaceState.json
+build-Server-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/Makefile
+build-Server-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/Makefile.Debug
+build-Server-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/debug/Server.exe
+Server/Server.pro.user
+Client/461DrawingProject.pro.user.7f374ac
+Client/461DrawingProject.pro.user
+build-Server-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/Makefile.Release
+Client/461DrawingProject.pro.user
