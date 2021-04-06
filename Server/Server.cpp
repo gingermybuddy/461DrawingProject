@@ -3,6 +3,9 @@
 #include <QDataStream>
 #include <QtSql>
 #include <QSqlQuery>
+#include <QString>
+#include <stdio.h>
+#include <string>
 
 Server::Server() : QMainWindow()
 {
@@ -157,24 +160,6 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 	circle_query->exec("SELECT * FROM Ellipse");
     circle_query->first();
 
-    /*
-    //Set values to pass into itemStats contstructor
-    std::string bid = circle_query->value(0).toString().toStdString();
-	std::string shape = "ellipse";
-	int sid = circle_query->value(1).toInt();
-	double x1 = circle_query->value(2).toDouble();
-	double x2 = circle_query->value(3).toDouble();
-	double y1 = circle_query->value(4).toDouble();
-	double y2 = circle_query->value(5).toDouble();
-	QColor color = QColor(circle_query->value(6).toString());
-
-    //Construct itemStats and convert to JSON
-	itemStats temp(bid, shape, sid, x1, y1, x2, y2, color);
-	QJsonObject cir = temp.toJson();
-    //Push back into our array of JSON objects
-    shapes.push_back(cir);
-	*/
-
     //Loop through and repeat for whole table
     while(circle_query->next()){
         std::string bid = circle_query->value(0).toString().toStdString();
@@ -184,15 +169,86 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		double x2 = circle_query->value(3).toDouble();
 		double y1 = circle_query->value(4).toDouble();
 		double y2 = circle_query->value(5).toDouble();
-		QColor color = QColor(circle_query->value(6).toString());
-		itemStats temp(bid, shape, sid, x1, y1, x2, y2, color);
+		QColor fillColor = QColor(circle_query->value(6).toString());
+		QColor outlineColor = QColor(circle_query->value(7).toString());
+		itemStats temp(bid, shape, sid, x1, y1, x2, y2, fillColor, outlineColor);
 		QJsonObject cir = temp.toJson();
 		shapes.push_back(cir);
+	}
+
+    QSqlQuery *rect_query = new QSqlQuery;
+	rect_query->exec("SELECT * FROM Rect");
+    rect_query->first();
+    
+	while(rect_query->next()){
+        std::string bid = rect_query->value(0).toString().toStdString();
+		std::string shape = "rect";
+		int sid = rect_query->value(1).toInt();
+		double x1 = rect_query->value(2).toDouble();
+		double x2 = rect_query->value(3).toDouble();
+		double y1 = rect_query->value(4).toDouble();
+		double y2 = rect_query->value(5).toDouble();
+		QColor fillColor = QColor(circle_query->value(6).toString());
+		QColor outlineColor = QColor(circle_query->value(7).toString());
+		itemStats temp(bid, shape, sid, x1, y1, x2, y2, fillColor, outlineColor);
+		QJsonObject rect = temp.toJson();
+		shapes.push_back(rect);
+	}
+
+    QSqlQuery *line_query = new QSqlQuery;
+	line_query->exec("SELECT * FROM Line");
+    line_query->first();
+    
+	while(line_query->next()){
+        std::string bid = line_query->value(0).toString().toStdString();
+		std::string shape = "line";
+		int sid = line_query->value(1).toInt();
+		double x1 = line_query->value(2).toDouble();
+		double x2 = line_query->value(3).toDouble();
+		double y1 = line_query->value(4).toDouble();
+		double y2 = line_query->value(5).toDouble();
+		QColor outlineColor = QColor(circle_query->value(6).toString());
+		itemStats temp(bid, shape, sid, x1, y1, x2, y2, outlineColor);
+		QJsonObject line = temp.toJson();
+		shapes.push_back(line);
+	}
+
+    QSqlQuery *text_query = new QSqlQuery;
+	text_query->exec("SELECT * FROM Text");
+    text_query->first();
+    
+	while(text_query->next()){
+        std::string bid = text_query->value(0).toString().toStdString();
+		std::string shape = "text";
+		int sid = text_query->value(1).toInt();
+		double x = text_query->value(2).toDouble();
+		double y = text_query->value(3).toDouble();
+        std::string text = text_query->value(4).toString().toStdString();
+		QColor color = QColor(text_query->value(5).toString());
+        itemStats temp(bid, shape, sid, x, y, text, color);
+        QJsonObject textTemp = temp.toJson();
+        shapes.push_back(textTemp);
+	}
+	
+    QSqlQuery *latex_query = new QSqlQuery;
+	latex_query->exec("SELECT * FROM Latex");
+    latex_query->first();
+    
+	while(latex_query->next()){
+        std::string bid = latex_query->value(0).toString().toStdString();
+		std::string shape = "latex";
+		int sid = latex_query->value(1).toInt();
+		double x = latex_query->value(2).toDouble();
+		double y = latex_query->value(3).toDouble();
+        std::string text = latex_query->value(4).toString().toStdString();
+		QColor color = QColor(latex_query->value(5).toString());
+        itemStats temp(bid, shape, sid, x, y, text, color);
+		QJsonObject latex = temp.toJson();
+		shapes.push_back(latex);
 	}
 	
 	//Create a JSON object of all the shapes using their sid as a key
     QJsonObject full_board;
-	full_board.insert("fullUpdate", "test");
 	for(QJsonObject temp : shapes){
 		full_board.insert(temp.value("sid").toString(), temp);
 	}
@@ -222,22 +278,37 @@ void Server::createBoard(QTcpSocket* socket)
     //bid = Board ID
     //sid = Shape ID
     //cid = Client/User ID
-    dbQuery->exec("CREATE TABLE Ellipse (bid int, sid int, x1 int, x2 int, y1 int, y2 int, color string, cid int);");
-    dbQuery->exec("CREATE TABLE Line (bid int, sid int, x1 int, x2 int, y1 int, y2 int, color string, cid int);");
-    dbQuery->exec("CREATE TABLE Rect (bid int, sid int, x1 int, x2 int, y1 int, y2 int, color string, cid int);");
+    dbQuery->exec("CREATE TABLE Ellipse (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
+    dbQuery->exec("CREATE TABLE Line (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
+    dbQuery->exec("CREATE TABLE Rect (bid int, sid int, x int, y int, width int, height int, fill string, outline string, cid int);");
+    dbQuery->exec("CREATE TABLE Latex (bid int, sid int, x int, y int, code string, color string, cid int");
+    dbQuery->exec("CREATE TABLE Text (bid int, sid int, x int, y int, code string, color string, cid int");
 
     ownedDB newDB;
     newDB.id = socket->socketDescriptor();
     newDB.db = db;
 
     databases.push_back(newDB);
-    delete dbQuery;
+	return;
 }
 
 void Server::deleteDB(QTcpSocket* socket)
 {
+    int id = socket->socketDescriptor();
+    std::string name;
+    QVector<ownedDB> newVec;
 
+    for(int i = 0; i < databases.size(); ++i)
+    {
+        if(databases[i].id == id){
+            name = databases[i].db.databaseName().toStdString();
+            //ownedDB* temp = databases[i];
+            //databases.erase(temp);
+            break;
+        }else{
+            newVec.push_back(databases[i]);
 
-
-
+        }
+    }
+    std::remove(name.c_str());
 }
