@@ -224,11 +224,11 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		int sid = text_query->value(1).toInt();
 		double x = text_query->value(2).toDouble();
 		double y = text_query->value(3).toDouble();
-		std::string text = text_query->value(4).toString();
+        std::string text = text_query->value(4).toString().toStdString();
 		QColor color = QColor(text_query->value(5).toString());
-		itemStats temp(bid, shape, sid, x, y, y2, text, color);
-		QJsonObject text = temp.toJson();
-		shapes.push_back(text);
+        itemStats temp(bid, shape, sid, x, y, text, color);
+        QJsonObject textTemp = temp.toJson();
+        shapes.push_back(textTemp);
 	}
 	
     QSqlQuery *latex_query = new QSqlQuery;
@@ -241,9 +241,9 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		int sid = latex_query->value(1).toInt();
 		double x = latex_query->value(2).toDouble();
 		double y = latex_query->value(3).toDouble();
-		std::string text = latex_query->value(4).toString();
+        std::string text = latex_query->value(4).toString().toStdString();
 		QColor color = QColor(latex_query->value(5).toString());
-		itemStats temp(bid, shape, sid, x, y, y2, text, color);
+        itemStats temp(bid, shape, sid, x, y, text, color);
 		QJsonObject latex = temp.toJson();
 		shapes.push_back(latex);
 	}
