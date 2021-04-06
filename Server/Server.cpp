@@ -1,5 +1,4 @@
 #include "Server.h"
-#include "../Client/itemStats.h"
 #include <iostream>
 #include <QDataStream>
 #include <QSqlQuery>
@@ -148,50 +147,55 @@ void Server::createBoard(QTcpSocket* socket)
 
 void Server::saveDB(QTcpSocket* socket)
 {
+	QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
 	db.setDatabaseName("CMSC461.db");
 	db.open();
-	QByteArray everything = itemStats();
+	QByteArray everything;
+	std::string board = "CMSC461";
 
 	QSqlQuery elQuery("SELECT * FROM Ellipse");
-	QByteArray ellipses = itemStats();
+	QByteArray ellipses;
 	while(elQuery.next()){
-		QByteArray data = itemStats("CMSC461","ellipse",elQuery.value(1),elQuery.value(2),elQuery.value(3),elQuery.value(4),elQuery.value(5),QColor(elQuery.value(6).toString())).byteData();
+		std::string shape = "ellipse";
+		QByteArray data = itemStats(board,shape,elQuery.value(1).toInt(),elQuery.value(2).toDouble(),elQuery.value(3).toDouble(),elQuery.value(4).toDouble(),elQuery.value(5).toDouble(),QColor(elQuery.value(6).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
-		QJsonObject obj = doc.object();
-		data = QJsonDocument::toJson(obj);
+		//QJsonObject obj = doc.object();
+		data = doc.toJson();
 		ellipses.append(data);
 	}
-	everything += "{\"Ellipse\":{"
+	everything += "{\"Ellipse\":{";
 	everything.append(ellipses);
 
 	QSqlQuery liQuery("SELECT * FROM Line");
-	QByteArray lines = itemStats();
+	QByteArray lines;
 	while(liQuery.next()){
-		QByteArray data = itemStats("CMSC461","line",liQuery.value(1),liQuery.value(2),liQuery.value(3),liQuery.value(4),liQuery.value(5),QColor(liQuery.value(6).toString())).byteData();
+		std::string shape = "line";
+		QByteArray data = itemStats(board,shape,liQuery.value(1).toInt(),liQuery.value(2).toDouble(),liQuery.value(3).toDouble(),liQuery.value(4).toDouble(),liQuery.value(5).toDouble(),QColor(liQuery.value(6).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
-		QJsonObject obj = doc.object();
-		data = QJsonDocument::toJson(obj);
+		//QJsonObject obj = doc.object();
+		data = doc.toJson();
 		lines.append(data);
 	}
-	everything += "}\"Line\":{"
+	everything += "}\"Line\":{";
 	everything.append(lines);
 
 	QSqlQuery reQuery("SELECT * FROM Rect");
-	QByteArray rectangles = itemStats();
-	while(liQuery.next()){
-		QByteArray data = itemStats("CMSC461","rect",reQuery.value(1),reQuery.value(2),reQuery.value(3),reQuery.value(4),reQuery.value(5),QColor(reQuery.value(6).toString())).byteData();
+	QByteArray rectangles;
+	while(reQuery.next()){
+		std::string shape = "rect";
+		QByteArray data = itemStats(board,shape,reQuery.value(1).toInt(),reQuery.value(2).toDouble(),reQuery.value(3).toDouble(),reQuery.value(4).toDouble(),reQuery.value(5).toDouble(),QColor(reQuery.value(6).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
-		QJsonObject obj = doc.object();
-		data = QJsonDocument::toJson(obj);
+		//QJsonObject obj = doc.object();
+		data = doc.toJson();
 		rectangles.append(data);
 	}
-	everything += "}\"Rect\":{"
+	everything += "}\"Rect\":{";
 	everything.append(rectangles);
 
-	everything += "}"
+	everything += "}";
 	QJsonDocument doc = QJsonDocument::fromJson(everything);
-	QJsonObject obj = doc.object();
-	everything = QJsonDocument::toJson(obj);
+	//QJsonObject obj = doc.object();
+	everything = doc.toJson();
 	std::cout << "Client Disconnected. Sending:\n" << everything.toStdString() << std::endl;
 
 	QDataStream socketstream(socket);
