@@ -11,7 +11,7 @@ Window::Window() : QMainWindow()
 	//This sets up a toolbar inside the mainwindow with the 'this' call.
 	
 	m_scene = new ProjectScene();
-    	m_scene->setBackgroundBrush(Qt::white);
+    m_scene->setBackgroundBrush(Qt::white);
 	m_view = new ProjectView; //Custom graphics scene where we can overload stuff
 	m_view->change_tool(1); // set default tool to line
 	m_view->change_color(255,0,0); // set default color to black

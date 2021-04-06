@@ -13,7 +13,7 @@ ToolBar::ToolBar() : QWidget()
 	m_yellow = new QPushButton(QIcon("./icons/yellow.png"), tr("Yellow"));
 	m_blue = new QPushButton(QIcon("./icons/blue.png"), tr("Blue"));
 	m_color_picker = new QPushButton(QIcon("./icons/colorPicker.png"), tr("Color Picker"));
-    	m_fill = new QPushButton(QIcon("./icons/fill.png"), tr("Fill"));
+    m_fill = new QPushButton(QIcon("./icons/fill.png"), tr("Fill"));
 	m_text = new QPushButton(QIcon("./icons/text.png"), tr("Text"));
 	m_layout = new QVBoxLayout(this);
 
@@ -31,19 +31,19 @@ ToolBar::ToolBar() : QWidget()
 	m_layout->addWidget(m_text);
 
 	connect(m_default, SIGNAL(clicked()), this, SLOT(set_default()));
-        connect(m_circle, SIGNAL(clicked()), this, SLOT(set_circle()));
-        connect(m_line, SIGNAL(clicked()), this, SLOT(set_line()));
-    	connect(m_rect, SIGNAL(clicked()), this, SLOT(place_rectangle()));
-	connect(m_text, SIGNAL(clicked()), this, SLOT(text()));
+    connect(m_circle, SIGNAL(clicked()), this, SLOT(set_circle()));
+    connect(m_line, SIGNAL(clicked()), this, SLOT(set_line()));
+    connect(m_rect, SIGNAL(clicked()), this, SLOT(place_rectangle()));
+	connect(m_text, SIGNAL(clicked()), this, SLOT(set_text()));
 
-    	// bind color buttons
-    	connect(m_black, SIGNAL(clicked()), this, SLOT(set_color_black()));
-    	connect(m_red, SIGNAL(clicked()), this, SLOT(set_color_red()));
-    	connect(m_green, SIGNAL(clicked()), this, SLOT(set_color_green()));
-    	connect(m_yellow, SIGNAL(clicked()), this, SLOT(set_color_yellow()));
-    	connect(m_blue, SIGNAL(clicked()), this, SLOT(set_color_blue()));
-    	connect(m_color_picker, SIGNAL(clicked()), this, SLOT(set_color_custom()));
-        connect(m_fill, SIGNAL(clicked()), this, SLOT(fill()));
+    // bind color buttons
+    connect(m_black, SIGNAL(clicked()), this, SLOT(set_color_black()));
+    connect(m_red, SIGNAL(clicked()), this, SLOT(set_color_red()));
+    connect(m_green, SIGNAL(clicked()), this, SLOT(set_color_green()));
+    connect(m_yellow, SIGNAL(clicked()), this, SLOT(set_color_yellow()));
+    connect(m_blue, SIGNAL(clicked()), this, SLOT(set_color_blue()));
+    connect(m_color_picker, SIGNAL(clicked()), this, SLOT(set_color_custom()));
+    connect(m_fill, SIGNAL(clicked()), this, SLOT(fill()));
  	
 	setLayout(m_layout);
 
@@ -117,9 +117,11 @@ void ToolBar::place_rectangle()
 {
         m_view->change_tool(3);
 }
-void ToolBar::fill(){
+void ToolBar::fill()
+{
 	m_view->change_tool(4);
 }
-void ToolBar::text(){
+void ToolBar::set_text()
+{
 	m_view->change_tool(5);
 }

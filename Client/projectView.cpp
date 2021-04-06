@@ -50,11 +50,17 @@ void ProjectView::fill()
 
      }
 }
-void text(){
-	QGraphicsTextItem* text = newGraphicsTextItem("text");
-	text->setTextInteractionFlags(Qt::TextEditorInteraction);
-	text->setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | ti->flags());
-	scene()->addItem(text);
+void ProjectView::text_tool(qreal x, qreal y)
+{
+    QString temp = "Test";
+	QGraphicsTextItem* text = scene()->addText(temp);
+    text->setPos(x, y);
+	// text->setTextInteractionFlags(Qt::TextEditorInteraction);
+	text->setFlag(QGraphicsItem::ItemIsSelectable, true);
+	text->setFlag(QGraphicsItem::ItemIsMovable, true);
+	text->setCursor(Qt::PointingHandCursor);
+	text->setData(0, -1);
+    text->setData(1, "text");
 }
 void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 {		
@@ -141,10 +147,11 @@ void ProjectView::mouseReleaseEvent(QMouseEvent *event)
         fill();
         break;
     case 5:
-	text();
-	break;
+        text_tool(x, y);
+        break;
     default:
         std::cout << "error" << std::endl;
+        break;
 
     }
 

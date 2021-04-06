@@ -23,12 +23,12 @@ class ProjectView : public QGraphicsView
 	public:
 		void change_tool(int tool);
 		void change_color(int r, int g, int b);
-                void fill();
-		void text();
-                void circle_tool(qreal x, qreal y,qreal x2, qreal y2);
-                void line_tool(qreal x, qreal y, qreal x2, qreal y2);
+        void fill();
+		void text_tool(qreal x, qreal y);
+        void circle_tool(qreal x, qreal y,qreal x2, qreal y2);
+        void line_tool(qreal x, qreal y, qreal x2, qreal y2);
 		void rect_tool(qreal x, qreal y, qreal x2, qreal y2);
-                void mousePressEvent(QMouseEvent* event);
+        void mousePressEvent(QMouseEvent* event);
 		void mouseReleaseEvent(QMouseEvent* event);
 		ProjectView();
 		~ProjectView();

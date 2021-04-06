@@ -28,20 +28,20 @@ class ToolBar : public QWidget
 		ProjectView* m_view;
 	public slots:
 		// set default
-        	void set_default();
-        	// shapes
-        	void place_rectangle();
-        	void set_line();
-        	void set_circle();
-        	// colors
-        	void set_color_black();
-        	void set_color_red();
-        	void set_color_green();
-        	void set_color_yellow();
-        	void set_color_blue();
-        	void set_color_custom();
-            	void fill();
-		void text();
+        void set_default();
+        // shapes
+        void place_rectangle();
+        void set_line();
+        void set_circle();
+        // colors
+        void set_color_black();
+        void set_color_red();
+        void set_color_green();
+        void set_color_yellow();
+        void set_color_blue();
+        void set_color_custom();
+        void fill();
+		void set_text();
 	public:
 		ToolBar();
 		~ToolBar();
