@@ -25,6 +25,8 @@ ProjectScene::ProjectScene()
 
 	//Sets up the socket that will be connected to the server.
         m_socket = new QTcpSocket(this);
+	m_timer = new QTimer(this);
+	connect(m_timer, SIGNAL(timeout()), this, SLOT(check_pos()));
 	
 	//Connects signals from the socket to functions on the client.
 	//readyRead signals that the socket has received data and is ready
@@ -107,6 +109,10 @@ void ProjectScene::fullUpdate(QJsonObject data)
 	//from the server itself. That'll catch it up to speed with everything else.
 }
 
+void ProjectScene::checkPos()
+{
+
+}
 
 //sends the data about the object that was on the scene to the server. 
 void ProjectScene::sceneChanged(const QList<QRectF> &region) 
