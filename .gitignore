@@ -1,3 +1,5 @@
+Server/Server
+Server/Makefile
 461DrawingProject
 compile_commands.json
 *.o

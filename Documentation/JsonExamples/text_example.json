@@ -1,0 +1,12 @@
+{
+    "data": {
+        "bid": "None",
+        "color": "ffffff",
+        "start": {
+            "x": "100",
+            "y": "25"
+        },
+        "text": "This is an example!"
+    },
+    "shape": "text"
+}
