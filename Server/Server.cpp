@@ -2,6 +2,9 @@
 #include <iostream>
 #include <QDataStream>
 #include <QSqlQuery>
+#include <QString>
+#include <stdio.h>
+#include <string>
 
 Server::Server() : QMainWindow()
 {
@@ -133,20 +136,37 @@ void Server::createBoard(QTcpSocket* socket)
     //bid = Board ID
     //sid = Shape ID
     //cid = Client/User ID
-    dbQuery->exec("CREATE TABLE Ellipse (bid int, sid int, x1 int, x2 int, y1 int, y2 int, color string, cid int);");
-    dbQuery->exec("CREATE TABLE Line (bid int, sid int, x1 int, x2 int, y1 int, y2 int, color string, cid int);");
-    dbQuery->exec("CREATE TABLE Rect (bid int, sid int, x int, y int, width int, height int, color string, cid int);");
+    dbQuery->exec("CREATE TABLE Ellipse (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
+    dbQuery->exec("CREATE TABLE Line (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
+    dbQuery->exec("CREATE TABLE Rect (bid int, sid int, x int, y int, width int, height int, fill string, outline string, cid int);");
+    dbQuery->exec("CREATE TABLE Latex (bid int, sid int, x int, y int, code string, color string, cid int");
+    dbQuery->exec("CREATE TABLE Text (bid int, sid int, x int, y int, code string, color string, cid int");
 
+	ownedDB newDB;
     newDB.id = socket->socketDescriptor();
     newDB.db = db;
 
     databases.push_back(newDB);
+	return;
 }
 
 void Server::deleteDB(QTcpSocket* socket)
 {
+    int id = socket->socketDescriptor();
+    std::string name;
+    QVector<ownedDB> newVec;
 
+    for(int i = 0; i < databases.size(); ++i)
+    {
+        if(databases[i].id == id){
+            name = databases[i].db.databaseName().toStdString();
+            //ownedDB* temp = databases[i];
+            //databases.erase(temp);
+            break;
+        }else{
+            newVec.push_back(databases[i]);
 
-
-
+        }
+    }
+    std::remove(name.c_str());
 }
