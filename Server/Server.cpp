@@ -166,9 +166,9 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		double x2 = circle_query->value(3).toDouble();
 		double y1 = circle_query->value(4).toDouble();
 		double y2 = circle_query->value(5).toDouble();
-		QColor color = QColor(circle_query->value(6).toString());
-		std::string text = "";
-		itemStats temp(bid, shape, sid, x1, y1, x2, y2, color, text);
+		QColor fillColor = QColor(circle_query->value(6).toString());
+		QColor outlineColor = QColor(circle_query->value(7).toString());
+		itemStats temp(bid, shape, sid, x1, y1, x2, y2, fillColor, outlineColor);
 		QJsonObject cir = temp.toJson();
 		shapes.push_back(cir);
 	}
@@ -185,9 +185,9 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		double x2 = rect_query->value(3).toDouble();
 		double y1 = rect_query->value(4).toDouble();
 		double y2 = rect_query->value(5).toDouble();
-		QColor color = QColor(rect_query->value(6).toString());
-		std::string text = "";
-		itemStats temp(bid, shape, sid, x1, y1, x2, y2, color, text);
+		QColor fillColor = QColor(circle_query->value(6).toString());
+		QColor outlineColor = QColor(circle_query->value(7).toString());
+		itemStats temp(bid, shape, sid, x1, y1, x2, y2, fillColor, outlineColor);
 		QJsonObject rect = temp.toJson();
 		shapes.push_back(rect);
 	}
@@ -204,16 +204,49 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		double x2 = line_query->value(3).toDouble();
 		double y1 = line_query->value(4).toDouble();
 		double y2 = line_query->value(5).toDouble();
-		QColor color = QColor(line_query->value(6).toString());
-		std::string text = "";
-		itemStats temp(bid, shape, sid, x1, y1, x2, y2, color, text);
-		QJsonObject rect = temp.toJson();
-		shapes.push_back(rect);
+		QColor fillColor = QColor(circle_query->value(6).toString());
+		QColor outlineColor = QColor(circle_query->value(7).toString());
+		itemStats temp(bid, shape, sid, x1, y1, x2, y2, fillColor, outlineColor);
+		QJsonObject line = temp.toJson();
+		shapes.push_back(line);
 	}
 
+    QSqlQuery *text_query = new QSqlQuery;
+	text_query->exec("SELECT * FROM Text");
+    text_query->first();
+    
+	while(text_query->next()){
+        std::string bid = text_query->value(0).toString().toStdString();
+		std::string shape = "text";
+		int sid = text_query->value(1).toInt();
+		double x = text_query->value(2).toDouble();
+		double y = text_query->value(3).toDouble();
+		std::string text = text_query->value(4).toString();
+		QColor color = QColor(text_query->value(5).toString());
+		itemStats temp(bid, shape, sid, x, y, y2, color, text);
+		QJsonObject text = temp.toJson();
+		shapes.push_back(text);
+	}
+	
+    QSqlQuery *latex_query = new QSqlQuery;
+	latex_query->exec("SELECT * FROM Latex");
+    latex_query->first();
+    
+	while(latex_query->next()){
+        std::string bid = latex_query->value(0).toString().toStdString();
+		std::string shape = "latex";
+		int sid = latex_query->value(1).toInt();
+		double x = latex_query->value(2).toDouble();
+		double y = latex_query->value(3).toDouble();
+		std::string text = latex_query->value(4).toString();
+		QColor color = QColor(latex_query->value(5).toString());
+		itemStats temp(bid, shape, sid, x, y, y2, color, text);
+		QJsonObject latex = temp.toJson();
+		shapes.push_back(latex);
+	}
+	
 	//Create a JSON object of all the shapes using their sid as a key
     QJsonObject full_board;
-	full_board.insert("fullUpdate", "test");
 	for(QJsonObject temp : shapes){
 		full_board.insert(temp.value("sid").toString(), temp);
 	}
