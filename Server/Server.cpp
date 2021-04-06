@@ -207,9 +207,8 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		double x2 = line_query->value(3).toDouble();
 		double y1 = line_query->value(4).toDouble();
 		double y2 = line_query->value(5).toDouble();
-		QColor fillColor = QColor(circle_query->value(6).toString());
-		QColor outlineColor = QColor(circle_query->value(7).toString());
-		itemStats temp(bid, shape, sid, x1, y1, x2, y2, fillColor, outlineColor);
+		QColor outlineColor = QColor(circle_query->value(6).toString());
+		itemStats temp(bid, shape, sid, x1, y1, x2, y2, outlineColor);
 		QJsonObject line = temp.toJson();
 		shapes.push_back(line);
 	}
