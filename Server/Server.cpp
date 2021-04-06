@@ -1,4 +1,5 @@
 #include "Server.h"
+#include "../Client/itemStats.h"
 #include <iostream>
 #include <QDataStream>
 #include <QSqlQuery>
@@ -67,6 +68,7 @@ void Server::disconnect()
 	//it was.
 	QTcpSocket* socket = reinterpret_cast<QTcpSocket*>(sender());
 
+	saveDB(socket);
     deleteDB(socket);
 
 	//Finds the socket.
@@ -142,6 +144,51 @@ void Server::createBoard(QTcpSocket* socket)
     newDB.db = db;
 
     databases.push_back(newDB);
+}
+
+void Server::saveDB(QTcpSocket* socket)
+{
+	db.setDatabaseName("CMSC461.db");
+	db.open();
+	QByteArray everything = itemStats();
+
+	QSqlQuery elQuery("SELECT * FROM Ellipse");
+	QByteArray ellipses = itemStats();
+	while(elQuery.next()){
+		QByteArray data = itemStats("CMSC461","ellipse",elQuery.value(1),elQuery.value(2),elQuery.value(3),elQuery.value(4),elQuery.value(5),elQuery.value(6).toString()).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		QJsonObject obj = doc.object();
+		data = QJsonDocument::toJson(obj);
+		ellipses.append(data);
+	}
+	everything += "{\"Ellipse\":{"
+	everything.append(ellipses);
+
+	QSqlQuery liQuery("SELECT * FROM Line");
+	QByteArray lines = itemStats();
+	while(liQuery.next()){
+		QByteArray data = itemStats("CMSC461","line",liQuery.value(1),liQuery.value(2),liQuery.value(3),liQuery.value(4),liQuery.value(5),liQuery.value(6).toString()).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		QJsonObject obj = doc.object();
+		data = QJsonDocument::toJson(obj);
+		lines.append(data);
+	}
+	everything += "}\"Line\":{"
+	everything.append(lines);
+
+	QSqlQuery reQuery("SELECT * FROM Rect");
+	QByteArray rectangles = itemStats();
+	while(liQuery.next()){
+		QByteArray data = itemStats("CMSC461","rect",reQuery.value(1),reQuery.value(2),reQuery.value(3),reQuery.value(4),reQuery.value(5),reQuery.value(6).toString()).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		QJsonObject obj = doc.object();
+		data = QJsonDocument::toJson(obj);
+		rectangles.append(data);
+	}
+	everything += "}\"Rect\":{"
+	everything.append(rectangles);
+
+	//cout << "{Ellipse:{" << elQuery.result() << "}Line:{" << liQuery.result() << "}Rect:{" << reQuery.result() << "}";
 }
 
 void Server::deleteDB(QTcpSocket* socket)
