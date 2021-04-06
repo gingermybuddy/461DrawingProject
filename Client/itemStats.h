@@ -21,7 +21,8 @@ struct itemStats
     double y;
     double height;
     double width;
-    QColor rgb;
+    QColor outline;
+    QColor fill;
 
 
 	//Functions to turn the thing into a QJsonObject
@@ -35,8 +36,9 @@ struct itemStats
 	//insert.
 	itemStats();
 	itemStats(std::string board_id, QGraphicsItem* item);
-	itemStats(std::string board_id, std::string type, int id, double x, double y, double height, double width, QColor rgb);
-	itemStats(std::string board_id, std::string type, int id, double x, double y, std::string text, QColor rgb); //constructor for text items
+	itemStats(std::string board_id, std::string type, int id, double x, double y, double height, double width, QColor fill, QColor outline);
+	itemStats(std::string board_id, std::string type, int id, double x, double y, double height, double width, QColor outline);
+	itemStats(std::string board_id, std::string type, int id, double x, double y, std::string text, QColor outline); //constructor for text items
 	~itemStats();
 };
 
