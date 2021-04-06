@@ -168,6 +168,7 @@ void Server::saveDB(QTcpSocket* socket)
 		//QJsonObject obj = doc.object();
 		data = doc.toJson();
 		ellipses.append(data);
+		std::cout << "An Ellipse" << std::endl;
 	}
 	everything += "{\"Ellipse\":{";
 	everything.append(ellipses);
@@ -181,6 +182,7 @@ void Server::saveDB(QTcpSocket* socket)
 		//QJsonObject obj = doc.object();
 		data = doc.toJson();
 		lines.append(data);
+		std::cout << "A Line" << std::endl;
 	}
 	everything += "}\"Line\":{";
 	everything.append(lines);
@@ -194,6 +196,7 @@ void Server::saveDB(QTcpSocket* socket)
 		//QJsonObject obj = doc.object();
 		data = doc.toJson();
 		rectangles.append(data);
+		std::cout << "A Rectangle" << std::endl;
 	}
 	everything += "}\"Rect\":{";
 	everything.append(rectangles);

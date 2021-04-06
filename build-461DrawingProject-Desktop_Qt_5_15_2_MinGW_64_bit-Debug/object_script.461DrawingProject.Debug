@@ -1,0 +1,10 @@
+debug/main.o
+debug/ProjectView.o
+debug/ProjectScene.o
+debug/toolBar.o
+debug/itemStats.o
+debug/window.o
+debug/moc_ProjectView.o
+debug/moc_ProjectScene.o
+debug/moc_toolBar.o
+debug/moc_window.o
