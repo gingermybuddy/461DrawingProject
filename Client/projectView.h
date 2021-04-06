@@ -25,6 +25,7 @@ class ProjectView : public QGraphicsView
 		void change_color(int r, int g, int b);
         void fill();
 		void text_tool(qreal x, qreal y);
+		void latex_tool(qreal x, qreal y);
         void circle_tool(qreal x, qreal y,qreal x2, qreal y2);
         void line_tool(qreal x, qreal y, qreal x2, qreal y2);
 		void rect_tool(qreal x, qreal y, qreal x2, qreal y2);
