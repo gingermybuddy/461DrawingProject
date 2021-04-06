@@ -33,6 +33,7 @@ class ProjectScene : public QGraphicsScene
 	signals:	
 	public:
                 int trackItem(QGraphicsItem* item);
+		void fullUpdate(QJsonObject data);
 		ProjectScene();
 		~ProjectScene();
 };
