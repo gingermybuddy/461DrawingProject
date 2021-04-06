@@ -223,7 +223,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		double y = text_query->value(3).toDouble();
 		std::string text = text_query->value(4).toString();
 		QColor color = QColor(text_query->value(5).toString());
-		itemStats temp(bid, shape, sid, x, y, y2, color, text);
+		itemStats temp(bid, shape, sid, x, y, y2, text, color);
 		QJsonObject text = temp.toJson();
 		shapes.push_back(text);
 	}
@@ -240,7 +240,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		double y = latex_query->value(3).toDouble();
 		std::string text = latex_query->value(4).toString();
 		QColor color = QColor(latex_query->value(5).toString());
-		itemStats temp(bid, shape, sid, x, y, y2, color, text);
+		itemStats temp(bid, shape, sid, x, y, y2, text, color);
 		QJsonObject latex = temp.toJson();
 		shapes.push_back(latex);
 	}
