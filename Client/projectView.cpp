@@ -50,7 +50,12 @@ void ProjectView::fill()
 
      }
 }
-
+void text(){
+	QGraphicsTextItem* text = newGraphicsTextItem("text");
+	text->setTextInteractionFlags(Qt::TextEditorInteraction);
+	text->setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | ti->flags());
+	scene()->addItem(text);
+}
 void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 {		
 	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
@@ -135,6 +140,9 @@ void ProjectView::mouseReleaseEvent(QMouseEvent *event)
     case 4:
         fill();
         break;
+    case 5:
+	text();
+	break;
     default:
         std::cout << "error" << std::endl;
 
