@@ -36,7 +36,7 @@ struct itemStats
 	itemStats();
 	itemStats(std::string board_id, QGraphicsItem* item);
 	itemStats(std::string board_id, std::string type, int id, double x, double y, double height, double width, QColor rgb);
-	itemStats(std::string board_id, std::string type, int id, std::string text); //constructor for text items
+	itemStats(std::string board_id, std::string type, int id, double x, double y, std::string text, QColor rgb); //constructor for text items
 	~itemStats();
 };
 
