@@ -155,7 +155,7 @@ void Server::saveDB(QTcpSocket* socket)
 	QSqlQuery elQuery("SELECT * FROM Ellipse");
 	QByteArray ellipses = itemStats();
 	while(elQuery.next()){
-		QByteArray data = itemStats("CMSC461","ellipse",elQuery.value(1),elQuery.value(2),elQuery.value(3),elQuery.value(4),elQuery.value(5),elQuery.value(6).toString()).byteData();
+		QByteArray data = itemStats("CMSC461","ellipse",elQuery.value(1),elQuery.value(2),elQuery.value(3),elQuery.value(4),elQuery.value(5),QColor(elQuery.value(6).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		QJsonObject obj = doc.object();
 		data = QJsonDocument::toJson(obj);
@@ -167,7 +167,7 @@ void Server::saveDB(QTcpSocket* socket)
 	QSqlQuery liQuery("SELECT * FROM Line");
 	QByteArray lines = itemStats();
 	while(liQuery.next()){
-		QByteArray data = itemStats("CMSC461","line",liQuery.value(1),liQuery.value(2),liQuery.value(3),liQuery.value(4),liQuery.value(5),liQuery.value(6).toString()).byteData();
+		QByteArray data = itemStats("CMSC461","line",liQuery.value(1),liQuery.value(2),liQuery.value(3),liQuery.value(4),liQuery.value(5),QColor(liQuery.value(6).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		QJsonObject obj = doc.object();
 		data = QJsonDocument::toJson(obj);
@@ -179,7 +179,7 @@ void Server::saveDB(QTcpSocket* socket)
 	QSqlQuery reQuery("SELECT * FROM Rect");
 	QByteArray rectangles = itemStats();
 	while(liQuery.next()){
-		QByteArray data = itemStats("CMSC461","rect",reQuery.value(1),reQuery.value(2),reQuery.value(3),reQuery.value(4),reQuery.value(5),reQuery.value(6).toString()).byteData();
+		QByteArray data = itemStats("CMSC461","rect",reQuery.value(1),reQuery.value(2),reQuery.value(3),reQuery.value(4),reQuery.value(5),QColor(reQuery.value(6).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		QJsonObject obj = doc.object();
 		data = QJsonDocument::toJson(obj);
@@ -188,6 +188,14 @@ void Server::saveDB(QTcpSocket* socket)
 	everything += "}\"Rect\":{"
 	everything.append(rectangles);
 
+	everything += "}"
+	QJsonDocument doc = QJsonDocument::fromJson(everything);
+	QJsonObject obj = doc.object();
+	everything = QJsonDocument::toJson(obj);
+	std::cout << "Client Disconnected. Sending:\n" << everything.toStdString() << std::endl;
+
+	QDataStream socketstream(socket);
+	socketstream << everything;
 	//cout << "{Ellipse:{" << elQuery.result() << "}Line:{" << liQuery.result() << "}Rect:{" << reQuery.result() << "}";
 }
 
