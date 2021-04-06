@@ -12,6 +12,12 @@ curl = "curl http://127.0.0.1:5000/addShape?shape=line&bid=test&sid=1&x1=10&y1=1
 result = subprocess.check_output(curl, shell=True)
 print(result)
 
+#check ellipse
+curlE = "curl http://127.0.0.1:5000/addShape?shape=ellipse&bid=None&sid=1&x1=10&y1=10&x2=100&y2=100&color=00000F"
+result = 
+
+
+
 #class TestSum(unittest.TestCase):
 
  #   def test_circle(self):

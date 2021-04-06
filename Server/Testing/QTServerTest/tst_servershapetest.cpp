@@ -1,8 +1,9 @@
-#include <QtTest>
+#include <QtTest/QtTest>
+#include "../../Server.h"
 
 // add necessary includes here
 
-class ServerShapeTest : public QObject
+class ServerShapeTest: public QObject
 {
     Q_OBJECT
 
@@ -11,8 +12,11 @@ public:
     ~ServerShapeTest();
 
 private slots:
-    void test_case1();
+    void testConstructor();
+    void init();
 
+private:
+    Server ser;
 };
 
 ServerShapeTest::ServerShapeTest()
@@ -25,9 +29,14 @@ ServerShapeTest::~ServerShapeTest()
 
 }
 
-void ServerShapeTest::test_case1()
+void ServerShapeTest::testConstructor()
 {
+    QVERIFY(true);
+}
 
+void ServerShapeTest::init()
+{
+    ser = Server();
 }
 
 QTEST_APPLESS_MAIN(ServerShapeTest)
