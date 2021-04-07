@@ -370,7 +370,6 @@ void Server::saveDB(QTcpSocket* socket)
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
-		std::cout << "An Ellipse:\n" << data.toStdString() << std::endl;
 	}
 
 	QSqlQuery liQuery("SELECT * FROM Line");
@@ -380,7 +379,6 @@ void Server::saveDB(QTcpSocket* socket)
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
-		std::cout << "A Line:\n" << data.toStdString() << std::endl;
 	}
 
 	QSqlQuery reQuery("SELECT * FROM Rect");
@@ -390,17 +388,31 @@ void Server::saveDB(QTcpSocket* socket)
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
-		std::cout << "A Rectangle:\n" << data.toStdString() << std::endl;
 	}
 
-//	QJsonDocument doc = QJsonDocument::fromJson(everything);
-//	everything = doc.toJson();
+	QSqlQuery txQuery("SELECT * FROM Text");
+	while(txQuery.next()){
+		std::string shape = "text";
+		QByteArray data = itemStats(board,shape,txQuery.value(1).toInt(),txQuery.value(2).toDouble(),txQuery.value(3).toDouble(),txQuery.value(4).toString().toStdString(),QColor(txQuery.value(5).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	QSqlQuery laQuery("SELECT * FROM Latex");
+	while(laQuery.next()){
+		std::string shape = "latex";
+		QByteArray data = itemStats(board,shape,laQuery.value(1).toInt(),laQuery.value(2).toDouble(),laQuery.value(3).toDouble(),laQuery.value(4).toString().toStdString(),QColor(laQuery.value(5).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
 	everything.append("]");
 	std::cout << "Client Disconnected. Sending:\n" << everything.toStdString() << std::endl;
 
 	QDataStream socketstream(socket);
 	socketstream << everything;
-	//cout << "{Ellipse:{" << elQuery.result() << "}Line:{" << liQuery.result() << "}Rect:{" << reQuery.result() << "}";
 }
 
 void Server::deleteDB(QTcpSocket* socket)
