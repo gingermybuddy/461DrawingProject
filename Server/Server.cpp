@@ -215,11 +215,10 @@ void Server::readSocket()
 
 void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 {
-
     //Initialize QSqlQuery for the Circles table of "db"
     QSqlQuery *circle_query = new QSqlQuery;
     circle_query->exec("SELECT * FROM Ellipse");
-    circle_query->first();
+    //circle_query->first();
 
     //Loop through and repeat for whole table
     while(circle_query->next()){
@@ -237,10 +236,10 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		shapes.push_back(cir);
 	}
 
-    QSqlQuery *rect_query = new QSqlQuery;
-	rect_query->exec("SELECT * FROM Rect");
-    rect_query->first();
-    
+   /*QSqlQuery *rect_query = new QSqlQuery;
+   rect_query->exec("SELECT * FROM Rect");
+   //rect_query->first();
+
 	while(rect_query->next()){
         std::string bid = rect_query->value(0).toString().toStdString();
 		std::string shape = "rect";
@@ -273,7 +272,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		QJsonObject line = temp.toJson();
 		shapes.push_back(line);
 	}
-
+/*
     QSqlQuery *text_query = new QSqlQuery;
 	text_query->exec("SELECT * FROM Text");
     text_query->first();
@@ -306,13 +305,17 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
         itemStats temp(bid, shape, sid, x, y, text, color);
 		QJsonObject latex = temp.toJson();
 		shapes.push_back(latex);
-	}
+	}*/
 	
 	//Create a JSON object of all the shapes using their sid as a key
-    QJsonObject full_board;
+    	QJsonObject full_board;
 	for(QJsonObject temp : shapes){
-		full_board.insert(temp.value("sid").toString(), temp);
+        std::cout << "shape ";
+        std::cout << temp.value("shape").toString().toStdString();
+        std::cout << " added" << std::endl;
+        full_board.insert(temp.value("sid").toString(), temp);
 	}
+
 	//Create JSON Document to write to the buffer
 	QJsonDocument doc(full_board);
 
