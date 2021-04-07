@@ -107,6 +107,7 @@ QJsonObject itemStats::toJson()
 	if(type == "text") {
 		data.insert("color", QJsonValue(outline.name()));
 		data.insert("start", QJsonValue(start));
+        data.insert("sid", QJsonValue(id)),
 		data.insert("text", QJsonValue(QString::fromStdString(text)));
 		returnval.insert("data", QJsonValue(data));
 		returnval.insert("shape", QJsonValue(QString::fromStdString(type)));

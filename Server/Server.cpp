@@ -133,7 +133,27 @@ void Server::readSocket()
 
 	QJsonDocument doc = QJsonDocument::fromJson(buf);
 	QJsonObject obj = doc.object();
-    m_shapes.push_back(obj);
+    bool found = false;
+    for(int i = 0; i < m_shapes.size(); ++i){
+        if(obj.value("data").toObject().value("sid").toInt() == m_shapes[i].value("data").toObject().value("sid").toInt()) {
+            m_shapes[i] = obj;
+            found = true;
+            break;
+        }
+    }
+    if(!found) {
+        m_shapes.push_back(obj);
+    }
+    for(QTcpSocket* sock : connected) {
+        if (sock == socket) continue;
+        QJsonDocument sent_doc(obj);
+        QByteArray package = sent_doc.toJson();
+        std::cout << "Sending: " << package.toStdString() << std::endl;
+        QDataStream sockstream(sock);
+        sockstream.startTransaction();
+        sockstream << package;
+        sockstream.commitTransaction();
+    }
     std::cout << m_shapes.size() << std::endl;
 
     QSqlQuery inserter;
@@ -216,6 +236,7 @@ void Server::readSocket()
 
 void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 {
+    /*
     //Initialize QSqlQuery for the Circles table of "db"
     QSqlQuery *circle_query = new QSqlQuery;
     circle_query->exec("SELECT * FROM Ellipse");
@@ -270,7 +291,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		itemStats temp(bid, shape, sid, x1, y1, x2, y2, outlineColor);
         shapes.push_back(temp);
 	}
-/*
+
     QSqlQuery *text_query = new QSqlQuery;
 	text_query->exec("SELECT * FROM Text");
     text_query->first();
@@ -301,12 +322,13 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		QColor color = QColor(latex_query->value(5).toString());
         itemStats temp(bid, shape, sid, x, y, text, color);
         shapes.push_back(temp);
-    }*/
+    }
 
 	//Create a JSON object of all the shapes using their sid as a key
     delete rect_query;
     delete line_query;
     delete circle_query;
+*/
 
     QJsonObject full_board;
     full_board.insert("fullUpdate", "test");
@@ -336,6 +358,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 	QDataStream sockstream(socket);
 	sockstream.startTransaction();
     sockstream << buf;
+    sockstream.commitTransaction();
 }
 
 void Server::createBoard(QTcpSocket* socket)

@@ -88,6 +88,9 @@ void ProjectScene::readSocket()
             shapes.push_back(obj.value(str).toObject());
         }
         updateCanvas(shapes);
+        for(QGraphicsItem* i : items()){
+            m_tracked_items.push_back(itemStats(m_board_id, i));
+        }
 		return;
     }
     std::vector<QJsonObject> shapes;
@@ -149,7 +152,7 @@ void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
             e->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
             e->setCursor(Qt::PointingHandCursor);
             e->setData(0, d.value("sid").toInt());
-            e->setData(1, "rect");
+            e->setData(1, "ellipse");
 
         } else if (type == "text") {
             QString text = d.value("text").toString();
@@ -181,7 +184,6 @@ int ProjectScene::trackItem(QGraphicsItem* item)
 void ProjectScene::checkPos()
 {
 	//QList<QGraphicsItem*> items = items();
-	std::cout << "Checking positions..." << std::endl;
 	for(int j = 0; j <  m_tracked_items.size(); ++j) {
 		itemStats x = m_tracked_items[j];
 		for(QGraphicsItem* i : items()) {
@@ -191,31 +193,42 @@ void ProjectScene::checkPos()
 					QGraphicsLineItem* l = (QGraphicsLineItem*)i;
 					QLineF chk = l->line();
 					if(x.x == chk.x1() && x.y == chk.y1() && x.height == chk.y2() && x.width == chk.x2() && x.outline == l->pen().color()) continue;
+                    std::cout << "Something changed about a line item" << std::endl;
 
 					itemStats package(m_board_id, i);
 					m_tracked_items[j] = package;
 					QDataStream socketstream(m_socket);
+                    socketstream.startTransaction();
 					socketstream << package.byteData();
+                    socketstream.commitTransaction();
 				} else if (x.type == "text") {
 					QGraphicsTextItem* t = (QGraphicsTextItem*)i;
 					if(x.x == t->x() && x.y == t->y() && x.outline == t->defaultTextColor() && x.text == t->toPlainText().toStdString()) continue;
+                    std::cout << "Something changed about a text item" << std::endl;
 
 					itemStats package(m_board_id, i);
 					m_tracked_items[j] = package;
 					QDataStream socketstream(m_socket);
+                    socketstream.startTransaction();
 					socketstream << package.byteData();
+                    socketstream.commitTransaction();
 				} else {
 					QGraphicsRectItem* r = (QGraphicsRectItem*)i;
 					QRectF chk = r->rect();
 					if(x.x == r->x() && x.y == r->y() && x.width == chk.width() && x.height == chk.height() && x.outline == r->pen().color() && x.fill == r->brush().color()) continue;
-					std::cout << "Something changed about a rectangle." << std::endl;
+                    std::cout << "Something changed about a rect/ellipse item" << std::endl;
 					std::cout << x.x << " " << x.y << " " << r->x() << " " << r->y() << std::endl;
 					itemStats package(m_board_id, i);
-					std::cout << package.x << " " << package.y << std::endl;
+                    package.x = r->x();
+                    package.y = r->y();
+                    std::cout << package.x << " " << package.y <<  " " << package.fill.name().toStdString() <<  std::endl;
 					m_tracked_items[j] = package;
 					std::cout << m_tracked_items[j].x << " " << m_tracked_items[j].y << std::endl;
 					QDataStream socketstream(m_socket);
+                    std::cout << QJsonDocument(package.toJson()).toJson(QJsonDocument::Compact).toStdString() << std::endl;
+                    socketstream.startTransaction();
 					socketstream << package.byteData();
+                    socketstream.commitTransaction();
 				}
 			}
 		}
@@ -247,7 +260,8 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 		std::cout << "Fresh item! ID: " << new_id << std::endl;
 		//Immediately tracks the item if it's fresh
 		//Sets the ID as well
-	} else {
+    }
+         else {
             itemStats checker;
             for(itemStats j : m_tracked_items) {
                 if(j.id == i->data(0).toInt()) {
@@ -279,7 +293,7 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 		    //Needs to be debugged.
 
         }
-	}
+    }
 
 	//So if it's made it to this point, something has changed about
 	//the item. It's time to send it out to the server.
@@ -289,6 +303,8 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 	//See 'itemStats.h' for more info on how it does it.
 
 	QDataStream socketstream(m_socket);
+    socketstream.startTransaction();
 	socketstream << data;
+    socketstream.commitTransaction();
     	}
 }
