@@ -82,6 +82,7 @@ void ProjectScene::readSocket()
 	QJsonValue fup = obj.value("fullUpdate");
 	if(fup.toString() == "test") {
 		std::cout << "This is a full update; we should parse this." << std::endl;
+		return;
 	}
 }
 
