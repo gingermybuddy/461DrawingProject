@@ -65,7 +65,13 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 		y = t->y();
 		outline = t->defaultTextColor();
 		text = t->toPlainText().toStdString();
-	} else {
+    } else if (type == "latex") {
+		QGraphicsPixmapItem* t = (QGraphicsPixmapItem*)item;
+		x = t->x();
+		y = t->y();
+		text = t->data(2).toString().toStdString();
+
+    } else {
 		QGraphicsRectItem* r = (QGraphicsRectItem*)item;
 		x = r->rect().x();
 		y = r->rect().y();
