@@ -226,8 +226,8 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		std::string shape = "ellipse";
 		int sid = circle_query->value(1).toInt();
 		double x1 = circle_query->value(2).toDouble();
-		double x2 = circle_query->value(3).toDouble();
-		double y1 = circle_query->value(4).toDouble();
+        double x2 = circle_query->value(4).toDouble();
+        double y1 = circle_query->value(3).toDouble();
 		double y2 = circle_query->value(5).toDouble();
 		QColor fillColor = QColor(circle_query->value(6).toString());
 		QColor outlineColor = QColor(circle_query->value(7).toString());
@@ -236,7 +236,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		shapes.push_back(cir);
 	}
 
-   /*QSqlQuery *rect_query = new QSqlQuery;
+   QSqlQuery *rect_query = new QSqlQuery;
    rect_query->exec("SELECT * FROM Rect");
    //rect_query->first();
 
@@ -245,8 +245,8 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		std::string shape = "rect";
 		int sid = rect_query->value(1).toInt();
 		double x1 = rect_query->value(2).toDouble();
-		double x2 = rect_query->value(3).toDouble();
-		double y1 = rect_query->value(4).toDouble();
+        double x2 = rect_query->value(4).toDouble();
+        double y1 = rect_query->value(3).toDouble();
 		double y2 = rect_query->value(5).toDouble();
 		QColor fillColor = QColor(circle_query->value(6).toString());
 		QColor outlineColor = QColor(circle_query->value(7).toString());
