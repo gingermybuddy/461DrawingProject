@@ -76,8 +76,10 @@ void ProjectView::latex_tool(qreal x, qreal y)
     QString temp = QInputDialog::getText(this, tr("Add Math"), tr("Enter text:"), QLineEdit::Normal, tr("\\left[-\\frac{\\hbar^2}{2m}\\frac{\\partial^2}{\\partial x^2}+V(x)\\right]\\Psi(x)=\\mathrm{i}\\hbar\\frac{\\partial}{\\partial t}\\Psi(x)") , &ok);
 	if(!ok || temp.isEmpty()) return;
 
+    // XXX WILL ONLY WORK ON UNIX XXX
+    // TODO
     // create file
-    std::string doc = "\\documentclass[preview]{standalone}\n\\begin{document}\n$" + temp.toStdString() + "$\n\\end{document}";
+    std::string doc = "\\documentclass{standalone}\n\\begin{document}\n\\Huge $" + temp.toStdString() + "$\n\\end{document}";
     system("touch temp.tex");
     // pipe into file
     std::string echo = "echo '" + doc + "' > temp.tex";
@@ -87,7 +89,7 @@ void ProjectView::latex_tool(qreal x, qreal y)
 
     // open file in qt
     QPixmap pix(QString("./temp.pdf"));
-    pix = pix.scaled(200, 200, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    // pix = pix.scaled(2 * pix.width(), 2 * pix.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     // remove file
     system("rm temp.tex");
     system("rm temp.pdf");
