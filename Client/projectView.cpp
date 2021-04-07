@@ -1,8 +1,16 @@
 #include "projectView.h"
 #include "qevent.h"
+#include "qpixmap.h"
 #include <QPointF>
 #include <QGraphicsItem>
+#include <QGraphicsRectItem>
+#include <QBrush>
+#include <QPixmap>
+#include <QColor>
 #include <iostream>
+#include <QInputDialog>
+#include <stdio.h>
+#include <stdlib.h>
 
 ProjectView::ProjectView() : QGraphicsView(), m_tool{0}
 {
@@ -22,7 +30,78 @@ void ProjectView::change_color(int r, int g, int b)
 	m_color_g = g;
 	m_color_b = b;
 }
+void ProjectView::fill()
+{
 
+        QList<QGraphicsItem*> selected = scene()->selectedItems();
+        for(QGraphicsItem* i : selected){
+            if(i->data(1).toString() == "line") continue;
+
+            //QBrush brush((QColor(m_color_r, m_color_g, m_color_b), Qt::SolidPattern));
+            //brush = i->brush().color();
+            QBrush br(QColor(m_color_r, m_color_g, m_color_b), Qt::SolidPattern);
+
+            if(i->data(1).toString() == "rect") {
+                QGraphicsRectItem *rect = qgraphicsitem_cast<QGraphicsRectItem *>(i);
+                //QGraphicsEllipseItem *circle = qgraphicsitem_cast<QGraphicsEllipseItem *>(circle);
+                rect->setBrush(br);
+                //circle->setBrush(br);
+                rect->update();
+            } else if (i->data(1).toString() == "ellipse") {
+                QGraphicsEllipseItem* e = (QGraphicsEllipseItem*)i;
+                e->setBrush(br);
+                e->update();
+            }
+
+     }
+}
+void ProjectView::text_tool(qreal x, qreal y)
+{
+	bool ok;
+    	QString temp = QInputDialog::getText(this, tr("Add Text"), tr("Enter text:"), QLineEdit::Normal, tr("My text"), &ok);
+	if(!ok || temp.isEmpty()) return;
+
+	QGraphicsTextItem* text = scene()->addText(temp);
+        text->setPos(x, y);
+	// text->setTextInteractionFlags(Qt::TextEditorInteraction);
+	text->setFlag(QGraphicsItem::ItemIsSelectable, true);
+	text->setFlag(QGraphicsItem::ItemIsMovable, true);
+	text->setCursor(Qt::PointingHandCursor);
+	text->setData(0, -1);
+        text->setData(1, "text");
+}
+void ProjectView::latex_tool(qreal x, qreal y)
+{
+	bool ok;
+    QString temp = QInputDialog::getText(this, tr("Add Math"), tr("Enter text:"), QLineEdit::Normal, tr("\\left[-\\frac{\\hbar^2}{2m}\\frac{\\partial^2}{\\partial x^2}+V(x)\\right]\\Psi(x)=\\mathrm{i}\\hbar\\frac{\\partial}{\\partial t}\\Psi(x)") , &ok);
+	if(!ok || temp.isEmpty()) return;
+
+    // create file
+    std::string doc = "\\documentclass[preview]{standalone}\n\\begin{document}\n$" + temp.toStdString() + "$\n\\end{document}";
+    system("touch temp.tex");
+    // pipe into file
+    std::string echo = "echo '" + doc + "' > temp.tex";
+    system(echo.c_str());
+    // pdflatex
+    system("pdflatex temp.tex");
+
+    // open file in qt
+    QPixmap pix(QString("./temp.pdf"));
+    pix = pix.scaled(200, 200, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    // remove file
+    system("rm temp.tex");
+    system("rm temp.pdf");
+
+	QGraphicsPixmapItem* text = scene()->addPixmap(pix);
+    text->setPos(x,y);
+	// text->setTextInteractionFlags(Qt::TextEditorInteraction);
+	text->setFlag(QGraphicsItem::ItemIsSelectable, true);
+	text->setFlag(QGraphicsItem::ItemIsMovable, true);
+	text->setCursor(Qt::PointingHandCursor);
+	text->setData(0, -1);
+    text->setData(1, "latex");
+    text->setData(2, temp);
+}
 void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 {		
 	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
@@ -35,7 +114,7 @@ void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
 	r->setCursor(Qt::PointingHandCursor);
 	r->setData(0, -1);
-    r->setData(1, "circle");
+    r->setData(1, "ellipse");
 	//This is some extra data we're adding to the item. Ideally the 'id' parameter
 	//iterates, but that hasn't been implemented yet. Probably track how many items are on the scene.
 	//The 'setData' function takes in an int as a key and a QVariant (any sort of variable) as parameters.
@@ -60,12 +139,12 @@ void ProjectView::line_tool(qreal x, qreal y, qreal x2, qreal y2)
 
 void ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
 {
-	
-	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
-	pen.setWidth(2);
 
-	QRectF rect(x, y, x2-x, y2-y);
-	QGraphicsRectItem* r = scene()->addRect(rect, pen, QBrush(Qt::transparent));
+	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
+    pen.setWidth(2);
+
+    QRectF rect(x, y, x2-x, y2-y);
+    QGraphicsRectItem* r = scene()->addRect(rect, pen, QBrush(Qt::transparent));
 	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
 	r->setCursor(Qt::PointingHandCursor);
@@ -101,11 +180,21 @@ void ProjectView::mouseReleaseEvent(QMouseEvent *event)
     case 2:
         circle_tool(x, y, x2, y2);
         break;
-	case 3:
-	    rect_tool(x2, y2, x, y);
-	    break;
+    case 3:
+         rect_tool(x2, y2, x, y);
+         break;
+    case 4:
+        fill();
+        break;
+    case 5:
+        text_tool(x, y);
+        break;
+    case 6:
+        latex_tool(x, y);
+        break;
     default:
         std::cout << "error" << std::endl;
+        break;
 
     }
 

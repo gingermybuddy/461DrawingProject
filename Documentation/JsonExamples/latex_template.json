@@ -1,0 +1,13 @@
+{
+    "data": {
+        "bid": "<board ID>",
+        "color": "<a color in HEX>",
+        "start": {
+            "x": "<x1; start x; first corner>", 
+            "y": "<y2; start y; first corner>"
+        },
+        "text": "$<LaTeX math markup>$"
+         
+    },
+    "shape": "text"
+}

@@ -25,6 +25,9 @@ ProjectScene::ProjectScene()
 
 	//Sets up the socket that will be connected to the server.
         m_socket = new QTcpSocket(this);
+	m_timer = new QTimer(this);
+	connect(m_timer, SIGNAL(timeout()), this, SLOT(checkPos()));
+	m_timer->start(2000);
 	
 	//Connects signals from the socket to functions on the client.
 	//readyRead signals that the socket has received data and is ready
@@ -42,6 +45,12 @@ ProjectScene::ProjectScene()
 	}
 	//Board ID is also fixed right now.
 	m_board_id = "CMSC461";
+
+	QByteArray request;
+	QString fup = "fullUpdate";
+	QDataStream sockstream(m_socket);
+	request = fup.toUtf8();
+	sockstream << request;
 
 
 }
@@ -65,11 +74,16 @@ void ProjectScene::readSocket()
 	//Right now all it does is pass received data into a string and outputs it
 	//to the console.
 	std::cout << "Received " << buf.toStdString() << std::endl;
-
 	//Passes the byte array into some JSON objects that we can use later.
         QJsonDocument doc = QJsonDocument::fromJson(buf);
         QJsonObject obj = doc.object();
 
+	//What the hell kind of JSON is this?
+	QJsonValue fup = obj.value("fullUpdate");
+	if(fup.toString() == "test") {
+		std::cout << "This is a full update; we should parse this." << std::endl;
+		return;
+	}
 }
 
 void ProjectScene::disconnect()
@@ -89,6 +103,56 @@ int ProjectScene::trackItem(QGraphicsItem* item)
 	m_tracked_items.push_back(itemStats(m_board_id, item));
 	return id;
 	//Returns the id of the newly-tracked item.
+}
+
+void ProjectScene::checkPos()
+{
+	//QList<QGraphicsItem*> items = items();
+	std::cout << "Checking positions..." << std::endl;
+	for(int j = 0; j <  m_tracked_items.size(); ++j) {
+		itemStats x = m_tracked_items[j];
+		for(QGraphicsItem* i : items()) {
+			if (i->data(0).toInt() == x.id) { // Same item.
+				if(i->x() == 0 && i->y() == 0) continue; //It's set to 0 when the item hasn't moved. Wack.
+				if(x.type == "line") {
+					QGraphicsLineItem* l = (QGraphicsLineItem*)i;
+					QLineF chk = l->line();
+					if(x.x == chk.x1() && x.y == chk.y1() && x.height == chk.y2() && x.width == chk.x2() && x.outline == l->pen().color()) continue;
+
+					itemStats package(m_board_id, i);
+					m_tracked_items[j] = package;
+					QDataStream socketstream(m_socket);
+					socketstream << package.byteData();
+				} else if (x.type == "text") {
+					QGraphicsTextItem* t = (QGraphicsTextItem*)i;
+					if(x.x == t->x() && x.y == t->y() && x.outline == t->defaultTextColor() && x.text == t->toPlainText().toStdString()) continue;
+
+					itemStats package(m_board_id, i);
+					m_tracked_items[j] = package;
+					QDataStream socketstream(m_socket);
+					socketstream << package.byteData();
+				} else {
+					QGraphicsRectItem* r = (QGraphicsRectItem*)i;
+					QRectF chk = r->rect();
+					if(x.x == r->x() && x.y == r->y() && x.width == chk.width() && x.height == chk.height() && x.outline == r->pen().color() && x.fill == r->brush().color()) continue;
+					std::cout << "Something changed about a rectangle." << std::endl;
+					std::cout << x.x << " " << x.y << " " << r->x() << " " << r->y() << std::endl;
+					itemStats package(m_board_id, i);
+					std::cout << package.x << " " << package.y << std::endl;
+					m_tracked_items[j] = package;
+					std::cout << m_tracked_items[j].x << " " << m_tracked_items[j].y << std::endl;
+					QDataStream socketstream(m_socket);
+					socketstream << package.byteData();
+				}
+			}
+		}
+	}
+}
+
+void ProjectScene::fullUpdate(QJsonObject data)
+{
+	//This should only be called once, right when the scene boots up, to grab a list of items
+	//from the server itself. That'll catch it up to speed with everything else.
 }
 
 
