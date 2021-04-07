@@ -239,13 +239,16 @@ void Server::readSocket()
 
 void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 {
-    /*
+
     //Initialize QSqlQuery for the Circles table of "db"
+    //Create vector to store shapes returned by queries
+    std::vector<itemStats> shapes;
+    
+    //Initialize QSqlQuery for the Ellipse table of "db"
     QSqlQuery *circle_query = new QSqlQuery;
     circle_query->exec("SELECT * FROM Ellipse");
-    //circle_query->first();
-    std::vector<itemStats> shapes;
-    //Loop through and repeat for whole table
+
+    //Loop through and repeat for whole Ellipse table
     while(circle_query->next()){
         std::string bid = circle_query->value(0).toString().toStdString();
 		std::string shape = "ellipse";
@@ -260,10 +263,10 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
         shapes.push_back(temp);
 	}
 
+   //Repeat process for Rect table 
    QSqlQuery *rect_query = new QSqlQuery;
    rect_query->exec("SELECT * FROM Rect");
-   //rect_query->first();
-
+  
 	while(rect_query->next()){
         std::string bid = rect_query->value(0).toString().toStdString();
 		std::string shape = "rect";
@@ -278,6 +281,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
         shapes.push_back(temp);
 	}
 
+    //Repeat process for Line table	
     QSqlQuery *line_query = new QSqlQuery;
 	line_query->exec("SELECT * FROM Line");
     line_query->first();
@@ -295,6 +299,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
         shapes.push_back(temp);
 	}
 
+	/*
     QSqlQuery *text_query = new QSqlQuery;
 	text_query->exec("SELECT * FROM Text");
     text_query->first();
@@ -327,11 +332,13 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
         shapes.push_back(temp);
     }
 
+	
 	//Create a JSON object of all the shapes using their sid as a key
+	*/
     delete rect_query;
     delete line_query;
     delete circle_query;
-*/
+
 
     QJsonObject full_board;
     full_board.insert("fullUpdate", "test");
