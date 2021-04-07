@@ -15,6 +15,7 @@ class ProjectView : public QGraphicsView
 		int m_color_r;
 		int m_color_g;
 		int m_color_b;
+                //QBrush m_fill;
 
         QPointF firstClick;
 	private slots:
@@ -22,11 +23,13 @@ class ProjectView : public QGraphicsView
 	public:
 		void change_tool(int tool);
 		void change_color(int r, int g, int b);
-
+        void fill();
+		void text_tool(qreal x, qreal y);
+		void latex_tool(qreal x, qreal y);
         void circle_tool(qreal x, qreal y,qreal x2, qreal y2);
         void line_tool(qreal x, qreal y, qreal x2, qreal y2);
 		void rect_tool(qreal x, qreal y, qreal x2, qreal y2);
-		void mousePressEvent(QMouseEvent* event);
+        void mousePressEvent(QMouseEvent* event);
 		void mouseReleaseEvent(QMouseEvent* event);
 		ProjectView();
 		~ProjectView();

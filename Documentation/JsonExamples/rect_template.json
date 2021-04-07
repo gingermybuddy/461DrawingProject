@@ -1,7 +1,8 @@
 {
   "data": {
     "bid": "<board ID>", 
-    "color": "<a color in HEX>", 
+    "fill_color": "<a color in HEX>", 
+    "outline_color": "<a color in HEX>", 
     "end": {
       "x": "<x2; end x; second corner>", 
       "y": "<y2; end y; second corner>"

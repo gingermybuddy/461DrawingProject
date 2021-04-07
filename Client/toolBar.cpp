@@ -13,7 +13,9 @@ ToolBar::ToolBar() : QWidget()
 	m_yellow = new QPushButton(QIcon("./icons/yellow.png"), tr("Yellow"));
 	m_blue = new QPushButton(QIcon("./icons/blue.png"), tr("Blue"));
 	m_color_picker = new QPushButton(QIcon("./icons/colorPicker.png"), tr("Color Picker"));
-
+    m_fill = new QPushButton(QIcon("./icons/fill.png"), tr("Fill"));
+	m_text = new QPushButton(QIcon("./icons/text.png"), tr("Text"));
+	m_latex = new QPushButton(QIcon("./icons/text.png"), tr("Math"));
 	m_layout = new QVBoxLayout(this);
 
 	m_layout->addWidget(m_circle);
@@ -26,20 +28,26 @@ ToolBar::ToolBar() : QWidget()
 	m_layout->addWidget(m_yellow);
 	m_layout->addWidget(m_blue);
 	m_layout->addWidget(m_color_picker);
+   	m_layout->addWidget(m_fill);
+	m_layout->addWidget(m_text);
+	m_layout->addWidget(m_latex);
 
 	connect(m_default, SIGNAL(clicked()), this, SLOT(set_default()));
-        connect(m_circle, SIGNAL(clicked()), this, SLOT(set_circle()));
-        connect(m_line, SIGNAL(clicked()), this, SLOT(set_line()));
-    	connect(m_rect, SIGNAL(clicked()), this, SLOT(place_rectangle()));
+    connect(m_circle, SIGNAL(clicked()), this, SLOT(set_circle()));
+    connect(m_line, SIGNAL(clicked()), this, SLOT(set_line()));
+    connect(m_rect, SIGNAL(clicked()), this, SLOT(place_rectangle()));
+	connect(m_text, SIGNAL(clicked()), this, SLOT(set_text()));
+	connect(m_latex, SIGNAL(clicked()), this, SLOT(set_latex()));
 
-    	// bind color buttons
-    	connect(m_black, SIGNAL(clicked()), this, SLOT(set_color_black()));
-    	connect(m_red, SIGNAL(clicked()), this, SLOT(set_color_red()));
-    	connect(m_green, SIGNAL(clicked()), this, SLOT(set_color_green()));
-    	connect(m_yellow, SIGNAL(clicked()), this, SLOT(set_color_yellow()));
-    	connect(m_blue, SIGNAL(clicked()), this, SLOT(set_color_blue()));
-    	connect(m_color_picker, SIGNAL(clicked()), this, SLOT(set_color_custom()));
- 
+    // bind color buttons
+    connect(m_black, SIGNAL(clicked()), this, SLOT(set_color_black()));
+    connect(m_red, SIGNAL(clicked()), this, SLOT(set_color_red()));
+    connect(m_green, SIGNAL(clicked()), this, SLOT(set_color_green()));
+    connect(m_yellow, SIGNAL(clicked()), this, SLOT(set_color_yellow()));
+    connect(m_blue, SIGNAL(clicked()), this, SLOT(set_color_blue()));
+    connect(m_color_picker, SIGNAL(clicked()), this, SLOT(set_color_custom()));
+    connect(m_fill, SIGNAL(clicked()), this, SLOT(fill()));
+ 	
 	setLayout(m_layout);
 
 }
@@ -56,6 +64,8 @@ ToolBar::~ToolBar()
 	delete m_yellow;
 	delete m_blue;
 	delete m_color_picker;
+    	delete m_fill;
+	delete m_text;
 	delete m_layout;
 }
 
@@ -110,4 +120,15 @@ void ToolBar::place_rectangle()
 {
         m_view->change_tool(3);
 }
-
+void ToolBar::fill()
+{
+	m_view->change_tool(4);
+}
+void ToolBar::set_text()
+{
+	m_view->change_tool(5);
+}
+void ToolBar::set_latex()
+{
+	m_view->change_tool(6);
+}

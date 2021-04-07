@@ -1,7 +1,8 @@
 {
   "data": {
     "bid": "None", 
-    "color": "ffffff", 
+    "fill_color": "ffffff", 
+    "outline_color": "ffffff", 
     "end": {
       "x": "100", 
       "y": "100"

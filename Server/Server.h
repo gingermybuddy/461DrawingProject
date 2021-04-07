@@ -20,7 +20,7 @@
 struct ownedDB{
     int id;
     QSqlDatabase db;
-} newDB;
+};
 
 class Server : public QMainWindow
 {
@@ -31,6 +31,8 @@ class Server : public QMainWindow
 		std::string m_board_id;
         QVector<ownedDB> databases;
 
+        std::vector<QJsonObject> m_shapes;
+
 	public slots:
 		void newConnection();
 		void readSocket();
@@ -40,7 +42,9 @@ class Server : public QMainWindow
 		~Server();
 		void appendSocket(QTcpSocket* sock);
         void createBoard(QTcpSocket* socket);
+		void saveDB(QTcpSocket* socket);
         void deleteDB(QTcpSocket* socket);
+        void fullUpdate(QString databaseName, QTcpSocket* socket);
 };
 
 #endif
