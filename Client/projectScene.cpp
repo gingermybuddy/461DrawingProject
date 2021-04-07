@@ -82,8 +82,19 @@ void ProjectScene::readSocket()
 	QJsonValue fup = obj.value("fullUpdate");
 	if(fup.toString() == "test") {
 		std::cout << "This is a full update; we should parse this." << std::endl;
+        obj.remove("fullUpdate");
+        std::vector<QJsonObject> shapes;
+        foreach(QString str, obj.keys()) {
+            shapes.push_back(obj.value(str).toObject());
+        }
+        updateCanvas(shapes);
 		return;
-	}
+    }
+    std::vector<QJsonObject> shapes;
+    shapes.push_back(obj);
+    updateCanvas(shapes);
+    return;
+
 }
 
 void ProjectScene::disconnect()
@@ -93,6 +104,68 @@ void ProjectScene::disconnect()
 	m_socket = nullptr;
 }
 
+void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
+{
+    for(QJsonObject obj : objects) {
+        QJsonObject d = obj.value("data").toObject();
+        std::string type = obj.value("shape").toString().toStdString();
+
+        if(type == "line") {
+            QPen pen(QColor(d.value("color").toString()));
+            pen.setWidth(2);
+
+            QJsonObject start = d.value("start").toObject();
+            QJsonObject end = d.value("end").toObject();
+            QLineF line(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
+            QGraphicsLineItem* l = addLine(line, pen);
+            l->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+            l->setCursor(Qt::PointingHandCursor);
+            l->setData(0, d.value("sid").toInt());
+            l->setData(1, "line");
+
+        } else if (type == "rect") {
+            QPen pen(QColor(d.value("outline_color").toString()));
+            pen.setWidth(2);
+
+            QBrush brush(QColor(d.value("fill_color").toString()));
+            QJsonObject start = d.value("start").toObject();
+            QJsonObject end = d.value("end").toObject();
+            QRectF rect(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
+            QGraphicsRectItem* r = addRect(rect, pen, brush);
+            r->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+            r->setCursor(Qt::PointingHandCursor);
+            r->setData(0, d.value("sid").toInt());
+            r->setData(1, "rect");
+
+        } else if (type == "ellipse") {
+            QPen pen(QColor(d.value("outline_color").toString()));
+            pen.setWidth(2);
+
+            QBrush brush(QColor(d.value("fill_color").toString()));
+            QJsonObject start = d.value("start").toObject();
+            QJsonObject end = d.value("end").toObject();
+            QRectF rect(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
+            QGraphicsEllipseItem* e = addEllipse(rect, pen, brush);
+            e->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+            e->setCursor(Qt::PointingHandCursor);
+            e->setData(0, d.value("sid").toInt());
+            e->setData(1, "rect");
+
+        } else if (type == "text") {
+            QString text = d.value("text").toString();
+            QGraphicsTextItem* t = addText(text);
+            QJsonObject start = d.value("start").toObject();
+            t->setPos(start.value("x").toDouble(), start.value("y").toDouble());
+            t->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+            t->setCursor(Qt::PointingHandCursor);
+            t->setData(0, d.value("sid").toInt());
+            t->setData(1, "text");
+
+        } else if (type == "latex") {
+            std::cout << "CHAD HELP ME" << std::endl;
+        }
+    }
+}
 
 int ProjectScene::trackItem(QGraphicsItem* item)
 {

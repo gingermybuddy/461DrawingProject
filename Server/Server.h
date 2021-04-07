@@ -31,6 +31,8 @@ class Server : public QMainWindow
 		std::string m_board_id;
         QVector<ownedDB> databases;
 
+        std::vector<QJsonObject> m_shapes;
+
 	public slots:
 		void newConnection();
 		void readSocket();

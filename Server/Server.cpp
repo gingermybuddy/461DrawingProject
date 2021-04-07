@@ -133,9 +133,10 @@ void Server::readSocket()
 
 	QJsonDocument doc = QJsonDocument::fromJson(buf);
 	QJsonObject obj = doc.object();
+    m_shapes.push_back(obj);
+    std::cout << m_shapes.size() << std::endl;
 
-
-    	QSqlQuery inserter;
+    QSqlQuery inserter;
 	QJsonValue type = obj.value("shape");
 	QJsonObject dval  = obj.value("data").toObject();
 	if(type.toString() == "ellipse") {
@@ -158,13 +159,13 @@ void Server::readSocket()
             inserter.prepare("INSERT INTO Line(bid, sid, x1, x2, y1, y2, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
-   		inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
+            inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":y2", dval.value("end").toObject().value("y").toInt());
             inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-		inserter.exec();
+            inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
@@ -172,14 +173,14 @@ void Server::readSocket()
             inserter.prepare("INSERT INTO Rect(bid, sid, x, y, width, height, fill, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
-   		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
+            inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":width", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":height", dval.value("end").toObject().value("y").toInt());
-        inserter.bindValue(":fill", dval.value("fill_color").toString());
+            inserter.bindValue(":fill", dval.value("fill_color").toString());
             inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-		inserter.exec();
+            inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
@@ -187,12 +188,12 @@ void Server::readSocket()
             inserter.prepare("INSERT INTO Text(bid, sid, x, y, text, outline, cid) VALUES(:bid, :sid, :x, :y, :text, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
-   		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
+            inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("end").toObject().value("y").toInt());
-		inserter.bindValue(":text", dval.value("text").toString());
+            inserter.bindValue(":text", dval.value("text").toString());
             inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-		inserter.exec();
+            inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
     		
@@ -200,12 +201,12 @@ void Server::readSocket()
         	inserter.prepare("INSERT INTO Latex(bid, sid, x, y, code, color, cid) VALUES(:bid, :sid, :x, :y, :text, :color, :cid)");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
-   		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
+            inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("end").toObject().value("y").toInt());
-		inserter.bindValue(":text", dval.value("text").toString());
+            inserter.bindValue(":text", dval.value("text").toString());
             inserter.bindValue(":color", dval.value("color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-		inserter.exec();
+            inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	} else {
@@ -303,15 +304,28 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
     }*/
 
 	//Create a JSON object of all the shapes using their sid as a key
+    delete rect_query;
+    delete line_query;
+    delete circle_query;
 
     QJsonObject full_board;
+    full_board.insert("fullUpdate", "test");
 
-    for(itemStats temp : shapes){
+    /*for(itemStats temp : shapes){
         std::cout << "shape ";
         std::cout << temp.type;
         std::cout << " added" << std::endl;
         full_board.insert(QString::number(temp.id), temp.toJson());
-	}
+    }*/
+
+    std::cout << m_shapes.size() << std::endl;
+    for (QJsonObject j : m_shapes) {
+        std::cout << QJsonDocument(j).toJson(QJsonDocument::Compact).toStdString() << std::endl;
+        QJsonObject data = j.value("data").toObject();
+        int id = data.value("sid").toInt();
+        std::cout << id << std::endl;
+        full_board.insert(QString::number(id), j);
+    }
 
 	//Create JSON Document to write to the buffer
 	QJsonDocument doc(full_board);

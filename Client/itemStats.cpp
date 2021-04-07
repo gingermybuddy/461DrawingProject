@@ -77,8 +77,8 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 		y = r->rect().y();
 		height = r->rect().height();
 		width = r->rect().width();
-		outline = r->pen().color();
-		fill = r->brush().color();
+        outline = r->pen().color();
+        fill = r->brush().color();
 	}
 }
 
@@ -123,7 +123,7 @@ QJsonObject itemStats::toJson()
 	} else {
 		end.insert("x", QJsonValue(width));
 		end.insert("y", QJsonValue(height));
-		data.insert("fill_color", QJsonValue(fill.name()));
+        data.insert("fill_color", QJsonValue(fill.name(QColor::HexArgb)));
 		data.insert("outline_color", QJsonValue(outline.name()));
 		data.insert("end", QJsonValue(end));
 		data.insert("sid", QJsonValue(id));
