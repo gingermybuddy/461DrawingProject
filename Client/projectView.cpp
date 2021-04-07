@@ -1,12 +1,16 @@
 #include "projectView.h"
 #include "qevent.h"
+#include "qpixmap.h"
 #include <QPointF>
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
 #include <QBrush>
+#include <QPixmap>
 #include <QColor>
 #include <iostream>
 #include <QInputDialog>
+#include <stdio.h>
+#include <stdlib.h>
 
 ProjectView::ProjectView() : QGraphicsView(), m_tool{0}
 {
@@ -65,6 +69,38 @@ void ProjectView::text_tool(qreal x, qreal y)
 	text->setCursor(Qt::PointingHandCursor);
 	text->setData(0, -1);
         text->setData(1, "text");
+}
+void ProjectView::latex_tool(qreal x, qreal y)
+{
+	bool ok;
+    QString temp = QInputDialog::getText(this, tr("Add Math"), tr("Enter text:"), QLineEdit::Normal, tr("\\left[-\\frac{\\hbar^2}{2m}\\frac{\\partial^2}{\\partial x^2}+V(x)\\right]\\Psi(x)=\\mathrm{i}\\hbar\\frac{\\partial}{\\partial t}\\Psi(x)") , &ok);
+	if(!ok || temp.isEmpty()) return;
+
+    // create file
+    std::string doc = "\\documentclass[preview]{standalone}\n\\begin{document}\n$" + temp.toStdString() + "$\n\\end{document}";
+    system("touch temp.tex");
+    // pipe into file
+    std::string echo = "echo '" + doc + "' > temp.tex";
+    system(echo.c_str());
+    // pdflatex
+    system("pdflatex temp.tex");
+
+    // open file in qt
+    QPixmap pix(QString("./temp.pdf"));
+    pix = pix.scaled(200, 200, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    // remove file
+    system("rm temp.tex");
+    system("rm temp.pdf");
+
+	QGraphicsPixmapItem* text = scene()->addPixmap(pix);
+    text->setPos(x,y);
+	// text->setTextInteractionFlags(Qt::TextEditorInteraction);
+	text->setFlag(QGraphicsItem::ItemIsSelectable, true);
+	text->setFlag(QGraphicsItem::ItemIsMovable, true);
+	text->setCursor(Qt::PointingHandCursor);
+	text->setData(0, -1);
+    text->setData(1, "latex");
+    text->setData(2, temp);
 }
 void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 {		
@@ -152,6 +188,9 @@ void ProjectView::mouseReleaseEvent(QMouseEvent *event)
         break;
     case 5:
         text_tool(x, y);
+        break;
+    case 6:
+        latex_tool(x, y);
         break;
     default:
         std::cout << "error" << std::endl;
