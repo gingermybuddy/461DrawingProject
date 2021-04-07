@@ -1,0 +1,407 @@
+\chapter{Client}
+  The following is an explanation of the client side of the 461 Drawing Project \linebreak \linebreak
+
+\section*{ItemStats}
+\addcontentsline{toc}{section}{\protect\numberline{}ItemStats}%
+\subsection{.h}
+  itemStats is a struct which contains all of the values which a shape/object
+contains. This is used in other documents and functions to help parse out and
+separate data.
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{cpp}
+struct itemStats
+{
+	//Lines get tracked the same as everything else.
+	//Set the width/height variables to x2 and y2, respectively.
+	std::string board_id;
+        std::string type;
+        int id;
+        double x;
+        double y;
+        double height;
+        double width;
+        QColor rgb;
+
+	//Functions to turn the thing into a QJsonObject
+	//and a QByteArray that can be sent directly over a socket.
+
+  QJsonObject toJson();
+	QByteArray byteData();
+
+	//Several different constructors for a couple of different
+	//uses. You can pass in nothing, a QGraphicsItem* for the
+	//client end, or a bunch of variables that it will simply
+	//insert.
+	itemStats();
+	itemStats(std::string board_id, QGraphicsItem* item);
+	itemStats(std::string board_id, std::string type, int id, double x, double y, \
+  double height, double width, QColor rgb);
+  ~itemStats();
+};
+\end{minted}
+
+\subsection{.cpp}
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{cpp}
+itemStats::itemStats(std::string nboard_id, std::string ntype, int nid, double nx, double ny, \
+double nheight, double nwidth, QColor nrgb)
+  //UPDATE THIS IF YOU ADD THINGS TO THE PLACED ITEMS
+
+itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
+  /*UPDATE THIS IF YOU ADD THINGS TO THE PLACED ITEMS
+  Parses the QGraphicsItem and throws the variables into their appropriate places.*/
+
+itemStats::~itemStats()
+  //destructor for itemStats
+
+QJsonObject itemStats::toJson()
+  /*UPDATE THIS IF YOU ADD THINGS TO THE PLACED ITEMS
+  Turns the item into a JSON object, formatted as it would be
+  in the jsonExamples folder. This doesn't actually differ at
+  all from different shape types.
+
+  For the 'end' parameter, it uses the width and height as x and y coordinates.
+  If the thing's a line, the end is just what it says on the tin - the ending coordinates of the line. */
+
+QByteArray itemStats::byteData()
+  /*Turns it first into a JSON object, then passes that object
+	into a QByteArray. This array can be sent straight to the server.*/
+
+\end{minted}
+
+\section*{ProjectScene}
+\addcontentsline{toc}{section}{\protect\numberline{}ProjectScene}%
+\subsection{.h}
+  projectScene is a class which contains functions that relate to the QGraphicsScene,
+that is, the 'behinds the scenes' of the graphical window.
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{cpp}
+class ProjectScene : public QGraphicsScene
+{
+	Q_OBJECT
+	private:
+		QTcpSocket* m_socket;
+		std::vector<itemStats> m_tracked_items;
+		std::string m_board_id;
+
+	public slots:
+		void sceneChanged(const QList<QRectF> &region);
+		void readSocket();
+		void disconnect();
+	signals:
+	public:
+                int trackItem(QGraphicsItem* item);
+		ProjectScene();
+		~ProjectScene();
+};
+
+\end{minted}
+
+\subsection{.cpp}
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{cpp}
+  ProjectScene::ProjectScene()
+    //A constructor for the ProjectScene class
+
+  ProjectScene::~ProjectScene()
+    //A destructor for the ProjectScene class
+
+  ProjectScene::readSocket()
+    //Reads in data that is received from the server into a JSON object
+
+  ProjectScene::disconnect()
+    /*Deletes the socket from the scene, effectively removing the connection from
+      the server.*/
+
+  ProjectScene::trackItem()
+    /*Pushes back all the data from a received graphics item into an internal list
+      of graphics items.*/
+
+  ProjectScene::sceneChanged()
+    /*When something in the scene changes, this event is triggered. What we do is
+     get a list of items that have changed (compare between the last update and
+     our internal list) and then tells the server about it.*/
+\end{minted}
+
+\section*{ProjectView}
+\addcontentsline{toc}{section}{\protect\numberline{}ProjectView}%
+\subsection{.h}
+  projectView is a class which contains the functions which relate to the QGraphicsView,
+that is, the canvas and buttons that we see on the graphical window.
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{cpp}
+class ProjectView : public QGraphicsView
+{
+	Q_OBJECT
+	private:
+		int m_tool;
+		int m_color_r;
+		int m_color_g;
+		int m_color_b;
+
+        QPointF firstClick;
+	private slots:
+
+	public:
+		void change_tool(int tool);
+		void change_color(int r, int g, int b);
+
+        void circle_tool(qreal x, qreal y,qreal x2, qreal y2);
+        void line_tool(qreal x, qreal y, qreal x2, qreal y2);
+		void rect_tool(qreal x, qreal y, qreal x2, qreal y2);
+		void mousePressEvent(QMouseEvent* event);
+		void mouseReleaseEvent(QMouseEvent* event);
+		ProjectView();
+		~ProjectView();
+};
+\end{minted}
+
+
+\subsection{.cpp}
+
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{cpp}
+ProjectView::ProjectView()
+  //A constructor for the ProjectView class
+
+ProjectView::~ProjectView()
+  //A destructor for the ProjectView class
+
+ProjectView::change_tool(int tool)
+  //Change the current tool based on an integer parameter
+
+ProjectView::change_color(int r, int g, int b)
+    //Change the current tool's color based on 3 integer parameters, r, g, and b.
+
+ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
+  /*Draw a circle on the canvas using two points, (x,y) and (x2,y2). This allows
+    us to draw ellipses easily as well as circeles, similarly to how we draw
+    rectangles.
+    (x,y) is the first location the user clicked, and (x2,y2) is the second.*/
+
+ProjectView::line_tool(qreal x, qreal y, qreal x2, qreal y2)
+    /*Draw a line on the canvas using two points, (x,y) and (x2,y2).
+    (x,y) is the first location the user clicked, and (x2,y2) is the second.*/
+
+ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
+    /*Draw a rectangle on the canvas using two points, (x,y) and (x2,y2).
+    (x,y) is the first location the user clicked, and (x2,y2) is the second.*/
+
+ProjectView::mousePressEvent()
+     /*This event is triggered when the user clicks down on the mouse. Technically,
+     it stores this point and doesn't do anything with it until a mouseReleaseEvent.*/
+
+ProjectView::mouseReleaseEvent()
+    /*This event is triggered when the user releases the click on the mouse. This
+    function takes the second point, figures out which action to take based on
+    the selected tool, and calls the appropriate function.*/
+\end{minted}
+
+\section*{ToolBar}
+\addcontentsline{toc}{section}{\protect\numberline{}ToolBar}%
+\subsection{.h}
+  toolbar is a class which contains the functions to change the different tools in
+the graphical window.
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{cpp}
+class ToolBar : public QWidget
+{
+	Q_OBJECT
+	private:
+		QPushButton* m_circle;
+		QPushButton* m_line;
+		QPushButton* m_rect;
+		QPushButton* m_default;
+		QPushButton* m_black;
+		QPushButton* m_red;
+		QPushButton* m_green;
+		QPushButton* m_yellow;
+		QPushButton* m_blue;
+		QPushButton* m_color_picker;
+		QVBoxLayout* m_layout;
+		ProjectView* m_view;
+	public slots:
+		// set default
+        	void set_default();
+        	// shapes
+        	void place_rectangle();
+        	void set_line();
+        	void set_circle();
+        	// colors
+        	void set_color_black();
+        	void set_color_red();
+        	void set_color_green();
+        	void set_color_yellow();
+        	void set_color_blue();
+        	void set_color_custom();
+
+	public:
+		ToolBar();
+		~ToolBar();
+		void set_view(ProjectView* view);
+
+};
+\end{minted}
+
+\subsection{.cpp}
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{cpp}
+ToolBar::ToolBar()
+  //A constructor for the ToolBar class
+
+ToolBar::~ToolBar()
+  //A destructor for the ToolBar class
+
+ToolBar::set_view(ProjectView* view)
+  //Sets the tool's m_view to view
+
+ToolBar::set_default()
+  //Sets the default tool to the select tool
+
+ToolBar::set_line()
+  //Sets the tool to the line tool
+
+ToolBar::set_circle()
+  //Sets the tool to the circle tool
+
+ToolBar::set_rect()
+  //Sets the tool to the rect tool
+
+ToolBar::set_color_black()
+  //Sets the tool's color to be black
+
+ToolBar::set_color_red()
+  //Sets the tool's color to be red
+
+ToolBar::set_color_green()
+  //Sets the tool's color to be green
+
+ToolBar::set_color_yellow()
+  //Sets the tool's color to be yellow
+
+ToolBar::set_color_blue()
+  //Sets the tool's color to be blue
+
+
+
+ToolBar::set_color_custom()
+  /*Brings up a color picker menu for the user to set their own color using a
+    graphical interface, rgb, hexadeicimal, or cmyk.*/
+\end{minted}
+
+\section*{Window}
+\addcontentsline{toc}{section}{\protect\numberline{}Window}%
+\subsection{.h}
+  window is essentially the 'main' of the graphical window, though there is a
+'main' that spawns it.
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{cpp}
+class Window : public QMainWindow //Extension on the base QMainWindow class
+{
+	Q_OBJECT //Must be included for qmake to recognize this
+
+	private: //Menus and features of the window
+		ToolBar* m_bar;
+		QDockWidget* m_tool_dock;
+		ProjectScene* m_scene;
+		ProjectView* m_view;
+
+        // shape tools
+
+	private slots: //Where functions attached to buttons go
+        // make a popup window
+		void popup();
+	public:
+		Window();
+		~Window();
+};
+\end{minted}
+
+\subsection{.cpp}
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{cpp}
+Window::Window()
+  /*A constructor for the Window class. Sets up the entire graphical window with
+    toolbars, docks, a canvas, a scene, and a menu.*/
+
+Window::~Window()
+  //A destructor for the Window class.
+\end{minted}
+
+\section*{Main}
+\addcontentsline{toc}{section}{\protect\numberline{}Main}%
+\subsection{.cpp}
+  main.cpp is a small file which contains one function: int main. This is the start of
+the entire client, where a new window is created in memory and executed. From
+there, upon returning, the event loop begins.
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{cpp}
+int main(int argc, char* argv[])
+  /*This is the start of the entire client, where a new window is created in memory and executed.*/
+\end{minted}

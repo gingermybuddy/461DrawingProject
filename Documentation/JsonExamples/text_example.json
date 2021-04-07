@@ -6,6 +6,7 @@
             "x": "100",
             "y": "25"
         },
+        "sid": "0",
         "text": "This is an example!"
     },
     "shape": "text"
