@@ -154,11 +154,6 @@ void ProjectScene::fullUpdate(QJsonObject data)
 	//from the server itself. That'll catch it up to speed with everything else.
 }
 
-void ProjectScene::checkPos()
-{
-
-}
-
 //sends the data about the object that was on the scene to the server. 
 void ProjectScene::sceneChanged(const QList<QRectF> &region) 
 {
