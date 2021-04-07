@@ -138,15 +138,15 @@ void Server::readSocket()
 	QJsonValue type = obj.value("shape");
 	QJsonObject dval  = obj.value("data").toObject();
 	if(type.toString() == "ellipse") {
-        	inserter.prepare("INSERT INTO Ellipse(bid, sid, x1, x2, y1, y2, fillColor, outlineColor, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fillColor, :outlineColor, :cid);");
+            inserter.prepare("INSERT INTO Ellipse(bid, sid, x1, x2, y1, y2, fill, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
     		inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":y2", dval.value("end").toObject().value("y").toInt());
-            inserter.bindValue(":fillColor", dval.value("fill_color").toString());
-            inserter.bindValue(":outlineColor", dval.value("outline_color").toString());
+            inserter.bindValue(":fill", dval.value("fill_color").toString());
+            inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
             inserter.exec();
 
@@ -154,42 +154,42 @@ void Server::readSocket()
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
 	} else if (type.toString() == "line") {
-        	inserter.prepare("INSERT INTO Line(bid, sid, x1, x2, y1, y2, outlineColor, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :outlineColor, :cid);");
+            inserter.prepare("INSERT INTO Line(bid, sid, x1, x2, y1, y2, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":y2", dval.value("end").toObject().value("y").toInt());
-    		inserter.bindValue(":outlineColor", dval.value("outline_color").toString());
+            inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
 	} else if (type.toString() == "rect") {
-        	inserter.prepare("INSERT INTO Rect(bid, sid, x, y, width, height, fillColor, outlineColor, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fillColor, :outlineColor, :cid);");
+            inserter.prepare("INSERT INTO Rect(bid, sid, x, y, width, height, fill, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":width", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":height", dval.value("end").toObject().value("y").toInt());
-		inserter.bindValue(":fillColor", dval.value("fill_color").toString());
-    		inserter.bindValue(":outlineColor", dval.value("outline_color").toString());
+        inserter.bindValue(":fill", dval.value("fill_color").toString());
+            inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
 	} else if (type.toString() == "text") {
-        	inserter.prepare("INSERT INTO Text(bid, sid, x, y, text, outlineColor, cid) VALUES(:bid, :sid, :x, :y, :text, :outlineColor, :cid);");
+            inserter.prepare("INSERT INTO Text(bid, sid, x, y, text, outline, cid) VALUES(:bid, :sid, :x, :y, :text, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("end").toObject().value("y").toInt());
 		inserter.bindValue(":text", dval.value("text").toString());
-    		inserter.bindValue(":outlineColor", dval.value("outline_color").toString());
+            inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
@@ -202,7 +202,7 @@ void Server::readSocket()
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("end").toObject().value("y").toInt());
 		inserter.bindValue(":text", dval.value("text").toString());
-    		inserter.bindValue(":outlineColor", dval.value("outline_color").toString());
+            inserter.bindValue(":color", dval.value("color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
