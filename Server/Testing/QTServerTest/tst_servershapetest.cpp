@@ -1,4 +1,7 @@
-#include <QtTest/QtTest>
+#include <QtTest>
+#include <QApplication>
+#include <QDataStream>
+#include <QSqlQuery>
 #include "../../Server.h"
 
 // add necessary includes here
@@ -13,10 +16,15 @@ public:
 
 private slots:
     void testConstructor();
-    void init();
+    void testEllipse();
+    void testCircle();
+    void testLine();
+    int main(int argc, char* argv[]);
 
 private:
     Server ser;
+    QByteArray buf;
+    QTcpSocket* socket = reinterpret_cast<QTcpSocket*>(sender());
 };
 
 ServerShapeTest::ServerShapeTest()
@@ -31,14 +39,35 @@ ServerShapeTest::~ServerShapeTest()
 
 void ServerShapeTest::testConstructor()
 {
-    QVERIFY(true);
+    QVERIFY(ser.m_board_id == "CMSC461");
 }
 
-void ServerShapeTest::init()
+void ServerShapeTest::testLine()
 {
-    ser = Server();
+    QVERIFY(ser.m_board_id == "CMSC461");
 }
 
-QTEST_APPLESS_MAIN(ServerShapeTest)
+void ServerShapeTest::testCircle()
+{
+    QVERIFY(ser.m_board_id == "CMSC461");
+}
+
+void ServerShapeTest::testEllipse()
+{
+    QVERIFY(ser.m_board_id == "CMSC461");
+}
+
+int ServerShapeTest::main(int argc, char* argv[])
+{
+    QApplication new_window(argc, argv);
+    ser = Server();
+    testConstructor();
+    testCircle();
+    testEllipse();
+    testLine();
+    return new_window.exec();
+}
+
+//QTEST_APPLESS_MAIN(ServerShapeTest)
 
 #include "tst_servershapetest.moc"
