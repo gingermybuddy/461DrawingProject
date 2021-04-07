@@ -81,6 +81,7 @@ void Server::disconnect()
 	//it was.
 	QTcpSocket* socket = reinterpret_cast<QTcpSocket*>(sender());
 
+	saveDB(socket);
     deleteDB(socket);
 
 	//Finds the socket.
@@ -392,6 +393,67 @@ void Server::createBoard(QTcpSocket* socket)
 	return;
 }
 
+void Server::saveDB(QTcpSocket* socket)
+{
+	QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+	db.setDatabaseName("CMSC461.db");
+	db.open();
+	QByteArray everything;
+	everything.append("[\n");
+
+	std::string board = "CMSC461";
+	QSqlQuery elQuery("SELECT * FROM Ellipse");
+	while(elQuery.next()){
+		std::string shape = "ellipse";
+		QByteArray data = itemStats(board,shape,elQuery.value(1).toInt(),elQuery.value(2).toDouble(),elQuery.value(3).toDouble(),elQuery.value(4).toDouble(),elQuery.value(5).toDouble(),QColor(elQuery.value(6).toString()),QColor(elQuery.value(7).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	QSqlQuery liQuery("SELECT * FROM Line");
+	while(liQuery.next()){
+		std::string shape = "line";
+		QByteArray data = itemStats(board,shape,liQuery.value(1).toInt(),liQuery.value(2).toDouble(),liQuery.value(3).toDouble(),liQuery.value(4).toDouble(),liQuery.value(5).toDouble(),QColor(liQuery.value(6).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	QSqlQuery reQuery("SELECT * FROM Rect");
+	while(reQuery.next()){
+		std::string shape = "rect";
+		QByteArray data = itemStats(board,shape,reQuery.value(1).toInt(),reQuery.value(2).toDouble(),reQuery.value(3).toDouble(),reQuery.value(4).toDouble(),reQuery.value(5).toDouble(),QColor(reQuery.value(6).toString()),QColor(reQuery.value(7).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	QSqlQuery txQuery("SELECT * FROM Text");
+	while(txQuery.next()){
+		std::string shape = "text";
+		QByteArray data = itemStats(board,shape,txQuery.value(1).toInt(),txQuery.value(2).toDouble(),txQuery.value(3).toDouble(),txQuery.value(4).toString().toStdString(),QColor(txQuery.value(5).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	QSqlQuery laQuery("SELECT * FROM Latex");
+	while(laQuery.next()){
+		std::string shape = "latex";
+		QByteArray data = itemStats(board,shape,laQuery.value(1).toInt(),laQuery.value(2).toDouble(),laQuery.value(3).toDouble(),laQuery.value(4).toString().toStdString(),QColor(laQuery.value(5).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	everything.append("]");
+	std::cout << "Client Disconnected. Sending:\n" << everything.toStdString() << std::endl;
+
+	QDataStream socketstream(socket);
+	socketstream << everything;
+}
+
 void Server::deleteDB(QTcpSocket* socket)
 {
     int id = socket->socketDescriptor();
@@ -407,8 +469,8 @@ void Server::deleteDB(QTcpSocket* socket)
             break;
         }else{
             newVec.push_back(databases[i]);
-
         }
+        databases = newVec;
     }
     std::remove(name.c_str());
 }

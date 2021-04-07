@@ -1,0 +1,10 @@
+release/main.o
+release/ProjectView.o
+release/ProjectScene.o
+release/toolBar.o
+release/itemStats.o
+release/window.o
+release/moc_ProjectView.o
+release/moc_ProjectScene.o
+release/moc_toolBar.o
+release/moc_window.o
