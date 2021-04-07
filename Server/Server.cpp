@@ -31,7 +31,12 @@ Server::Server() : QMainWindow()
     //either connect to the database named CMSC461.db or create it if it doesn't exist
     db.setDatabaseName("CMSC461.db");
     db.open();
-
+    QSqlQuery dbQuery;
+    dbQuery.exec("CREATE TABLE Ellipse (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
+    dbQuery.exec("CREATE TABLE Line (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
+    dbQuery.exec("CREATE TABLE Rect (bid int, sid int, x int, y int, width int, height int, fill string, outline string, cid int);");
+    dbQuery.exec("CREATE TABLE Latex (bid int, sid int, x int, y int, code string, color string, cid int;");
+    dbQuery.exec("CREATE TABLE Text (bid int, sid int, x int, y int, code string, color string, cid int;");
 	//The server will give out a 'signal' when it receives
 	//a new connection. This connects that signal to the
 	//function 'newConnection()'.
@@ -140,8 +145,8 @@ void Server::readSocket()
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":y2", dval.value("end").toObject().value("y").toInt());
-   		inserter.bindValue(":fillColor", dval.value("fillColor").toString());
-        inserter.bindValue(":outlineColor", dval.value("outlineColor").toString());
+   		inserter.bindValue(":fillColor", dval.value("fill_color").toString());
+        inserter.bindValue(":outlineColor", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
@@ -155,22 +160,22 @@ void Server::readSocket()
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":y2", dval.value("end").toObject().value("y").toInt());
-    		inserter.bindValue(":outlineColor", dval.value("outlineColor").toString());
+    		inserter.bindValue(":outlineColor", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
 	} else if (type.toString() == "rect") {
-        	inserter.prepare("INSERT INTO Rect(bid, sid, x1, x2, y1, y2, fillColor, outlineColor, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fillColor, :outlineColor, :cid);");
+        	inserter.prepare("INSERT INTO Rect(bid, sid, x, y, width, height, fillColor, outlineColor, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fillColor, :outlineColor, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
     		inserter.bindValue(":sid", dval.value("sid").toString());
-   		inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
-    		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
-    		inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
-    		inserter.bindValue(":y2", dval.value("end").toObject().value("y").toInt());
-		inserter.bindValue(":fillColor", dval.value("fillColor").toString());
-    		inserter.bindValue(":outlineColor", dval.value("outlineColor").toString());
+   		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
+    		inserter.bindValue(":width", dval.value("end").toObject().value("x").toInt());
+    		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
+    		inserter.bindValue(":height", dval.value("end").toObject().value("y").toInt());
+		inserter.bindValue(":fillColor", dval.value("fill_color").toString());
+    		inserter.bindValue(":outlineColor", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
@@ -183,7 +188,7 @@ void Server::readSocket()
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("end").toObject().value("y").toInt());
 		inserter.bindValue(":text", dval.value("text").toString());
-    		inserter.bindValue(":outlineColor", dval.value("outlineColor").toString());
+    		inserter.bindValue(":outlineColor", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
@@ -196,7 +201,7 @@ void Server::readSocket()
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("end").toObject().value("y").toInt());
 		inserter.bindValue(":text", dval.value("text").toString());
-    		inserter.bindValue(":outlineColor", dval.value("outlineColor").toString());
+    		inserter.bindValue(":outlineColor", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
@@ -335,8 +340,8 @@ void Server::createBoard(QTcpSocket* socket)
     dbQuery->exec("CREATE TABLE Ellipse (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
     dbQuery->exec("CREATE TABLE Line (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
     dbQuery->exec("CREATE TABLE Rect (bid int, sid int, x int, y int, width int, height int, fill string, outline string, cid int);");
-    dbQuery->exec("CREATE TABLE Latex (bid int, sid int, x int, y int, code string, color string, cid int");
-    dbQuery->exec("CREATE TABLE Text (bid int, sid int, x int, y int, code string, color string, cid int");
+    dbQuery->exec("CREATE TABLE Latex (bid int, sid int, x int, y int, code string, color string, cid int;");
+    dbQuery->exec("CREATE TABLE Text (bid int, sid int, x int, y int, code string, color string, cid int;");
 
     ownedDB newDB;
     newDB.id = socket->socketDescriptor();
