@@ -360,54 +360,42 @@ void Server::saveDB(QTcpSocket* socket)
 	db.setDatabaseName("CMSC461.db");
 	db.open();
 	QByteArray everything;
-	std::string board = "CMSC461";
+	everything.append("[\n");
 
+	std::string board = "CMSC461";
 	QSqlQuery elQuery("SELECT * FROM Ellipse");
-	QByteArray ellipses;
 	while(elQuery.next()){
 		std::string shape = "ellipse";
-		QByteArray data = itemStats(board,shape,elQuery.value(1).toInt(),elQuery.value(2).toDouble(),elQuery.value(3).toDouble(),elQuery.value(4).toDouble(),elQuery.value(5).toDouble(),QColor(elQuery.value(6).toString())).byteData();
+		QByteArray data = itemStats(board,shape,elQuery.value(1).toInt(),elQuery.value(2).toDouble(),elQuery.value(3).toDouble(),elQuery.value(4).toDouble(),elQuery.value(5).toDouble(),QColor(elQuery.value(6).toString()),QColor(elQuery.value(7).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
-		//QJsonObject obj = doc.object();
 		data = doc.toJson();
-		ellipses.append(data);
-		std::cout << "An Ellipse" << std::endl;
+		everything += data;
+		std::cout << "An Ellipse:\n" << data.toStdString() << std::endl;
 	}
-	everything += "{\"Ellipse\":{";
-	everything.append(ellipses);
 
 	QSqlQuery liQuery("SELECT * FROM Line");
-	QByteArray lines;
 	while(liQuery.next()){
 		std::string shape = "line";
 		QByteArray data = itemStats(board,shape,liQuery.value(1).toInt(),liQuery.value(2).toDouble(),liQuery.value(3).toDouble(),liQuery.value(4).toDouble(),liQuery.value(5).toDouble(),QColor(liQuery.value(6).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
-		//QJsonObject obj = doc.object();
 		data = doc.toJson();
-		lines.append(data);
-		std::cout << "A Line" << std::endl;
+		everything += data;
+		std::cout << "A Line:\n" << data.toStdString() << std::endl;
 	}
-	everything += "}\"Line\":{";
-	everything.append(lines);
 
 	QSqlQuery reQuery("SELECT * FROM Rect");
-	QByteArray rectangles;
 	while(reQuery.next()){
 		std::string shape = "rect";
-		QByteArray data = itemStats(board,shape,reQuery.value(1).toInt(),reQuery.value(2).toDouble(),reQuery.value(3).toDouble(),reQuery.value(4).toDouble(),reQuery.value(5).toDouble(),QColor(reQuery.value(6).toString())).byteData();
+		QByteArray data = itemStats(board,shape,reQuery.value(1).toInt(),reQuery.value(2).toDouble(),reQuery.value(3).toDouble(),reQuery.value(4).toDouble(),reQuery.value(5).toDouble(),QColor(reQuery.value(6).toString()),QColor(reQuery.value(7).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
-		//QJsonObject obj = doc.object();
 		data = doc.toJson();
-		rectangles.append(data);
-		std::cout << "A Rectangle" << std::endl;
+		everything += data;
+		std::cout << "A Rectangle:\n" << data.toStdString() << std::endl;
 	}
-	everything += "}\"Rect\":{";
-	everything.append(rectangles);
 
-	everything += "}";
-	QJsonDocument doc = QJsonDocument::fromJson(everything);
-	//QJsonObject obj = doc.object();
-	everything = doc.toJson();
+//	QJsonDocument doc = QJsonDocument::fromJson(everything);
+//	everything = doc.toJson();
+	everything.append("]");
 	std::cout << "Client Disconnected. Sending:\n" << everything.toStdString() << std::endl;
 
 	QDataStream socketstream(socket);
