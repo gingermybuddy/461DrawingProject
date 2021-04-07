@@ -98,6 +98,7 @@ void Server::readSocket()
 {
 	//More black magic.
 	QTcpSocket* socket = reinterpret_cast<QTcpSocket*>(sender());
+    std::cout << "Data from client" << socket->socketDescriptor() << std::endl;
 
 	//The QByteArray here is the array of bytes that the socket
 	//has just sent to the server. The array is formatted as a JSON
@@ -125,7 +126,6 @@ void Server::readSocket()
 	//If it gets to here, the data has been received and is
 	//ready to be parsed. Right now, all it does is turn it into
 	//a string and outputs it to console.
-	std::cout << "Received " << buf.toStdString() << std::endl;
 	
 	//This casts the byte array into a Qt style JSON object.
 	//You can get keys and values out of this the same way
@@ -133,6 +133,7 @@ void Server::readSocket()
 
 	QJsonDocument doc = QJsonDocument::fromJson(buf);
 	QJsonObject obj = doc.object();
+    std::cout << "Received: " << QJsonDocument(obj).toJson(QJsonDocument::Compact).toStdString() << std::endl;
     bool found = false;
     for(int i = 0; i < m_shapes.size(); ++i){
         if(obj.value("data").toObject().value("sid").toInt() == m_shapes[i].value("data").toObject().value("sid").toInt()) {
@@ -148,7 +149,8 @@ void Server::readSocket()
         if (sock == socket) continue;
         QJsonDocument sent_doc(obj);
         QByteArray package = sent_doc.toJson();
-        std::cout << "Sending: " << package.toStdString() << std::endl;
+        std::cout << "Sending: " << QJsonDocument(obj).toJson(QJsonDocument::Compact).toStdString()<< std::endl;
+        std::cout << "To client: " << sock->socketDescriptor() << std::endl;
         QDataStream sockstream(sock);
         sockstream.startTransaction();
         sockstream << package;

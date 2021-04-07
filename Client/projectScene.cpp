@@ -87,12 +87,14 @@ void ProjectScene::readSocket()
         foreach(QString str, obj.keys()) {
             shapes.push_back(obj.value(str).toObject());
         }
-        updateCanvas(shapes);
+        fullUpdate(shapes);
         for(QGraphicsItem* i : items()){
             m_tracked_items.push_back(itemStats(m_board_id, i));
         }
 		return;
     }
+    //If it's not a full update it's just some kind of other shape update
+    //Either a new shape got added or an existing one is updated.
     std::vector<QJsonObject> shapes;
     shapes.push_back(obj);
     updateCanvas(shapes);
@@ -110,9 +112,13 @@ void ProjectScene::disconnect()
 void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
 {
     for(QJsonObject obj : objects) {
+        for(QGraphicsItem* i : items()) {
+            if(obj.value("data").toObject().value("sid").toInt() == i->data(0).toInt()) {
+                delete i;
+            }
+        }
         QJsonObject d = obj.value("data").toObject();
         std::string type = obj.value("shape").toString().toStdString();
-
         if(type == "line") {
             QPen pen(QColor(d.value("color").toString()));
             pen.setWidth(2);
@@ -235,10 +241,69 @@ void ProjectScene::checkPos()
 	}
 }
 
-void ProjectScene::fullUpdate(QJsonObject data)
+void ProjectScene::fullUpdate(std::vector<QJsonObject> objects)
 {
 	//This should only be called once, right when the scene boots up, to grab a list of items
 	//from the server itself. That'll catch it up to speed with everything else.
+    for(QJsonObject obj : objects) {
+        QJsonObject d = obj.value("data").toObject();
+        std::string type = obj.value("shape").toString().toStdString();
+        if(type == "line") {
+            QPen pen(QColor(d.value("color").toString()));
+            pen.setWidth(2);
+
+            QJsonObject start = d.value("start").toObject();
+            QJsonObject end = d.value("end").toObject();
+            QLineF line(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
+            QGraphicsLineItem* l = addLine(line, pen);
+            l->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+            l->setCursor(Qt::PointingHandCursor);
+            l->setData(0, d.value("sid").toInt());
+            l->setData(1, "line");
+
+        } else if (type == "rect") {
+            QPen pen(QColor(d.value("outline_color").toString()));
+            pen.setWidth(2);
+
+            QBrush brush(QColor(d.value("fill_color").toString()));
+            QJsonObject start = d.value("start").toObject();
+            QJsonObject end = d.value("end").toObject();
+            QRectF rect(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
+            QGraphicsRectItem* r = addRect(rect, pen, brush);
+            r->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+            r->setCursor(Qt::PointingHandCursor);
+            r->setData(0, d.value("sid").toInt());
+            r->setData(1, "rect");
+
+        } else if (type == "ellipse") {
+            QPen pen(QColor(d.value("outline_color").toString()));
+            pen.setWidth(2);
+
+            QBrush brush(QColor(d.value("fill_color").toString()));
+            QJsonObject start = d.value("start").toObject();
+            QJsonObject end = d.value("end").toObject();
+            QRectF rect(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
+            QGraphicsEllipseItem* e = addEllipse(rect, pen, brush);
+            e->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+            e->setCursor(Qt::PointingHandCursor);
+            e->setData(0, d.value("sid").toInt());
+            e->setData(1, "ellipse");
+
+        } else if (type == "text") {
+            QString text = d.value("text").toString();
+            QGraphicsTextItem* t = addText(text);
+            QJsonObject start = d.value("start").toObject();
+            t->setPos(start.value("x").toDouble(), start.value("y").toDouble());
+            t->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+            t->setCursor(Qt::PointingHandCursor);
+            t->setData(0, d.value("sid").toInt());
+            t->setData(1, "text");
+
+        } else if (type == "latex") {
+            std::cout << "CHAD HELP ME" << std::endl;
+        }
+    }
+
 }
 
 //sends the data about the object that was on the scene to the server. 
@@ -261,7 +326,7 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 		//Immediately tracks the item if it's fresh
 		//Sets the ID as well
     }
-         else {
+         else { /*
             itemStats checker;
             for(itemStats j : m_tracked_items) {
                 if(j.id == i->data(0).toInt()) {
@@ -292,7 +357,8 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 		    //Right now, for whatever reason, the above if statements do not trigger if the item is moved.
 		    //Needs to be debugged.
 
-        }
+        } */
+        continue;
     }
 
 	//So if it's made it to this point, something has changed about
