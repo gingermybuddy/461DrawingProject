@@ -219,7 +219,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
     QSqlQuery *circle_query = new QSqlQuery;
     circle_query->exec("SELECT * FROM Ellipse");
     //circle_query->first();
-
+    std::vector<itemStats> shapes;
     //Loop through and repeat for whole table
     while(circle_query->next()){
         std::string bid = circle_query->value(0).toString().toStdString();
@@ -232,8 +232,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		QColor fillColor = QColor(circle_query->value(6).toString());
 		QColor outlineColor = QColor(circle_query->value(7).toString());
 		itemStats temp(bid, shape, sid, x1, y1, x2, y2, fillColor, outlineColor);
-		QJsonObject cir = temp.toJson();
-		shapes.push_back(cir);
+        shapes.push_back(temp);
 	}
 
    QSqlQuery *rect_query = new QSqlQuery;
@@ -251,8 +250,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		QColor fillColor = QColor(circle_query->value(6).toString());
 		QColor outlineColor = QColor(circle_query->value(7).toString());
 		itemStats temp(bid, shape, sid, x1, y1, x2, y2, fillColor, outlineColor);
-		QJsonObject rect = temp.toJson();
-		shapes.push_back(rect);
+        shapes.push_back(temp);
 	}
 
     QSqlQuery *line_query = new QSqlQuery;
@@ -269,8 +267,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		double y2 = line_query->value(5).toDouble();
 		QColor outlineColor = QColor(circle_query->value(6).toString());
 		itemStats temp(bid, shape, sid, x1, y1, x2, y2, outlineColor);
-		QJsonObject line = temp.toJson();
-		shapes.push_back(line);
+        shapes.push_back(temp);
 	}
 /*
     QSqlQuery *text_query = new QSqlQuery;
@@ -286,8 +283,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
         std::string text = text_query->value(4).toString().toStdString();
 		QColor color = QColor(text_query->value(5).toString());
         itemStats temp(bid, shape, sid, x, y, text, color);
-        QJsonObject textTemp = temp.toJson();
-        shapes.push_back(textTemp);
+        shapes.push_back(temp);
 	}
 	
     QSqlQuery *latex_query = new QSqlQuery;
@@ -303,17 +299,18 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
         std::string text = latex_query->value(4).toString().toStdString();
 		QColor color = QColor(latex_query->value(5).toString());
         itemStats temp(bid, shape, sid, x, y, text, color);
-		QJsonObject latex = temp.toJson();
-		shapes.push_back(latex);
-	}*/
-	
+        shapes.push_back(temp);
+    }*/
+
 	//Create a JSON object of all the shapes using their sid as a key
-    	QJsonObject full_board;
-	for(QJsonObject temp : shapes){
+
+    QJsonObject full_board;
+
+    for(itemStats temp : shapes){
         std::cout << "shape ";
-        std::cout << temp.value("shape").toString().toStdString();
+        std::cout << temp.type;
         std::cout << " added" << std::endl;
-        full_board.insert(temp.value("sid").toString(), temp);
+        full_board.insert(QString::number(temp.id), temp.toJson());
 	}
 
 	//Create JSON Document to write to the buffer
