@@ -79,6 +79,7 @@ void ProjectView::text_tool(qreal x, qreal y)
 
 	QGraphicsTextItem* text = scene()->addText(temp);
         text->setPos(x, y);
+    text->setDefaultTextColor(QColor(m_color_r, m_color_g, m_color_b));
 	// text->setTextInteractionFlags(Qt::TextEditorInteraction);
 	text->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	text->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -130,6 +131,7 @@ void ProjectView::latex_tool(qreal x, qreal y)
         // otherwise, it was invalid latex
         std::cout << "WAS NOT GOOD!"<< std::endl;
         QGraphicsTextItem* text = scene()->addText(temp);
+        text->setDefaultTextColor(QColor(m_color_r, m_color_g, m_color_b));
         text->setPos(x,y);
         text->setFlag(QGraphicsItem::ItemIsSelectable, true);
         text->setFlag(QGraphicsItem::ItemIsMovable, true);
