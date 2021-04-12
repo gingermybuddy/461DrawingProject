@@ -1,8 +1,7 @@
 \chapter{Client}
   The following is an explanation of the client side of the 461 Drawing Project \linebreak \linebreak
 
-\section*{ItemStats}
-\addcontentsline{toc}{section}{\protect\numberline{}ItemStats}%
+\section{ItemStats}
 \subsection{.h}
   itemStats is a struct which contains all of the values which a shape/object
 contains. This is used in other documents and functions to help parse out and
@@ -81,8 +80,7 @@ QByteArray itemStats::byteData()
 
 \end{minted}
 
-\section*{ProjectScene}
-\addcontentsline{toc}{section}{\protect\numberline{}ProjectScene}%
+\section{ProjectScene}
 \subsection{.h}
   projectScene is a class which contains functions that relate to the QGraphicsScene,
 that is, the 'behinds the scenes' of the graphical window.
@@ -147,8 +145,7 @@ fontsize=\footnotesize,
      our internal list) and then tells the server about it.*/
 \end{minted}
 
-\section*{ProjectView}
-\addcontentsline{toc}{section}{\protect\numberline{}ProjectView}%
+\section{ProjectView}
 \subsection{.h}
   projectView is a class which contains the functions which relate to the QGraphicsView,
 that is, the canvas and buttons that we see on the graphical window.
@@ -233,8 +230,7 @@ ProjectView::mouseReleaseEvent()
     the selected tool, and calls the appropriate function.*/
 \end{minted}
 
-\section*{ToolBar}
-\addcontentsline{toc}{section}{\protect\numberline{}ToolBar}%
+\section{ToolBar}
 \subsection{.h}
   toolbar is a class which contains the functions to change the different tools in
 the graphical window.
@@ -337,8 +333,7 @@ ToolBar::set_color_custom()
     graphical interface, rgb, hexadeicimal, or cmyk.*/
 \end{minted}
 
-\section*{Window}
-\addcontentsline{toc}{section}{\protect\numberline{}Window}%
+\section{Window}
 \subsection{.h}
   window is essentially the 'main' of the graphical window, though there is a
 'main' that spawns it.
@@ -388,8 +383,7 @@ Window::~Window()
   //A destructor for the Window class.
 \end{minted}
 
-\section*{Main}
-\addcontentsline{toc}{section}{\protect\numberline{}Main}%
+\section{Main}
 \subsection{.cpp}
   main.cpp is a small file which contains one function: int main. This is the start of
 the entire client, where a new window is created in memory and executed. From
