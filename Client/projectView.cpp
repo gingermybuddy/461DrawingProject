@@ -111,6 +111,9 @@ void ProjectView::latex_tool(qreal x, qreal y)
     // remove file
     system("rm temp.tex");
     system("rm temp.pdf");
+    system("rm temp.fls");
+    system("rm temp.log");
+    system("rm temp.aux");
 
     if (isGood == 0){
         // The latex was valid!
