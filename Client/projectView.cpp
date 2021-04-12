@@ -30,6 +30,22 @@ void ProjectView::change_color(int r, int g, int b)
 	m_color_g = g;
 	m_color_b = b;
 }
+int ProjectView::get_m_tool()
+{
+    return m_tool;
+}
+int ProjectView::get_m_color_r()
+{
+    return m_color_r;
+}
+int ProjectView::get_m_color_g()
+{
+    return m_color_g;
+}
+int ProjectView::get_m_color_b()
+{
+    return m_color_b;
+}
 void ProjectView::fill()
 {
 
