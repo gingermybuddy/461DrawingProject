@@ -106,10 +106,14 @@ void ProjectView::latex_tool(qreal x, qreal y)
     int isGood = system("pdflatex -interaction=nonstopmode temp.tex");
     std::cout << "RETURNVALUE WAS: "<< isGood << std::endl;
 
+    // convert to a png
+    system("pdftoppm -png -r 500 temp.pdf > temp.png");
     // open file in qt
-    QPixmap pix(QString("./temp.pdf"));
+    QPixmap pix(QString("./temp.png"));
+    std::cout << pix.isNull() << std::endl;
     // pix = pix.scaled(2 * pix.width(), 2 * pix.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     // remove file
+    system("rm temp.png");
     system("rm temp.tex");
     system("rm temp.pdf");
     system("rm temp.fls");
