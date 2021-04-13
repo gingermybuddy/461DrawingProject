@@ -8,6 +8,8 @@
 #include <QPixmap>
 #include <QColor>
 #include <iostream>
+#include "cmath"
+#include "math.h"
 #include <QInputDialog>
 #include <stdio.h>
 #include <stdlib.h>
@@ -146,19 +148,39 @@ void ProjectView::latex_tool(qreal x, qreal y)
 	// text->setTextInteractionFlags(Qt::TextEditorInteraction);
 
 }
+void ProjectView::arrow_tool(qreal x, qreal y, qreal x2, qreal y2)
+{
+    QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
+    pen.setWidth(2);
+
+    qreal arrowSize = 20;
+    QLineF line(x,y,x2,y2);
+
+    double angle = std::atan2(-line.dy(), line.dx());
+    QPointF arrowP1 = line.p1() + QPointF(sin(angle + M_PI / 3) * arrowSize,
+                                            cos(angle + M_PI / 3) * arrowSize);
+    QPointF arrowP2 = line.p1() + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
+                                            cos(angle + M_PI - M_PI / 3) * arrowSize);
+    QPolygonF arrowHead;
+    arrowHead << line.p1() << arrowP1 << arrowP2;
+    QGraphicsLineItem* liner = scene()->addLine(line,pen);
+    scene()->addPolygon(arrowHead,pen);
+
+}
+
 void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 {		
 	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
 	pen.setWidth(2);
 
 	//Draws a circle where the coordinates were
-    QRectF circ(x, y, x2-x, y2-y);
-    QGraphicsEllipseItem* r = scene()->addEllipse(circ, pen, QBrush(Qt::transparent));
+    	QRectF circ(x, y, x2-x, y2-y);
+    	QGraphicsEllipseItem* r = scene()->addEllipse(circ, pen, QBrush(Qt::transparent));
 	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	r->setFlag(QGraphicsItem::ItemIsMovable, true);
 	r->setCursor(Qt::PointingHandCursor);
 	r->setData(0, -1);
-    r->setData(1, "ellipse");
+    	r->setData(1, "ellipse");
 	//This is some extra data we're adding to the item. Ideally the 'id' parameter
 	//iterates, but that hasn't been implemented yet. Probably track how many items are on the scene.
 	//The 'setData' function takes in an int as a key and a QVariant (any sort of variable) as parameters.
@@ -171,14 +193,14 @@ void ProjectView::line_tool(qreal x, qreal y, qreal x2, qreal y2)
 	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
 	pen.setWidth(2);
 
-    QLineF liner(x, y, x2, y2);
-    // std::cout << "Making a line! \n";
-    QGraphicsLineItem* line = scene()->addLine(liner, pen);
+         QLineF liner(x, y, x2, y2);
+        // std::cout << "Making a line! \n";
+        QGraphicsLineItem* line = scene()->addLine(liner, pen);
 	line->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	line->setFlag(QGraphicsItem::ItemIsMovable, true);
 	line->setCursor(Qt::PointingHandCursor);
 	line->setData(0, -1);
-    line->setData(1, "line");
+        line->setData(1, "line");
 }
 
 void ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
@@ -236,6 +258,9 @@ void ProjectView::mouseReleaseEvent(QMouseEvent *event)
     case 6:
         latex_tool(x, y);
         break;
+    case 7:
+	arrow_tool(x, y, x2, y2);
+	break;
     default:
         std::cout << "error" << std::endl;
         break;

@@ -16,6 +16,7 @@ ToolBar::ToolBar() : QWidget()
     m_fill = new QPushButton(QIcon("./icons/fill.png"), tr("Fill"));
 	m_text = new QPushButton(QIcon("./icons/text.png"), tr("Text"));
 	m_latex = new QPushButton(QIcon("./icons/text.png"), tr("Math"));
+    m_arrow = new QPushButton(QIcon("./icons/arrow.png"), tr("Arrow"));
 	m_layout = new QVBoxLayout(this);
 
 	m_layout->addWidget(m_circle);
@@ -31,13 +32,15 @@ ToolBar::ToolBar() : QWidget()
    	m_layout->addWidget(m_fill);
 	m_layout->addWidget(m_text);
 	m_layout->addWidget(m_latex);
+	m_layout->addWidget(m_arrow);
 
 	connect(m_default, SIGNAL(clicked()), this, SLOT(set_default()));
-    connect(m_circle, SIGNAL(clicked()), this, SLOT(set_circle()));
-    connect(m_line, SIGNAL(clicked()), this, SLOT(set_line()));
-    connect(m_rect, SIGNAL(clicked()), this, SLOT(place_rectangle()));
+    	connect(m_circle, SIGNAL(clicked()), this, SLOT(set_circle()));
+   	connect(m_line, SIGNAL(clicked()), this, SLOT(set_line()));
+    	connect(m_rect, SIGNAL(clicked()), this, SLOT(place_rectangle()));
 	connect(m_text, SIGNAL(clicked()), this, SLOT(set_text()));
 	connect(m_latex, SIGNAL(clicked()), this, SLOT(set_latex()));
+	connect(m_arrow, SIGNAL(clicked()), this, SLOT(set_arrow()));
 
     // bind color buttons
     connect(m_black, SIGNAL(clicked()), this, SLOT(set_color_black()));
@@ -66,6 +69,7 @@ ToolBar::~ToolBar()
 	delete m_color_picker;
     	delete m_fill;
 	delete m_text;
+	delete m_arrow;
 	delete m_layout;
 }
 
@@ -131,4 +135,8 @@ void ToolBar::set_text()
 void ToolBar::set_latex()
 {
 	m_view->change_tool(6);
+}
+void ToolBar::set_arrow()
+{
+	m_view->change_tool(7);
 }

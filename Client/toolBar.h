@@ -26,6 +26,7 @@ class ToolBar : public QWidget
 		QPushButton* m_fill;
 		QPushButton* m_text;
 		QPushButton* m_latex;
+		QPushButton* m_arrow;
 		ProjectView* m_view;
 	public slots:
 		// set default
@@ -42,8 +43,9 @@ class ToolBar : public QWidget
         void set_color_blue();
         void set_color_custom();
         void fill();
-		void set_text();
-		void set_latex();
+	void set_text();
+	void set_latex();
+	void set_arrow();
 	public:
 		ToolBar();
 		~ToolBar();
