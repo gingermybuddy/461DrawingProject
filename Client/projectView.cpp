@@ -202,6 +202,18 @@ void ProjectView::line_tool(qreal x, qreal y, qreal x2, qreal y2)
 	line->setData(0, -1);
         line->setData(1, "line");
 }
+void ProjectView::bezier_tool(qreal x, qreal y, qreal x2, qreal y2)
+{		
+	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
+	pen.setWidth(2);
+
+    QPainterPath path;
+    path.moveTo(x,y);
+    path.quadTo(((x+x2)/2) + 50,((y+y2)/2) + 50,x2,y2);
+
+    QGraphicsPathItem* line = scene()->addPath(path, pen);
+
+}
 
 void ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
 {
@@ -259,8 +271,11 @@ void ProjectView::mouseReleaseEvent(QMouseEvent *event)
         latex_tool(x, y);
         break;
     case 7:
-	arrow_tool(x, y, x2, y2);
-	break;
+        arrow_tool(x, y, x2, y2);
+        break;
+    case 8:
+        bezier_tool(x, y, x2, y2);
+        break;
     default:
         std::cout << "error" << std::endl;
         break;

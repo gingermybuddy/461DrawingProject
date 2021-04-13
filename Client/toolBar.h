@@ -27,6 +27,7 @@ class ToolBar : public QWidget
 		QPushButton* m_text;
 		QPushButton* m_latex;
 		QPushButton* m_arrow;
+		QPushButton* m_bezier;
 		ProjectView* m_view;
 	public slots:
 		// set default
@@ -46,6 +47,7 @@ class ToolBar : public QWidget
 	void set_text();
 	void set_latex();
 	void set_arrow();
+	void set_bezier();
 	public:
 		ToolBar();
 		~ToolBar();

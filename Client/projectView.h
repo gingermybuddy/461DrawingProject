@@ -34,6 +34,7 @@ class ProjectView : public QGraphicsView
         void arrow_tool(qreal x, qreal y, qreal x2, qreal y2);
 	void circle_tool(qreal x, qreal y,qreal x2, qreal y2);
         void line_tool(qreal x, qreal y, qreal x2, qreal y2);
+        void bezier_tool(qreal x, qreal y, qreal x2, qreal y2);
 	void rect_tool(qreal x, qreal y, qreal x2, qreal y2);
         void mousePressEvent(QMouseEvent* event);
 	void mouseReleaseEvent(QMouseEvent* event);
