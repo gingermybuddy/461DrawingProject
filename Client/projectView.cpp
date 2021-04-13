@@ -79,6 +79,7 @@ void ProjectView::text_tool(qreal x, qreal y)
 
 	QGraphicsTextItem* text = scene()->addText(temp);
         text->setPos(x, y);
+    text->setDefaultTextColor(QColor(m_color_r, m_color_g, m_color_b));
 	// text->setTextInteractionFlags(Qt::TextEditorInteraction);
 	text->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	text->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -89,7 +90,8 @@ void ProjectView::text_tool(qreal x, qreal y)
 void ProjectView::latex_tool(qreal x, qreal y)
 {
 	bool ok;
-    QString temp = QInputDialog::getText(this, tr("Add Math"), tr("Enter text:"), QLineEdit::Normal, tr("\\left[-\\frac{\\hbar^2}{2m}\\frac{\\partial^2}{\\partial x^2}+V(x)\\right]\\Psi(x)=\\mathrm{i}\\hbar\\frac{\\partial}{\\partial t}\\Psi(x)") , &ok);
+    // QString temp = QInputDialog::getText(this, tr("Add Math"), tr("Enter text:"), QLineEdit::Normal, tr("\\left[-\\frac{\\hbar^2}{2m}\\frac{\\partial^2}{\\partial x^2}+V(x)\\right]\\Psi(x)=\\mathrm{i}\\hbar\\frac{\\partial}{\\partial t}\\Psi(x)") , &ok);
+    QString temp = QInputDialog::getMultiLineText(this, tr("add Math"), tr("Enter text:"), tr("\\left[-\\frac{\\hbar^2}{2m}\\frac{\\partial^2}{\\partial x^2}+V(x)\\right]\\Psi(x)=\\mathrm{i}\\hbar\\frac{\\partial}{\\partial t}\\Psi(x)"), &ok);
 	if(!ok || temp.isEmpty()) return;
 
     // XXX WILL ONLY WORK ON UNIX XXX
@@ -101,24 +103,48 @@ void ProjectView::latex_tool(qreal x, qreal y)
     std::string echo = "echo '" + doc + "' > temp.tex";
     system(echo.c_str());
     // pdflatex
-    system("pdflatex temp.tex");
+    int isGood = system("pdflatex -interaction=nonstopmode temp.tex");
+    std::cout << "RETURNVALUE WAS: "<< isGood << std::endl;
 
+    // convert to a png
+    system("pdftoppm -png -r 500 temp.pdf > temp.png");
     // open file in qt
-    QPixmap pix(QString("./temp.pdf"));
+    QPixmap pix(QString("./temp.png"));
+    std::cout << pix.isNull() << std::endl;
     // pix = pix.scaled(2 * pix.width(), 2 * pix.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     // remove file
+    system("rm temp.png");
     system("rm temp.tex");
     system("rm temp.pdf");
+    system("rm temp.fls");
+    system("rm temp.log");
+    system("rm temp.aux");
 
-	QGraphicsPixmapItem* text = scene()->addPixmap(pix);
-    text->setPos(x,y);
+    if (isGood == 0){
+        // The latex was valid!
+        std::cout << "WAS GOOD!"<< std::endl;
+        QGraphicsPixmapItem* text = scene()->addPixmap(pix);
+        text->setPos(x,y);
+        text->setFlag(QGraphicsItem::ItemIsSelectable, true);
+        text->setFlag(QGraphicsItem::ItemIsMovable, true);
+        text->setCursor(Qt::PointingHandCursor);
+        text->setData(0, -1);
+        text->setData(1, "latex");
+        text->setData(2, temp);
+    } else {
+        // otherwise, it was invalid latex
+        std::cout << "WAS NOT GOOD!"<< std::endl;
+        QGraphicsTextItem* text = scene()->addText(temp);
+        text->setDefaultTextColor(QColor(m_color_r, m_color_g, m_color_b));
+        text->setPos(x,y);
+        text->setFlag(QGraphicsItem::ItemIsSelectable, true);
+        text->setFlag(QGraphicsItem::ItemIsMovable, true);
+        text->setCursor(Qt::PointingHandCursor);
+        text->setData(0, -1);
+        text->setData(1, "text");
+    }
 	// text->setTextInteractionFlags(Qt::TextEditorInteraction);
-	text->setFlag(QGraphicsItem::ItemIsSelectable, true);
-	text->setFlag(QGraphicsItem::ItemIsMovable, true);
-	text->setCursor(Qt::PointingHandCursor);
-	text->setData(0, -1);
-    text->setData(1, "latex");
-    text->setData(2, temp);
+
 }
 void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 {		
