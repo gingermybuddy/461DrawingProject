@@ -164,8 +164,14 @@ void ProjectView::arrow_tool(qreal x, qreal y, qreal x2, qreal y2)
     QPolygonF arrowHead;
     arrowHead << line.p1() << arrowP1 << arrowP2;
     QGraphicsLineItem* liner = scene()->addLine(line,pen);
-    scene()->addPolygon(arrowHead,pen);
-
+    QGraphicsPolygonItem* head = scene()->addPolygon(arrowHead,pen);
+	
+	liner->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+	liner->setCursor(Qt::PointingHandCursor);
+	liner->setData(0, -1);
+	liner->setData(1, "arrow");
+    head->setData(1, "arrowhead");
+    liner->setData(3, (unsigned long long int)head); //You ever feel like you committed a sin?
 }
 
 void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
@@ -212,6 +218,10 @@ void ProjectView::bezier_tool(qreal x, qreal y, qreal x2, qreal y2)
     path.quadTo(((x+x2)/2) + 50,((y+y2)/2) + 50,x2,y2);
 
     QGraphicsPathItem* line = scene()->addPath(path, pen);
+    line->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+    line->setCursor(Qt::PointingHandCursor);
+    line->setData(0, -1);
+    line->setData(1, "bezier");
 
 }
 

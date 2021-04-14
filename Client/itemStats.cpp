@@ -65,6 +65,13 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 		y = t->y();
 		outline = t->defaultTextColor();
 		text = t->toPlainText().toStdString();
+    } else if (type == "arrow") {
+        QGraphicsLineItem* i = (QGraphicsLineItem*) item;
+        x = i->line().x1();
+        y = i->line().y1();
+        height = i->line().y2();
+        width = i->line().x2();
+        outline = i->pen().color();
     } else if (type == "latex") {
 		QGraphicsPixmapItem* t = (QGraphicsPixmapItem*)item;
 		x = t->x();
@@ -112,7 +119,12 @@ QJsonObject itemStats::toJson()
 		returnval.insert("data", QJsonValue(data));
 		returnval.insert("shape", QJsonValue(QString::fromStdString(type)));
 
-	} else if (type == "line") {
+    } else if (type =="latex") {
+        data.insert("color", QJsonValue("#000000"));
+        data.insert("start", QJsonValue(start));
+        data.insert("sid", QJsonValue(id));
+        data.insert("text", QJsonValue(QString::fromStdString(text)));
+    } else if (type == "line" || type == "arrow") {
 		end.insert("x", QJsonValue(width));
 		end.insert("y", QJsonValue(height));
 		data.insert("color", QJsonValue(outline.name()));

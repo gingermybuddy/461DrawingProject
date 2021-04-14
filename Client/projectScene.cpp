@@ -73,7 +73,7 @@ void ProjectScene::readSocket()
 	}
 	//Right now all it does is pass received data into a string and outputs it
 	//to the console.
-	std::cout << "Received " << buf.toStdString() << std::endl;
+    std::cout << "Received " <<  QJsonDocument::fromJson(buf).toJson(QJsonDocument::Compact).toStdString() << std::endl;
 	//Passes the byte array into some JSON objects that we can use later.
         QJsonDocument doc = QJsonDocument::fromJson(buf);
         QJsonObject obj = doc.object();
@@ -114,6 +114,10 @@ void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
     for(QJsonObject obj : objects) {
         for(QGraphicsItem* i : items()) {
             if(obj.value("data").toObject().value("sid").toInt() == i->data(0).toInt()) {
+                if (i->data(1) == "arrow") {
+                    QGraphicsPolygonItem* header = (QGraphicsPolygonItem*)i->data(3).toULongLong();
+                    delete header;
+                }
                 delete i;
             }
         }
@@ -122,7 +126,6 @@ void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
         if(type == "line") {
             QPen pen(QColor(d.value("color").toString()));
             pen.setWidth(2);
-
             QJsonObject start = d.value("start").toObject();
             QJsonObject end = d.value("end").toObject();
             QLineF line(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
@@ -172,6 +175,30 @@ void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
 
         } else if (type == "latex") {
             std::cout << "CHAD HELP ME" << std::endl;
+
+        } else if (type == "arrow") {
+            QPen pen(QColor(d.value("color").toString()));
+            pen.setWidth(2);
+            QJsonObject start = d.value("start").toObject();
+            QJsonObject end = d.value("end").toObject();
+            QLineF line(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
+            QGraphicsLineItem* l = addLine(line, pen);
+            l->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+            l->setCursor(Qt::PointingHandCursor);
+            l->setData(0, d.value("sid").toInt());
+            l->setData(1, "arrow");
+
+            qreal arrowSize = 20;
+            double angle = std::atan2(-line.dy(), line.dx());
+            QPointF arrowP1 = line.p1() + QPointF(sin(angle + M_PI / 3) * arrowSize,
+                                                    cos(angle + M_PI / 3) * arrowSize);
+            QPointF arrowP2 = line.p1() + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
+                                                    cos(angle + M_PI - M_PI / 3) * arrowSize);
+            QPolygonF arrowHead;
+            arrowHead << line.p1() << arrowP1 << arrowP2;
+            QGraphicsPolygonItem* head = addPolygon(arrowHead,pen);
+            head->setData(1, "arrowhead");
+
         }
     }
 }
@@ -182,7 +209,9 @@ int ProjectScene::trackItem(QGraphicsItem* item)
 	QString type = item->data(1).toString();
 	int id = m_tracked_items.size();
 	item->setData(0, id);
-	m_tracked_items.push_back(itemStats(m_board_id, item));
+    itemStats tracker = itemStats(m_board_id, item);
+    m_tracked_items.push_back(tracker);
+    //item->setPos(tracker.x, tracker.y);
 	return id;
 	//Returns the id of the newly-tracked item.
 }
@@ -321,11 +350,17 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 
         if(i->data(0).toInt() == -1) {
 		//Is this a fresh item?
+        if(i->data(1).toString() == "arrowhead") {
+            continue;
+        }
 		int new_id = trackItem(i);
 		std::cout << "Fresh item! ID: " << new_id << std::endl;
 		//Immediately tracks the item if it's fresh
 		//Sets the ID as well
     }
+
+
+
          else { /*
             itemStats checker;
             for(itemStats j : m_tracked_items) {
