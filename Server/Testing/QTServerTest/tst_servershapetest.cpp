@@ -1,8 +1,8 @@
+#include "../../Server.h"
 #include <QtTest>
 #include <QApplication>
 #include <QDataStream>
 #include <QSqlQuery>
-#include "../../Server.h"
 
 // add necessary includes here
 
@@ -60,7 +60,7 @@ void ServerShapeTest::testEllipse()
 int ServerShapeTest::main(int argc, char* argv[])
 {
     QApplication new_window(argc, argv);
-    ser = Server();
+    Server* s = new Server();
     testConstructor();
     testCircle();
     testEllipse();

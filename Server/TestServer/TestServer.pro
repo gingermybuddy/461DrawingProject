@@ -10,4 +10,4 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES +=  tst_servershapetest.cpp
+SOURCES +=  tst_testserver.cpp
