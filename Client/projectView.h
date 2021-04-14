@@ -21,6 +21,11 @@ class ProjectView : public QGraphicsView
 	private slots:
 
 	public:
+        int get_m_tool();
+        int get_m_color_r();
+        int get_m_color_g();
+        int get_m_color_b();
+
 		void change_tool(int tool);
 		void change_color(int r, int g, int b);
         void fill();

@@ -26,6 +26,11 @@ class Window : public QMainWindow //Extension on the base QMainWindow class
         // make a popup window
 		void popup();
 	public:
+        ToolBar* get_m_bar();
+        QDockWidget* get_m_tool_dock();
+        ProjectScene* get_m_scene();
+        ProjectView* get_m_view();
+
 		Window();
 		~Window();
 };

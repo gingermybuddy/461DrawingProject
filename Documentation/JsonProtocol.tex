@@ -1,6 +1,8 @@
 \chapter{JSON Protocol}
     Defined here is what a JSON Object should look like for sending and receiving shapes. \linebreak \linebreak
-\quad For circles:
+
+\section{Rectangles}
+For Rectangles:
 \begin{minted}
 [
 frame=lines,
@@ -11,20 +13,89 @@ fontsize=\footnotesize,
 {json}
 
 {
-    "id": 1,
-    "shape": "circle",
-    "data": {
-        "radius": "10",
-        "center": {
-            "x": 100,
-            "y": 150
-        }
+  "data": {
+    "bid": "<board ID>",
+    "fill_color": "<a color in HEX>",
+    "outline_color": "<a color in HEX>",
+    "end": {
+      "x": "<x2; end x; second corner>",
+      "y": "<y2; end y; second corner>"
+    },
+    "sid": <shape ID>,
+    "start": {
+      "x": "<x1; start x; first corner>",
+      "y": "<y2; start y; first corner>"
     }
+  },
+  "shape": "rect"
+}
+\end{minted}
+
+
+\bigskip
+\section{Ellipses}
+For Ellipses:
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{json}
+
+{
+  "data": {
+    "bid": "<board ID>",
+    "fill_color": "<a color in HEX>",
+    "outline_color": "<a color in HEX>",
+    "end": {
+      "x": "<x2; end x; second corner>",
+      "y": "<y2; end y; second corner>"
+    },
+    "sid": <shape ID>,
+    "start": {
+      "x": "<x1; start x; first corner>",
+      "y": "<y2; start y; first corner>"
+    }
+  },
+  "shape": "ellipse"
+}
+\end{minted}
+
+
+
+\bigskip
+\section{LaTeX}
+For LaTeX:
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{json}
+
+{
+    "data": {
+        "bid": "<board ID>",
+        "color": "<a color in HEX>",
+        "start": {
+            "x": "<x1; start x; first corner>",
+            "y": "<y2; start y; first corner>"
+        },
+        "sid": "<Shape ID>",
+        "text": "$<LaTeX math markup>$"
+
+    },
+    "shape": "text"
 }
 \end{minted}
 
 \bigskip
-For rectangles:
+\section{Lines}
+For Lines:
 \begin{minted}
 [
 frame=lines,
@@ -35,17 +106,48 @@ fontsize=\footnotesize,
 {json}
 
 {
-    "id": 2,
-    "shape": "line",
-    "data": {
-        "start": {
-            "x": 10,
-            "y": 50
-        },
-        "end": {
-            "x": 150,
-            "y": 100
-        }
+  "data": {
+    "bid": "<board ID>",
+    "color": "<a color in HEX>",
+    "end": {
+      "x": "<x2; end x>",
+      "y": "<y2; end y>"
+    },
+    "sid": <shape ID>,
+    "start": {
+      "x": "<x1; start x>",
+      "y": "<y1; start y>"
     }
+  },
+  "shape": "line"
 }
+\end{minted}
+
+
+\bigskip
+\section{Text}
+For Text:
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+]
+{json}
+
+{
+    "data": {
+        "bid": "<board ID>",
+        "color": "<a color in HEX>",
+        "start": {
+            "x": "<x1; start x; first corner>",
+            "y": "<y2; start y; first corner>"
+        },
+        "sid": "<shape ID>",
+        "text": "<the text of the string>"
+    },
+    "shape": "text"
+}
+
 \end{minted}

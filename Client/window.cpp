@@ -38,6 +38,24 @@ Window::~Window()
 	// delete m_testoption;
 }
 
+
+ToolBar* Window::get_m_bar()
+{
+    return m_bar;
+}
+QDockWidget* Window::get_m_tool_dock()
+{
+    return m_tool_dock;
+}
+ProjectScene* Window::get_m_scene()
+{
+    return m_scene;
+}
+ProjectView* Window::get_m_view()
+{
+    return m_view;
+}
+
 void Window::popup()
 {
 	QMessageBox popup;
