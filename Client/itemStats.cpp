@@ -52,7 +52,7 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 	board_id = nboard_id;
 	type = item->data(1).toString().toStdString();
 	id = item->data(0).toInt();
-	if(type == "line") {
+    if(type == "line" || type == "arrow") {
 		QGraphicsLineItem* i = (QGraphicsLineItem*)item;
 		x = i->line().x1();
 		y = i->line().y1();
@@ -70,7 +70,6 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 		x = t->x();
 		y = t->y();
 		text = t->data(2).toString().toStdString();
-
     } else {
 		QGraphicsRectItem* r = (QGraphicsRectItem*)item;
 		x = r->rect().x();
