@@ -135,6 +135,8 @@ QJsonObject itemStats::toJson()
         data.insert("start", QJsonValue(start));
         data.insert("sid", QJsonValue(id));
         data.insert("text", QJsonValue(QString::fromStdString(text)));
+        returnval.insert("data", QJsonValue(data));
+        returnval.insert("shape", QJsonValue(QString::fromStdString(type)));
 
     } else if (type == "line" || type == "arrow") {
 		end.insert("x", QJsonValue(width));
