@@ -331,7 +331,19 @@ void ProjectScene::checkPos()
                     socketstream.startTransaction();
 					socketstream << package.byteData();
                     socketstream.commitTransaction();
-				} else {
+                } else if (x.type == "latex") {
+                    QGraphicsPixmapItem* t = (QGraphicsPixmapItem*)i;
+                    if(x.x == t->x() && x.y == t->y() && x.text == t->data(2).toString().toStdString()) continue;
+                    std::cout << "Something changed about a latex item" << std::endl;
+                    itemStats package(m_board_id, i);
+                    m_tracked_items[j] = package;
+
+                    QDataStream socketstream(m_socket);
+                    socketstream.startTransaction();
+                    socketstream << package.byteData();
+                    socketstream.commitTransaction();
+
+                } else {
 					QGraphicsRectItem* r = (QGraphicsRectItem*)i;
                     QRectF chk = r->rect();
                     if(x.scenex == r->x() && x.sceney == r->y() && x.width == chk.width() && x.height == chk.height() && x.outline == r->pen().color() && x.fill == r->brush().color()) continue;
