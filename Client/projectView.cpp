@@ -208,10 +208,27 @@ void ProjectView::bezier_tool(qreal x, qreal y, qreal x2, qreal y2)
 	pen.setWidth(2);
 
     QPainterPath path;
+    // move path to start
     path.moveTo(x,y);
-    path.quadTo(((x+x2)/2) + 50,((y+y2)/2) + 50,x2,y2);
+    // XXX calculate midpoint 
+    qreal midx = (x+x2)/2;
+    qreal midy = (y+y2)/2;
+
+    qreal tempx = x2-midx;
+    qreal tempy = y2-midy;
+
+    qreal cx = midx - tempy;
+    qreal cy = midy + tempx;
+
+    // XXX do transformation
+    path.quadTo(cx, cy ,x2,y2);
 
     QGraphicsPathItem* line = scene()->addPath(path, pen);
+	line->setFlag(QGraphicsItem::ItemIsSelectable, true);
+	line->setFlag(QGraphicsItem::ItemIsMovable, true);
+	line->setCursor(Qt::PointingHandCursor);
+	line->setData(0, -1);
+    line->setData(1, "bezier");
 
 }
 
