@@ -1,8 +1,7 @@
 \chapter{Server}
   The server is run off of a Qt framework using Qt sockets. Clients can connect to the server via these Qt sockets, and are assigned unique identifiers using the socketDescriptor value of the connecting socket. By maintaining a constant connection, the server is able to receive and send the most current information about databases and shapes.
 
-\section*{Server}
-\addcontentsline{toc}{section}{\protect\numberline{}Server}%
+\section{Server}
 \subsection{.h}
 Server.h includes some tools to set up an item based on its data and turn it into a byte array. Also turn it into a QJsonObject.
 \begin{minted}
@@ -121,8 +120,7 @@ fontsize=\footnotesize,
     # Create a new database for every new board that is created
 \end{minted}
 
-\section*{Main}
-\addcontentsline{toc}{section}{\protect\numberline{}Main}%
+\section{Main}
 \subsection{.cpp}
 \begin{minted}
 [
