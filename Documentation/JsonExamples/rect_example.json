@@ -1,6 +1,10 @@
 {
   "data": {
-    "bid": "None", 
+    "bid": "None",
+	"scenepos": {
+	  "x": "0",
+	  "y": "0"
+	}	
     "fill_color": "ffffff", 
     "outline_color": "ffffff", 
     "end": {
