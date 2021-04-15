@@ -216,17 +216,22 @@ void ProjectView::bezier_tool(qreal x, qreal y, qreal x2, qreal y2)
     QPainterPath path;
     // move path to start
     path.moveTo(x,y);
-    // XXX calculate midpoint 
+
+    // calculate distance between points to use in determining control point
+    double distance = std::sqrt(pow(x2-x,2)+pow(y2-y,2));
+    // std::cout << "distance was " << distance << std::endl;
+
+    // calculate midpoint 
     qreal midx = (x+x2)/2;
     qreal midy = (y+y2)/2;
 
-    qreal tempx = x2-midx;
-    qreal tempy = y2-midy;
+    qreal slopex = x2-midx;
+    qreal slopey = y2-midy;
 
-    qreal cx = midx - tempy;
-    qreal cy = midy + tempx;
+    qreal cx = midx - 125*slopex/(distance/2);
+    qreal cy = midy + 125*slopey/(distance/2);
 
-    // XXX do transformation
+    // do transformation
     path.quadTo(cx, cy ,x2,y2);
 
     QGraphicsPathItem* line = scene()->addPath(path, pen);
