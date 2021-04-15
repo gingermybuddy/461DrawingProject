@@ -54,11 +54,7 @@ void ProjectView::fill()
         QList<QGraphicsItem*> selected = scene()->selectedItems();
         for(QGraphicsItem* i : selected){
             if(i->data(1).toString() == "line") continue;
-
-            //QBrush brush((QColor(m_color_r, m_color_g, m_color_b), Qt::SolidPattern));
-            //brush = i->brush().color();
-            QBrush br(QColor(m_color_r, m_color_g, m_color_b), Qt::SolidPattern);
-
+                QBrush br(QColor(m_color_r, m_color_g, m_color_b), Qt::SolidPattern);
             if(i->data(1).toString() == "rect") {
                 QGraphicsRectItem *rect = qgraphicsitem_cast<QGraphicsRectItem *>(i);
                 //QGraphicsEllipseItem *circle = qgraphicsitem_cast<QGraphicsEllipseItem *>(circle);
@@ -70,7 +66,6 @@ void ProjectView::fill()
                 e->setBrush(br);
                 e->update();
             }
-
      }
 }
 void ProjectView::text_tool(qreal x, qreal y)
@@ -81,7 +76,7 @@ void ProjectView::text_tool(qreal x, qreal y)
 
 	QGraphicsTextItem* text = scene()->addText(temp);
         text->setPos(x, y);
-    text->setDefaultTextColor(QColor(m_color_r, m_color_g, m_color_b));
+        text->setDefaultTextColor(QColor(m_color_r, m_color_g, m_color_b));
 	// text->setTextInteractionFlags(Qt::TextEditorInteraction);
 	text->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	text->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -91,10 +86,10 @@ void ProjectView::text_tool(qreal x, qreal y)
 }
 void ProjectView::latex_tool(qreal x, qreal y)
 {
-	bool ok;
+    bool ok;
     // QString temp = QInputDialog::getText(this, tr("Add Math"), tr("Enter text:"), QLineEdit::Normal, tr("\\left[-\\frac{\\hbar^2}{2m}\\frac{\\partial^2}{\\partial x^2}+V(x)\\right]\\Psi(x)=\\mathrm{i}\\hbar\\frac{\\partial}{\\partial t}\\Psi(x)") , &ok);
     QString temp = QInputDialog::getMultiLineText(this, tr("add Math"), tr("Enter text:"), tr("\\left[-\\frac{\\hbar^2}{2m}\\frac{\\partial^2}{\\partial x^2}+V(x)\\right]\\Psi(x)=\\mathrm{i}\\hbar\\frac{\\partial}{\\partial t}\\Psi(x)"), &ok);
-	if(!ok || temp.isEmpty()) return;
+    if(!ok || temp.isEmpty()) return;
 
     // XXX WILL ONLY WORK ON UNIX XXX
     // TODO
@@ -164,6 +159,12 @@ void ProjectView::arrow_tool(qreal x, qreal y, qreal x2, qreal y2)
     QPolygonF arrowHead;
     arrowHead << line.p1() << arrowP1 << arrowP2;
     QGraphicsLineItem* liner = scene()->addLine(line,pen);
+    scene()->addPolygon(arrowHead,pen);
+    liner->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    liner->setFlag(QGraphicsItem::ItemIsMovable, true);
+    liner->setCursor(Qt::PointingHandCursor);
+    liner->setData(0, -1);
+    liner->setData(1, "arrow");
     QGraphicsPolygonItem* head = scene()->addPolygon(arrowHead,pen);
 	
 	liner->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
@@ -199,8 +200,7 @@ void ProjectView::line_tool(qreal x, qreal y, qreal x2, qreal y2)
 	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
 	pen.setWidth(2);
 
-         QLineF liner(x, y, x2, y2);
-        // std::cout << "Making a line! \n";
+        QLineF liner(x, y, x2, y2);
         QGraphicsLineItem* line = scene()->addLine(liner, pen);
 	line->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	line->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -246,16 +246,16 @@ void ProjectView::bezier_tool(qreal x, qreal y, qreal x2, qreal y2)
 void ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
 {
 
-	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
+    QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
     pen.setWidth(2);
 
     QRectF rect(x, y, x2-x, y2-y);
     QGraphicsRectItem* r = scene()->addRect(rect, pen, QBrush(Qt::transparent));
-	r->setFlag(QGraphicsItem::ItemIsSelectable, true);
-	r->setFlag(QGraphicsItem::ItemIsMovable, true);
-	r->setCursor(Qt::PointingHandCursor);
-	r->setData(0,-1);
-	r->setData(1, "rect");
+    r->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    r->setFlag(QGraphicsItem::ItemIsMovable, true);
+    r->setCursor(Qt::PointingHandCursor);
+    r->setData(0,-1);
+    r->setData(1, "rect");
 }
 
 void ProjectView::mousePressEvent(QMouseEvent *event)
@@ -267,7 +267,7 @@ void ProjectView::mousePressEvent(QMouseEvent *event)
 
 void ProjectView::mouseReleaseEvent(QMouseEvent *event)
 {
-	//Grabs some useful information based on where the mouse was clicked.
+    //Grabs some useful information based on where the mouse was clicked.
     // std::cout << "Mouse released!\n";
 	QPoint end = event->pos();
 	QPointF q = mapToScene(end);

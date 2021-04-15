@@ -56,8 +56,9 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 	board_id = nboard_id;
 	type = item->data(1).toString().toStdString();
 	id = item->data(0).toInt();
-    scenex = item->x();
-    sceney = item->y();
+    if(type == "line" || type == "arrow") {
+    	scenex = item->x();
+    	sceney = item->y();
 
 	if(type == "line") {
 		QGraphicsLineItem* i = (QGraphicsLineItem*)item;
@@ -84,7 +85,6 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 		x = t->x();
 		y = t->y();
 		text = t->data(2).toString().toStdString();
-
     } else {
 		QGraphicsRectItem* r = (QGraphicsRectItem*)item;
         x = r->rect().x();
