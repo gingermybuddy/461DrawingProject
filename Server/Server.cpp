@@ -415,7 +415,7 @@ void Server::saveDB(QTcpSocket* socket)
 	everything.append("[\n");
     qreal x = 0;
     qreal y = 0;
-
+/*
 	std::string board = "CMSC461";
 	QSqlQuery elQuery("SELECT * FROM Ellipse");
 	while(elQuery.next()){
@@ -467,6 +467,7 @@ void Server::saveDB(QTcpSocket* socket)
 
 	QDataStream socketstream(socket);
 	socketstream << everything;
+    */
 }
 
 void Server::deleteDB(QTcpSocket* socket)
