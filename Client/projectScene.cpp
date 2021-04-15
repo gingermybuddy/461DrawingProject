@@ -208,6 +208,53 @@ void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
 
             } else if (type == "latex") {
                 std::cout << "CHAD HELP ME" << std::endl;
+                string doc = "\\documentclass{standalone}\n\\begin{document}\n\\Huge $" + d.value("text").toString().toStdString() + "$\n\\end{document}";
+                system("touch temp.tex");
+                // pipe into file
+                std::string echo = "echo '" + doc + "' > temp.tex";
+                system(echo.c_str());
+                // pdflatex
+                int isGood = system("pdflatex -interaction=nonstopmode temp.tex");
+                std::cout << "RETURNVALUE WAS: "<< isGood << std::endl;
+
+                // convert to a png
+                system("pdftoppm -png -r 500 temp.pdf > temp.png");
+                // open file in qt
+                QPixmap pix(QString("./temp.png"));
+                std::cout << pix.isNull() << std::endl;
+                // pix = pix.scaled(2 * pix.width(), 2 * pix.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+                // remove file
+                system("rm temp.png");
+                system("rm temp.tex");
+                system("rm temp.pdf");
+                system("rm temp.fls");
+                system("rm temp.log");
+                system("rm temp.aux");
+
+                if (isGood == 0){
+                    // The latex was valid!
+                    std::cout << "WAS GOOD!"<< std::endl;
+                    QGraphicsPixmapItem* text = addPixmap(pix);
+                    text->setPos(start.value("x").toDouble(), start.value("y").toDouble());
+                    text->setFlag(QGraphicsItem::ItemIsSelectable, true);
+                    text->setFlag(QGraphicsItem::ItemIsMovable, true);
+                    text->setCursor(Qt::PointingHandCursor);
+                    text->setData(0, d.value("sid").toInt());
+                    text->setData(1, "latex");
+                    text->setData(2, d.value("text").toString());
+                } else {
+                    // otherwise, it was invalid latex
+                    std::cout << "WAS NOT GOOD!"<< std::endl;
+                    QGraphicsTextItem* text = addText(d.value("text").toString());
+                    text->setDefaultTextColor(Qt::black);
+                    text->setPos(start.value("x").toDouble(), start.value("y").toDouble());
+                    text->setFlag(QGraphicsItem::ItemIsSelectable, true);
+                    text->setFlag(QGraphicsItem::ItemIsMovable, true);
+                    text->setCursor(Qt::PointingHandCursor);
+                    text->setData(0, d.value("sid").toInt());
+                    text->setData(1, "text");
+                }
+                // text->setTextInteractionFlags(Qt::TextEditorInteraction);
 
             } else if (type == "arrow") {
                 QPen pen(QColor(d.value("color").toString()));

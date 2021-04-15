@@ -10,5 +10,5 @@
         "text": "$<LaTeX math markup>$"
          
     },
-    "shape": "text"
+    "shape": "latex"
 }
