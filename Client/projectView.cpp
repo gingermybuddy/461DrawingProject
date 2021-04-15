@@ -165,6 +165,14 @@ void ProjectView::arrow_tool(qreal x, qreal y, qreal x2, qreal y2)
     liner->setCursor(Qt::PointingHandCursor);
     liner->setData(0, -1);
     liner->setData(1, "arrow");
+    QGraphicsPolygonItem* head = scene()->addPolygon(arrowHead,pen);
+	
+	liner->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+	liner->setCursor(Qt::PointingHandCursor);
+	liner->setData(0, -1);
+	liner->setData(1, "arrow");
+    head->setData(1, "arrowhead");
+    liner->setData(3, (unsigned long long int)head); //You ever feel like you committed a sin?
 }
 
 void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
@@ -199,6 +207,35 @@ void ProjectView::line_tool(qreal x, qreal y, qreal x2, qreal y2)
 	line->setCursor(Qt::PointingHandCursor);
 	line->setData(0, -1);
         line->setData(1, "line");
+}
+void ProjectView::bezier_tool(qreal x, qreal y, qreal x2, qreal y2)
+{		
+	QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
+	pen.setWidth(2);
+
+    QPainterPath path;
+    // move path to start
+    path.moveTo(x,y);
+    // XXX calculate midpoint 
+    qreal midx = (x+x2)/2;
+    qreal midy = (y+y2)/2;
+
+    qreal tempx = x2-midx;
+    qreal tempy = y2-midy;
+
+    qreal cx = midx - tempy;
+    qreal cy = midy + tempx;
+
+    // XXX do transformation
+    path.quadTo(cx, cy ,x2,y2);
+
+    QGraphicsPathItem* line = scene()->addPath(path, pen);
+	line->setFlag(QGraphicsItem::ItemIsSelectable, true);
+	line->setFlag(QGraphicsItem::ItemIsMovable, true);
+	line->setCursor(Qt::PointingHandCursor);
+	line->setData(0, -1);
+    line->setData(1, "bezier");
+
 }
 
 void ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
@@ -257,8 +294,11 @@ void ProjectView::mouseReleaseEvent(QMouseEvent *event)
         latex_tool(x, y);
         break;
     case 7:
-	arrow_tool(x, y, x2, y2);
-	break;
+        arrow_tool(x, y, x2, y2);
+        break;
+    case 8:
+        bezier_tool(x, y, x2, y2);
+        break;
     default:
         std::cout << "error" << std::endl;
         break;
