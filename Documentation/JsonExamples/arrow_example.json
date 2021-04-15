@@ -1,6 +1,10 @@
 {
   "data": {
     "bid": "None", 
+	"scenepos" {
+	  "x": "0",
+	  "y": "0"
+	}
     "color": "ffffff", 
     "end": {
       "x": "100", 

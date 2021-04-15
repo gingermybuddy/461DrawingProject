@@ -243,7 +243,7 @@ void ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
 void ProjectView::mousePressEvent(QMouseEvent *event)
 {
     QPoint temp = event->pos();
-	firstClick = mapToScene(temp);
+    firstClick = mapToScene(temp);
     // std::cout << "Mouse pressed!\n";
 }
 

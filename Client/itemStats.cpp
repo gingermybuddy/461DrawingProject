@@ -6,7 +6,7 @@ itemStats::itemStats()
 }
 
 //UPDATE THIS IF YOU ADD THINGS TO THE PLACED ITEMS
-itemStats::itemStats(std::string nboard_id, std::string ntype, int nid, double nx, double ny, double nheight, double nwidth, QColor nfill, QColor noutline)
+itemStats::itemStats(std::string nboard_id, std::string ntype, int nid, double nx, double ny, double nheight, double nwidth,  double nscenex, double nsceney, QColor nfill, QColor noutline)
 {
 	board_id = nboard_id;
 	type = ntype;
@@ -15,6 +15,8 @@ itemStats::itemStats(std::string nboard_id, std::string ntype, int nid, double n
 	y = ny;
 	height = nheight;
 	width = nwidth;
+    scenex = nscenex;
+    sceney = nsceney;
 	fill = nfill;
 	outline = noutline;
 }
@@ -31,7 +33,7 @@ itemStats::itemStats(std::string nboard_id, std::string ntype,int nid, double nx
 }
 
 
-itemStats::itemStats(std::string nboard_id, std::string ntype,int nid, double nx, double ny, double nheight, double nwidth, QColor nrgb)
+itemStats::itemStats(std::string nboard_id, std::string ntype,int nid, double nx, double ny, double nheight, double nwidth,  double nscenex, double nsceney, QColor nrgb)
 {
 	board_id = nboard_id;
 	type = ntype;
@@ -40,6 +42,8 @@ itemStats::itemStats(std::string nboard_id, std::string ntype,int nid, double nx
 	y = ny;
 	height = nheight;
 	width = nwidth;
+    scenex = nscenex;
+    sceney = nsceney;
 	outline = nrgb;
 }
 
@@ -52,6 +56,9 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 	board_id = nboard_id;
 	type = item->data(1).toString().toStdString();
 	id = item->data(0).toInt();
+    scenex = item->x();
+    sceney = item->y();
+
 	if(type == "line") {
 		QGraphicsLineItem* i = (QGraphicsLineItem*)item;
 		x = i->line().x1();
@@ -80,8 +87,8 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 
     } else {
 		QGraphicsRectItem* r = (QGraphicsRectItem*)item;
-		x = r->rect().x();
-		y = r->rect().y();
+        x = r->rect().x();
+        y = r->rect().y();
 		height = r->rect().height();
 		width = r->rect().width();
         outline = r->pen().color();
@@ -105,12 +112,16 @@ QJsonObject itemStats::toJson()
 	QJsonObject data;
 	QJsonObject start;
 	QJsonObject end;
-
+    QJsonObject scenepos;
 	data.insert("bid", QJsonValue(QString::fromStdString(board_id)));
 
 	start.insert("x", QJsonValue(x));
 	start.insert("y", QJsonValue(y));
-	
+
+    scenepos.insert("scenex", QJsonValue(scenex));
+    scenepos.insert("sceney", QJsonValue(sceney));
+    data.insert("scenepos", QJsonValue(scenepos));
+
 	if(type == "text") {
 		data.insert("color", QJsonValue(outline.name()));
 		data.insert("start", QJsonValue(start));
