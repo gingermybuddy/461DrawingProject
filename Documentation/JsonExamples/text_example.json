@@ -1,11 +1,16 @@
 {
     "data": {
         "bid": "None",
+	"scenepos": {
+	  "x": "0",
+	  "y": "0"
+	}
         "color": "ffffff",
         "start": {
             "x": "100",
             "y": "25"
         },
+        "sid": "0",
         "text": "This is an example!"
     },
     "shape": "text"

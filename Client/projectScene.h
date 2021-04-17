@@ -23,14 +23,17 @@ class ProjectScene : public QGraphicsScene
 		QTcpSocket* m_socket;
 		std::vector<itemStats> m_tracked_items;
 		std::string m_board_id;
+		QTimer* m_timer;
 
 	public slots:
 		void sceneChanged(const QList<QRectF> &region);
+		void checkPos();
 		void readSocket();
 		void disconnect();
 	signals:	
 	public:
-                int trackItem(QGraphicsItem* item);
+        int trackItem(QGraphicsItem* item);
+        void updateCanvas(std::vector<QJsonObject> objects);
 		ProjectScene();
 		~ProjectScene();
 };

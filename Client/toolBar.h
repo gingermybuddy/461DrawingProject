@@ -23,22 +23,31 @@ class ToolBar : public QWidget
 		QPushButton* m_blue;
 		QPushButton* m_color_picker;
 		QVBoxLayout* m_layout;
+		QPushButton* m_fill;
+		QPushButton* m_text;
+		QPushButton* m_latex;
+		QPushButton* m_arrow;
+		QPushButton* m_bezier;
 		ProjectView* m_view;
 	public slots:
 		// set default
-        	void set_default();
-        	// shapes
-        	void place_rectangle();
-        	void set_line();
-        	void set_circle();
-        	// colors
-        	void set_color_black();
-        	void set_color_red();
-        	void set_color_green();
-        	void set_color_yellow();
-        	void set_color_blue();
-        	void set_color_custom();
-
+        void set_default();
+        // shapes
+        void place_rectangle();
+        void set_line();
+        void set_circle();
+        // colors
+        void set_color_black();
+        void set_color_red();
+        void set_color_green();
+        void set_color_yellow();
+        void set_color_blue();
+        void set_color_custom();
+        void fill();
+	void set_text();
+	void set_latex();
+	void set_arrow();
+	void set_bezier();
 	public:
 		ToolBar();
 		~ToolBar();
