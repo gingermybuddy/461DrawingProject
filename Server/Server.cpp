@@ -141,6 +141,7 @@ void Server::createBoard(QTcpSocket* socket)
     dbQuery->exec("CREATE TABLE Rect (bid int, sid int, x int, y int, width int, height int, fill string, outline string, cid int);");
     dbQuery->exec("CREATE TABLE Latex (bid int, sid int, x int, y int, code string, color string, cid int");
     dbQuery->exec("CREATE TABLE Text (bid int, sid int, x int, y int, code string, color string, cid int");
+	dbQuery->exec("CREATE TABLE Arrow (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
 
     ownedDB newDB;
     newDB.id = socket->socketDescriptor();
