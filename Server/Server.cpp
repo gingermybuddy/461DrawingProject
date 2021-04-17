@@ -188,9 +188,9 @@ void Server::readSocket()
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
-    		inserter.bindValue(":y", dval.value("end").toObject().value("y").toInt());
-		inserter.bindValue(":code", dval.value("code").toString());
-            inserter.bindValue(":color", dval.value("outline_color").toString());
+    		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
+		inserter.bindValue(":code", dval.value("text").toString());
+            inserter.bindValue(":color", dval.value("color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
@@ -201,9 +201,9 @@ void Server::readSocket()
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
-    		inserter.bindValue(":y", dval.value("end").toObject().value("y").toInt());
+    		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
 		inserter.bindValue(":code", dval.value("text").toString());
-            inserter.bindValue(":color", dval.value("outline_color").toString());
+            inserter.bindValue(":color", dval.value("color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
