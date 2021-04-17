@@ -184,12 +184,12 @@ void Server::readSocket()
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
 	} else if (type.toString() == "text") {
-            inserter.prepare("INSERT INTO Text(bid, sid, x, y, code, color, cid) VALUES(:bid, :sid, :x, :y, :code, :color, :cid);");
+            inserter.prepare("INSERT INTO Text(bid, sid, x, y, text, color, cid) VALUES(:bid, :sid, :x, :y, :text, :color, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
-		inserter.bindValue(":code", dval.value("text").toString());
+		inserter.bindValue(":text", dval.value("text").toString());
             inserter.bindValue(":color", dval.value("color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
@@ -197,12 +197,12 @@ void Server::readSocket()
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
     		
 	} else if (type.toString() == "latex") {
-        	inserter.prepare("INSERT INTO Latex(bid, sid, x, y, code, color, cid) VALUES(:bid, :sid, :x, :y, :code, :color, :cid)");
+        	inserter.prepare("INSERT INTO Latex(bid, sid, x, y, text, color, cid) VALUES(:bid, :sid, :x, :y, :text, :color, :cid)");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
-		inserter.bindValue(":code", dval.value("text").toString());
+		inserter.bindValue(":text", dval.value("text").toString());
             inserter.bindValue(":color", dval.value("color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
