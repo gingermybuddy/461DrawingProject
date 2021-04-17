@@ -6,8 +6,9 @@
             "x": "<x1; start x; first corner>", 
             "y": "<y2; start y; first corner>"
         },
+        "sid": "<Shape ID>",
         "text": "$<LaTeX math markup>$"
          
     },
-    "shape": "text"
+    "shape": "latex"
 }

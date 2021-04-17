@@ -32,8 +32,8 @@ class ProjectScene : public QGraphicsScene
 		void disconnect();
 	signals:	
 	public:
-                int trackItem(QGraphicsItem* item);
-		void fullUpdate(QJsonObject data);
+        int trackItem(QGraphicsItem* item);
+        void updateCanvas(std::vector<QJsonObject> objects);
 		ProjectScene();
 		~ProjectScene();
 };

@@ -1,21 +1,20 @@
 {
   "data": {
-    "bid": "None",
+    "bid": "None", 
 	"scenepos": {
 	  "x": "0",
 	  "y": "0"
-	}	
-    "fill_color": "ffffff", 
-    "outline_color": "ffffff", 
+	}
+    "color": "ffffff", 
     "end": {
       "x": "100", 
       "y": "100"
     }, 
-    "sid": 3, 
+    "sid": 2, 
     "start": {
       "x": "10", 
       "y": "10"
-    } 
+    }
   }, 
-  "shape": "rect"
+  "shape": "arrow"
 }

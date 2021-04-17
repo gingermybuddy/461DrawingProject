@@ -16,6 +16,8 @@ Server/*.db
 _minted-documentation
 *.pyc
 Client/Makefile
+Client/temp2.pdf
+Client/temp2.tex
 .qmake.stash
 build-461DrawingProject-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/Makefile
 build-461DrawingProject-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/debug/461DrawingProject.exe
@@ -61,4 +63,8 @@ Client/461DrawingProject.pro.user
 *.Debug
 *.user
 *.user
+Client/461DrawingProject.pro.user
+*.user
+*.db
+*.db
 Client/461DrawingProject.pro.user

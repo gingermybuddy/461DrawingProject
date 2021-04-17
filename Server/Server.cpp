@@ -81,6 +81,7 @@ void Server::disconnect()
 	//it was.
 	QTcpSocket* socket = reinterpret_cast<QTcpSocket*>(sender());
 
+	saveDB(socket);
     deleteDB(socket);
 
 	//Finds the socket.
@@ -98,6 +99,7 @@ void Server::readSocket()
 {
 	//More black magic.
 	QTcpSocket* socket = reinterpret_cast<QTcpSocket*>(sender());
+    std::cout << "Data from client" << socket->socketDescriptor() << std::endl;
 
 	//The QByteArray here is the array of bytes that the socket
 	//has just sent to the server. The array is formatted as a JSON
@@ -125,7 +127,6 @@ void Server::readSocket()
 	//If it gets to here, the data has been received and is
 	//ready to be parsed. Right now, all it does is turn it into
 	//a string and outputs it to console.
-	std::cout << "Received " << buf.toStdString() << std::endl;
 	
 	//This casts the byte array into a Qt style JSON object.
 	//You can get keys and values out of this the same way
@@ -133,9 +134,32 @@ void Server::readSocket()
 
 	QJsonDocument doc = QJsonDocument::fromJson(buf);
 	QJsonObject obj = doc.object();
+    std::cout << "Received: " << QJsonDocument(obj).toJson(QJsonDocument::Compact).toStdString() << std::endl;
+    bool found = false;
+    for(int i = 0; i < m_shapes.size(); ++i){
+        if(obj.value("data").toObject().value("sid").toInt() == m_shapes[i].value("data").toObject().value("sid").toInt()) {
+            m_shapes[i] = obj;
+            found = true;
+            break;
+        }
+    }
+    if(!found) {
+        m_shapes.push_back(obj);
+    }
+    for(QTcpSocket* sock : connected) {
+        if (sock == socket) continue;
+        QJsonDocument sent_doc(obj);
+        QByteArray package = sent_doc.toJson();
+        std::cout << "Sending: " << QJsonDocument(obj).toJson(QJsonDocument::Compact).toStdString()<< std::endl;
+        std::cout << "To client: " << sock->socketDescriptor() << std::endl;
+        QDataStream sockstream(sock);
+        sockstream.startTransaction();
+        sockstream << package;
+        sockstream.commitTransaction();
+    }
+    std::cout << m_shapes.size() << std::endl;
 
-
-    	QSqlQuery inserter;
+    QSqlQuery inserter;
 	QJsonValue type = obj.value("shape");
 	QJsonObject dval  = obj.value("data").toObject();
 	if(type.toString() == "ellipse") {
@@ -158,13 +182,13 @@ void Server::readSocket()
             inserter.prepare("INSERT INTO Line(bid, sid, x1, x2, y1, y2, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
-   		inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
+            inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":y2", dval.value("end").toObject().value("y").toInt());
             inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-		inserter.exec();
+            inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
@@ -172,14 +196,14 @@ void Server::readSocket()
             inserter.prepare("INSERT INTO Rect(bid, sid, x, y, width, height, fill, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
-   		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
+            inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":width", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":height", dval.value("end").toObject().value("y").toInt());
-        inserter.bindValue(":fill", dval.value("fill_color").toString());
+            inserter.bindValue(":fill", dval.value("fill_color").toString());
             inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-		inserter.exec();
+            inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
@@ -192,7 +216,7 @@ void Server::readSocket()
 		inserter.bindValue(":text", dval.value("text").toString());
             inserter.bindValue(":color", dval.value("color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-		inserter.exec();
+            inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
     		
@@ -205,7 +229,7 @@ void Server::readSocket()
 		inserter.bindValue(":text", dval.value("text").toString());
             inserter.bindValue(":color", dval.value("color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-		inserter.exec();
+            inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	} else {
@@ -215,6 +239,8 @@ void Server::readSocket()
 
 void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 {
+
+    //Initialize QSqlQuery for the Circles table of "db"
     //Create vector to store shapes returned by queries
     std::vector<itemStats> shapes;
     
@@ -233,7 +259,9 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		double y2 = circle_query->value(5).toDouble();
 		QColor fillColor = QColor(circle_query->value(6).toString());
 		QColor outlineColor = QColor(circle_query->value(7).toString());
-		itemStats temp(bid, shape, sid, x1, y1, x2, y2, fillColor, outlineColor);
+        qreal scenex = 0;
+        qreal sceney = 0; //Add these to the SQL stuff...
+        itemStats temp(bid, shape, sid, x1, y1, x2, y2, scenex, sceney, fillColor, outlineColor);
         shapes.push_back(temp);
 	}
 
@@ -249,9 +277,11 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
         double x2 = rect_query->value(4).toDouble();
         double y1 = rect_query->value(3).toDouble();
 		double y2 = rect_query->value(5).toDouble();
+        qreal scenex = 0;
+        qreal sceney = 0; //Add these to the SQL stuff...
 		QColor fillColor = QColor(circle_query->value(6).toString());
 		QColor outlineColor = QColor(circle_query->value(7).toString());
-		itemStats temp(bid, shape, sid, x1, y1, x2, y2, fillColor, outlineColor);
+        itemStats temp(bid, shape, sid, x1, y1, x2, y2, scenex, sceney, fillColor, outlineColor);
         shapes.push_back(temp);
 	}
 
@@ -268,8 +298,10 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		double x2 = line_query->value(3).toDouble();
 		double y1 = line_query->value(4).toDouble();
 		double y2 = line_query->value(5).toDouble();
+        qreal scenex = 0;
+        qreal sceney = 0; //Add these to the SQL stuff...
 		QColor outlineColor = QColor(circle_query->value(6).toString());
-		itemStats temp(bid, shape, sid, x1, y1, x2, y2, outlineColor);
+        itemStats temp(bid, shape, sid, x1, y1, x2, y2, scenex, sceney, outlineColor);
         shapes.push_back(temp);
 	}
 
@@ -308,14 +340,30 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 
 	
 	//Create a JSON object of all the shapes using their sid as a key
-    QJsonObject full_board;
+	*/
+    delete rect_query;
+    delete line_query;
+    delete circle_query;
 
-    for(itemStats temp : shapes){
+
+    QJsonObject full_board;
+    full_board.insert("fullUpdate", "test");
+
+    /*for(itemStats temp : shapes){
         std::cout << "shape ";
         std::cout << temp.type;
         std::cout << " added" << std::endl;
         full_board.insert(QString::number(temp.id), temp.toJson());
-	}
+    }*/
+
+    std::cout << m_shapes.size() << std::endl;
+    for (QJsonObject j : m_shapes) {
+        std::cout << QJsonDocument(j).toJson(QJsonDocument::Compact).toStdString() << std::endl;
+        QJsonObject data = j.value("data").toObject();
+        int id = data.value("sid").toInt();
+        std::cout << id << std::endl;
+        full_board.insert(QString::number(id), j);
+    }
 
 	//Create JSON Document to write to the buffer
 	QJsonDocument doc(full_board);
@@ -326,6 +374,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 	QDataStream sockstream(socket);
 	sockstream.startTransaction();
     sockstream << buf;
+    sockstream.commitTransaction();
 }
 
 void Server::createBoard(QTcpSocket* socket)
@@ -357,6 +406,70 @@ void Server::createBoard(QTcpSocket* socket)
 	return;
 }
 
+void Server::saveDB(QTcpSocket* socket)
+{
+	QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+	db.setDatabaseName("CMSC461.db");
+	db.open();
+	QByteArray everything;
+	everything.append("[\n");
+    qreal x = 0;
+    qreal y = 0;
+/*
+	std::string board = "CMSC461";
+	QSqlQuery elQuery("SELECT * FROM Ellipse");
+	while(elQuery.next()){
+		std::string shape = "ellipse";
+        QByteArray data = itemStats(board,shape,elQuery.value(1).toInt(),elQuery.value(2).toDouble(),elQuery.value(3).toDouble(),elQuery.value(4).toDouble(),x, y, elQuery.value(5).toDouble(),QColor(elQuery.value(6).toString()),QColor(elQuery.value(7).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	QSqlQuery liQuery("SELECT * FROM Line");
+	while(liQuery.next()){
+		std::string shape = "line";
+        QByteArray data = itemStats(board,shape,liQuery.value(1).toInt(),liQuery.value(2).toDouble(),liQuery.value(3).toDouble(),liQuery.value(4).toDouble(),liQuery.value(5).toDouble(), x, y, QColor(liQuery.value(6).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	QSqlQuery reQuery("SELECT * FROM Rect");
+	while(reQuery.next()){
+		std::string shape = "rect";
+        QByteArray data = itemStats(board,shape,reQuery.value(1).toInt(),reQuery.value(2).toDouble(),reQuery.value(3).toDouble(),reQuery.value(4).toDouble(),reQuery.value(5).toDouble(), x, y, QColor(reQuery.value(6).toString()),QColor(reQuery.value(7).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	QSqlQuery txQuery("SELECT * FROM Text");
+	while(txQuery.next()){
+		std::string shape = "text";
+		QByteArray data = itemStats(board,shape,txQuery.value(1).toInt(),txQuery.value(2).toDouble(),txQuery.value(3).toDouble(),txQuery.value(4).toString().toStdString(),QColor(txQuery.value(5).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	QSqlQuery laQuery("SELECT * FROM Latex");
+	while(laQuery.next()){
+		std::string shape = "latex";
+		QByteArray data = itemStats(board,shape,laQuery.value(1).toInt(),laQuery.value(2).toDouble(),laQuery.value(3).toDouble(),laQuery.value(4).toString().toStdString(),QColor(laQuery.value(5).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	everything.append("]");
+	std::cout << "Client Disconnected. Sending:\n" << everything.toStdString() << std::endl;
+
+	QDataStream socketstream(socket);
+	socketstream << everything;
+    */
+}
+
 void Server::deleteDB(QTcpSocket* socket)
 {
     int id = socket->socketDescriptor();
@@ -372,8 +485,8 @@ void Server::deleteDB(QTcpSocket* socket)
             break;
         }else{
             newVec.push_back(databases[i]);
-
         }
+        databases = newVec;
     }
     std::remove(name.c_str());
 }
