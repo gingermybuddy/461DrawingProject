@@ -163,9 +163,11 @@ void Server::readSocket()
 	QJsonValue type = obj.value("shape");
 	QJsonObject dval  = obj.value("data").toObject();
 	if(type.toString() == "ellipse") {
-            inserter.prepare("INSERT INTO Ellipse(bid, sid, x1, x2, y1, y2, fill, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
+            inserter.prepare("INSERT INTO Ellipse(bid, scenePosX, scenePosY, id, x1, x2, y1, y2, fill, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
-            inserter.bindValue(":sid", dval.value("sid").toInt());
+            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject.value("x").toInt());
+            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject.value("y").toInt());
+		inserter.bindValue(":sid", dval.value("sid").toInt());
     		inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
@@ -179,8 +181,10 @@ void Server::readSocket()
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
 	} else if (type.toString() == "line") {
-            inserter.prepare("INSERT INTO Line(bid, sid, x1, x2, y1, y2, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :outline, :cid);");
+            inserter.prepare("INSERT INTO Line(bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
+            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject.value("x").toInt());
+            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject.value("y").toInt());
             inserter.bindValue(":sid", dval.value("sid").toInt());
             inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
@@ -193,8 +197,10 @@ void Server::readSocket()
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
 	} else if (type.toString() == "rect") {
-            inserter.prepare("INSERT INTO Rect(bid, sid, x, y, width, height, fill, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
+            inserter.prepare("INSERT INTO Rect(bid, scenePosX, scenePosY, sid, x, y, width, height, fill, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
+            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject.value("x").toInt());
+            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject.value("y").toInt());
             inserter.bindValue(":sid", dval.value("sid").toInt());
             inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":width", dval.value("end").toObject().value("x").toInt());
@@ -208,8 +214,10 @@ void Server::readSocket()
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
 	} else if (type.toString() == "text") {
-            inserter.prepare("INSERT INTO Text(bid, sid, x, y, text, color, cid) VALUES(:bid, :sid, :x, :y, :text, :color, :cid);");
+            inserter.prepare("INSERT INTO Text(bid, scenePosX, scenePosY, sid, x, y, text, color, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x, :y, :text, :color, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
+            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject.value("x").toInt());
+            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject.value("y").toInt());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
@@ -221,8 +229,10 @@ void Server::readSocket()
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
     		
 	} else if (type.toString() == "latex") {
-        	inserter.prepare("INSERT INTO Latex(bid, sid, x, y, text, color, cid) VALUES(:bid, :sid, :x, :y, :text, :color, :cid)");
+        	inserter.prepare("INSERT INTO Latex(bid, scenePosX, scenePosY, sid, x, y, text, color, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x, :y, :text, :color, :cid)");
     		inserter.bindValue(":bid", dval.value("bid").toString());
+            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject.value("x").toInt());
+            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject.value("y").toInt());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
@@ -340,7 +350,6 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 
 	
 	//Create a JSON object of all the shapes using their sid as a key
-	*/
     delete rect_query;
     delete line_query;
     delete circle_query;
