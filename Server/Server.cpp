@@ -197,13 +197,13 @@ void Server::readSocket()
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
     		
 	} else if (type.toString() == "latex") {
-        	inserter.prepare("INSERT INTO Latex(bid, sid, x, y, code, color, cid) VALUES(:bid, :sid, :x, :y, :text, :color, :cid)");
+        	inserter.prepare("INSERT INTO Latex(bid, sid, x, y, text, outline, cid) VALUES(:bid, :sid, :x, :y, :text, :outline, :cid)");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("end").toObject().value("y").toInt());
 		inserter.bindValue(":text", dval.value("text").toString());
-            inserter.bindValue(":color", dval.value("color").toString());
+            inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
 		inserter.exec();
     		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
@@ -273,7 +273,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
         shapes.push_back(temp);
 	}
 
-	/*
+	
     QSqlQuery *text_query = new QSqlQuery;
 	text_query->exec("SELECT * FROM Text");
     text_query->first();
@@ -304,7 +304,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
 		QColor color = QColor(latex_query->value(5).toString());
         itemStats temp(bid, shape, sid, x, y, text, color);
         shapes.push_back(temp);
-    }*/
+    }
 
 	
 	//Create a JSON object of all the shapes using their sid as a key
