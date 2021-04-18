@@ -502,14 +502,12 @@ void Server::saveDB(QTcpSocket* socket)
 	db.open();
 	QByteArray everything;
 	everything.append("[\n");
-    qreal x = 0;
-    qreal y = 0;
-/*
+
 	std::string board = "CMSC461";
 	QSqlQuery elQuery("SELECT * FROM Ellipse");
 	while(elQuery.next()){
 		std::string shape = "ellipse";
-        QByteArray data = itemStats(board,shape,elQuery.value(1).toInt(),elQuery.value(2).toDouble(),elQuery.value(3).toDouble(),elQuery.value(4).toDouble(),x, y, elQuery.value(5).toDouble(),QColor(elQuery.value(6).toString()),QColor(elQuery.value(7).toString())).byteData();
+        QByteArray data = itemStats(board,shape,elQuery.value(1).toInt(),elQuery.value(2).toDouble(),elQuery.value(3).toDouble(),elQuery.value(4).toDouble(),elQuery.value(5).toDouble(),elQuery.value(9).toDouble(),elQuery.value(10).toDouble(),QColor(elQuery.value(6).toString()),QColor(elQuery.value(7).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
@@ -518,7 +516,7 @@ void Server::saveDB(QTcpSocket* socket)
 	QSqlQuery liQuery("SELECT * FROM Line");
 	while(liQuery.next()){
 		std::string shape = "line";
-        QByteArray data = itemStats(board,shape,liQuery.value(1).toInt(),liQuery.value(2).toDouble(),liQuery.value(3).toDouble(),liQuery.value(4).toDouble(),liQuery.value(5).toDouble(), x, y, QColor(liQuery.value(6).toString())).byteData();
+        QByteArray data = itemStats(board,shape,liQuery.value(1).toInt(),liQuery.value(2).toDouble(),liQuery.value(3).toDouble(),liQuery.value(4).toDouble(),liQuery.value(5).toDouble(),liQuery.value(9).toDouble(),liQuery.value(10).toDouble(),QColor(liQuery.value(7).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
@@ -527,7 +525,7 @@ void Server::saveDB(QTcpSocket* socket)
 	QSqlQuery reQuery("SELECT * FROM Rect");
 	while(reQuery.next()){
 		std::string shape = "rect";
-        QByteArray data = itemStats(board,shape,reQuery.value(1).toInt(),reQuery.value(2).toDouble(),reQuery.value(3).toDouble(),reQuery.value(4).toDouble(),reQuery.value(5).toDouble(), x, y, QColor(reQuery.value(6).toString()),QColor(reQuery.value(7).toString())).byteData();
+        QByteArray data = itemStats(board,shape,reQuery.value(1).toInt(),reQuery.value(2).toDouble(),reQuery.value(3).toDouble(),reQuery.value(4).toDouble(),reQuery.value(5).toDouble(),reQuery.value(9).toDouble(),reQuery.value(10).toDouble(),QColor(reQuery.value(6).toString()),QColor(reQuery.value(7).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
@@ -536,7 +534,7 @@ void Server::saveDB(QTcpSocket* socket)
 	QSqlQuery txQuery("SELECT * FROM Text");
 	while(txQuery.next()){
 		std::string shape = "text";
-		QByteArray data = itemStats(board,shape,txQuery.value(1).toInt(),txQuery.value(2).toDouble(),txQuery.value(3).toDouble(),txQuery.value(4).toString().toStdString(),QColor(txQuery.value(5).toString())).byteData();
+		QByteArray data = itemStats(board,shape,txQuery.value(1).toInt(),txQuery.value(2).toDouble(),txQuery.value(3).toDouble(),txQuery.value(7).toDouble(),txQuery.value(8).toDouble(),txQuery.value(4).toString().toStdString(),QColor(txQuery.value(5).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
@@ -545,7 +543,16 @@ void Server::saveDB(QTcpSocket* socket)
 	QSqlQuery laQuery("SELECT * FROM Latex");
 	while(laQuery.next()){
 		std::string shape = "latex";
-		QByteArray data = itemStats(board,shape,laQuery.value(1).toInt(),laQuery.value(2).toDouble(),laQuery.value(3).toDouble(),laQuery.value(4).toString().toStdString(),QColor(laQuery.value(5).toString())).byteData();
+		QByteArray data = itemStats(board,shape,laQuery.value(1).toInt(),laQuery.value(2).toDouble(),laQuery.value(3).toDouble(),laQuery.value(7).toDouble(),laQuery.value(8).toDouble(),laQuery.value(4).toString().toStdString(),QColor(laQuery.value(5).toString())).byteData();
+		QJsonDocument doc = QJsonDocument::fromJson(data);
+		data = doc.toJson();
+		everything += data;
+	}
+
+	QSqlQuery arQuery("SELECT * FROM Arrow");
+	while(arQuery.next()){
+		std::string shape = "arrow";
+        QByteArray data = itemStats(board,shape,arQuery.value(1).toInt(),arQuery.value(2).toDouble(),arQuery.value(3).toDouble(),arQuery.value(4).toDouble(),arQuery.value(5).toDouble(),arQuery.value(9).toDouble(),arQuery.value(10).toDouble(),QColor(arQuery.value(6).toString()),QColor(arQuery.value(7).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
@@ -556,7 +563,6 @@ void Server::saveDB(QTcpSocket* socket)
 
 	QDataStream socketstream(socket);
 	socketstream << everything;
-    */
 }
 
 void Server::deleteDB(QTcpSocket* socket)
