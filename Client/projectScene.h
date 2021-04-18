@@ -34,6 +34,8 @@ class ProjectScene : public QGraphicsScene
 	public:
         int trackItem(QGraphicsItem* item);
         void updateCanvas(std::vector<QJsonObject> objects);
+        void sendItem(itemStats package);
+
 		ProjectScene();
 		~ProjectScene();
 };

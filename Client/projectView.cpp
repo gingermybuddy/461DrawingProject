@@ -11,6 +11,7 @@
 #include "cmath"
 #include "math.h"
 #include <QInputDialog>
+#include <QJsonObject>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -148,31 +149,27 @@ void ProjectView::arrow_tool(qreal x, qreal y, qreal x2, qreal y2)
     QPen pen(QColor(m_color_r, m_color_g, m_color_b)); //Sets up a basic pen
     pen.setWidth(2);
 
-    qreal arrowSize = 20;
     QLineF line(x,y,x2,y2);
 
+    qreal arrowSize = 20;
     double angle = std::atan2(-line.dy(), line.dx());
     QPointF arrowP1 = line.p1() + QPointF(sin(angle + M_PI / 3) * arrowSize,
                                             cos(angle + M_PI / 3) * arrowSize);
     QPointF arrowP2 = line.p1() + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
                                             cos(angle + M_PI - M_PI / 3) * arrowSize);
     QPolygonF arrowHead;
-    arrowHead << line.p1() << arrowP1 << arrowP2;
-    QGraphicsLineItem* liner = scene()->addLine(line,pen);
-    scene()->addPolygon(arrowHead,pen);
-    liner->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    liner->setFlag(QGraphicsItem::ItemIsMovable, true);
-    liner->setCursor(Qt::PointingHandCursor);
-    liner->setData(0, -1);
-    liner->setData(1, "arrow");
+    arrowHead << arrowP1 << arrowP2 << line.p1() << line.p2() << line.p1();
+
+    std::cout << "Placing an arrow from: " << line.p1().x() << " " << line.p1().y() << " to " << line.p2().x() << " " << line.p2().y() << std::endl;
+
     QGraphicsPolygonItem* head = scene()->addPolygon(arrowHead,pen);
-	
-	liner->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
-	liner->setCursor(Qt::PointingHandCursor);
-	liner->setData(0, -1);
-	liner->setData(1, "arrow");
-    head->setData(1, "arrowhead");
-    liner->setData(3, (unsigned long long int)head); //You ever feel like you committed a sin?
+    head->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+    head->setCursor(Qt::PointingHandCursor);
+    head->setData(0, -1);
+    head->setData(1, "arrow");
+
+    //The placement of the "head" for the line has been moved to ProjectScene.cpp for tracking purposes
+
 }
 
 void ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
@@ -241,6 +238,14 @@ void ProjectView::bezier_tool(qreal x, qreal y, qreal x2, qreal y2)
 	line->setData(0, -1);
     line->setData(1, "bezier");
 
+    QJsonObject start;
+    QJsonObject end;
+    start.insert("x", QJsonValue(x));
+    start.insert("y", QJsonValue(y));
+    end.insert("x", QJsonValue(x2));
+    end.insert("y", QJsonValue(y2));
+    line->setData(4, start);
+    line->setData(5, end);
 }
 
 void ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)

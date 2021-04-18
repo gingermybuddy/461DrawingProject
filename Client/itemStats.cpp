@@ -56,9 +56,8 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 	board_id = nboard_id;
 	type = item->data(1).toString().toStdString();
 	id = item->data(0).toInt();
-    if(type == "line" || type == "arrow") {
-    	scenex = item->x();
-    	sceney = item->y();
+    scenex = item->x();
+    sceney = item->y();
 
 	if(type == "line") {
 		QGraphicsLineItem* i = (QGraphicsLineItem*)item;
@@ -74,17 +73,25 @@ itemStats::itemStats(std::string nboard_id, QGraphicsItem* item)
 		outline = t->defaultTextColor();
 		text = t->toPlainText().toStdString();
     } else if (type == "arrow") {
-        QGraphicsLineItem* i = (QGraphicsLineItem*) item;
-        x = i->line().x1();
-        y = i->line().y1();
-        height = i->line().y2();
-        width = i->line().x2();
+        QGraphicsPolygonItem* i = (QGraphicsPolygonItem*)item;
+        QPolygonF p = i->polygon();
+        x = p[2].x();
+        y = p[2].y();
+        height = p[3].y();
+        width = p[3].x();
         outline = i->pen().color();
     } else if (type == "latex") {
 		QGraphicsPixmapItem* t = (QGraphicsPixmapItem*)item;
 		x = t->x();
 		y = t->y();
 		text = t->data(2).toString().toStdString();
+    } else if (type == "bezier") {
+        QGraphicsPathItem* p = (QGraphicsPathItem*)item;
+        x = p->data(4).toJsonObject().value("x").toDouble();
+        y = p->data(4).toJsonObject().value("y").toDouble();
+        height = p->data(5).toJsonObject().value("y").toDouble();
+        width = p->data(5).toJsonObject().value("x").toDouble();
+        outline = p->pen().color();
     } else {
 		QGraphicsRectItem* r = (QGraphicsRectItem*)item;
         x = r->rect().x();
@@ -138,7 +145,7 @@ QJsonObject itemStats::toJson()
         returnval.insert("data", QJsonValue(data));
         returnval.insert("shape", QJsonValue(QString::fromStdString(type)));
 
-    } else if (type == "line" || type == "arrow") {
+    } else if (type == "line" || type == "arrow" || type == "bezier") {
 		end.insert("x", QJsonValue(width));
 		end.insert("y", QJsonValue(height));
 		data.insert("color", QJsonValue(outline.name()));
@@ -147,7 +154,7 @@ QJsonObject itemStats::toJson()
 		data.insert("start", QJsonValue(start));
 		returnval.insert("data", QJsonValue(data));
 		returnval.insert("shape", QJsonValue(QString::fromStdString(type)));
-	} else {
+    } else {
 		end.insert("x", QJsonValue(width));
 		end.insert("y", QJsonValue(height));
         data.insert("fill_color", QJsonValue(fill.name(QColor::HexArgb)));
