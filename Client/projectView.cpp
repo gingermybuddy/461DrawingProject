@@ -225,8 +225,12 @@ void ProjectView::bezier_tool(qreal x, qreal y, qreal x2, qreal y2)
     qreal slopex = x2-midx;
     qreal slopey = y2-midy;
 
-    qreal cx = midx - 125*slopex/(distance/2);
-    qreal cy = midy + 125*slopey/(distance/2);
+    qreal cx = midx - 25*sin(atan(slopey/slopex));
+    qreal cy = midy + 25*cos(atan(slopey/slopex));
+
+    if (x2 < x){
+        cy = midy - 25*cos(atan(slopey/slopex));
+    }
 
     // do transformation
     path.quadTo(cx, cy ,x2,y2);
