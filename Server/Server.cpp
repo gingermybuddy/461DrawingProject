@@ -392,12 +392,12 @@ void Server::createBoard(QTcpSocket* socket)
     //bid = Board ID
     //sid = Shape ID
     //cid = Client/User ID
-    dbQuery->exec("CREATE TABLE Ellipse (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
-    dbQuery->exec("CREATE TABLE Line (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
-    dbQuery->exec("CREATE TABLE Rect (bid int, sid int, x int, y int, width int, height int, fill string, outline string, cid int);");
-    dbQuery->exec("CREATE TABLE Latex (bid int, sid int, x int, y int, code string, color string, cid int");
-    dbQuery->exec("CREATE TABLE Text (bid int, sid int, x int, y int, code string, color string, cid int");
-	dbQuery->exec("CREATE TABLE Arrow (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
+    dbQuery->exec("CREATE TABLE Ellipse (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int, scenex double, sceney double);");
+    dbQuery->exec("CREATE TABLE Line (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int, scenex double, sceney double);");
+    dbQuery->exec("CREATE TABLE Rect (bid int, sid int, x int, y int, width int, height int, fill string, outline string, cid int, scenex double, sceney double);");
+    dbQuery->exec("CREATE TABLE Latex (bid int, sid int, x int, y int, code string, color string, cid int, scenex double, sceney double");
+    dbQuery->exec("CREATE TABLE Text (bid int, sid int, x int, y int, code string, color string, cid int, scenex double, sceney double");
+	dbQuery->exec("CREATE TABLE Arrow (bid int, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int, scenex double, sceney double);");
 
     ownedDB newDB;
     newDB.id = socket->socketDescriptor();
@@ -470,6 +470,52 @@ void Server::saveDB(QTcpSocket* socket)
 	socketstream << everything;
 }
 
+void Server::loadDB(QTcpSocket* socket, QByteArray data)
+{
+
+	QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+	db.setDatabaseName("CMSC461.db");
+	db.open();
+
+	QJsonDocument doc = QJsonDocument::fromJson(data);
+	QJsonArray jsonArray = QJsonDocument::array(doc);
+
+	int sizeOfArray = jsonArray.size();
+
+	int bid = -1;
+	int sid = -1;
+	int cid = -1;
+	int x1 = -1;
+	int x2 = -1;
+	int y1 = -1;
+	int y2 = -1;
+	int x = -1;
+	int y = -1;
+	int width = -1;
+	int height = -1;
+	double scenex = -1.0;
+	double sceney = -1.0;
+	string fill = "";
+	string outline = "";
+	string code = "";
+	
+
+	for(int i = 0; i < size; ++i){
+
+	  if(jsonArray[i]["shape"] == "ellipse"){
+		
+
+
+
+
+	}
+
+	
+
+
+
+
+}
 void Server::deleteDB(QTcpSocket* socket)
 {
     int id = socket->socketDescriptor();
