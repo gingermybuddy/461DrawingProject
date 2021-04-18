@@ -164,8 +164,8 @@ void Server::readSocket()
 	QJsonObject dval  = obj.value("data").toObject();
 	if(type.toString() == "ellipse") {
     		inserter.bindValue(":bid", dval.value("bid").toString());
-            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject.value("x").toInt());
-            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject.value("y").toInt());
+            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
+            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
 		inserter.bindValue(":sid", dval.value("sid").toInt());
     		inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
@@ -176,8 +176,8 @@ void Server::readSocket()
     		inserter.bindValue(":cid", socket->socketDescriptor());
             inserter.exec();
     	QSqlQuery *circle_query = new QSqlQuery;
-	if(circle_query->exec("SELECT * FROM Ellipse WHERE sid = :sid"){
-		inserter.prepare("UPDATE Ellipse SET (bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, fill, outline, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid) WHERE sid = :sid;"
+	if(circle_query->exec("SELECT * FROM Ellipse WHERE sid = :sid")){
+		inserter.prepare("UPDATE Ellipse SET (bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, fill, outline, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid) WHERE sid = :sid;");
 		inserter.exec();
             	std::cout << "Executed: " << inserter.executedQuery().toStdString() <<  std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
@@ -186,12 +186,12 @@ void Server::readSocket()
             	inserter.exec();
             	std::cout << "Executed: " << inserter.executedQuery().toStdString() <<  std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
-	
+		}
 	} else if (type.toString() == "line") {
             inserter.prepare("INSERT INTO Line(bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
-            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject.value("x").toInt());
-            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject.value("y").toInt());
+            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
+            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
             inserter.bindValue(":sid", dval.value("sid").toInt());
             inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
@@ -206,8 +206,8 @@ void Server::readSocket()
 	} else if (type.toString() == "rect") {
             inserter.prepare("INSERT INTO Rect(bid, scenePosX, scenePosY, sid, x, y, width, height, fill, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
-            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject.value("x").toInt());
-            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject.value("y").toInt());
+            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
+            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
             inserter.bindValue(":sid", dval.value("sid").toInt());
             inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":width", dval.value("end").toObject().value("x").toInt());
@@ -223,8 +223,8 @@ void Server::readSocket()
 	} else if (type.toString() == "text") {
             inserter.prepare("INSERT INTO Text(bid, scenePosX, scenePosY, sid, x, y, text, color, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x, :y, :text, :color, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
-            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject.value("x").toInt());
-            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject.value("y").toInt());
+            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
+            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
@@ -238,8 +238,8 @@ void Server::readSocket()
 	} else if (type.toString() == "latex") {
         	inserter.prepare("INSERT INTO Latex(bid, scenePosX, scenePosY, sid, x, y, text, color, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x, :y, :text, :color, :cid)");
     		inserter.bindValue(":bid", dval.value("bid").toString());
-            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject.value("x").toInt());
-            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject.value("y").toInt());
+            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
+            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
             inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
@@ -325,7 +325,7 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
     QSqlQuery *text_query = new QSqlQuery;
     text_query->exec("SELECT * FROM Text");
     
-	while(text_query->next(){
+	while(text_query->next()){
 		std::string bid = text_query->value(0).toString().toStdString();
 		std::string shape = "text";
 		int sid = text_query->value(1).toInt();
