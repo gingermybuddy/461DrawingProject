@@ -21,13 +21,15 @@ itemStats::itemStats(std::string nboard_id, std::string ntype, int nid, double n
 	outline = noutline;
 }
 
-itemStats::itemStats(std::string nboard_id, std::string ntype,int nid, double nx, double ny, std::string ntext, QColor nrgb)
+itemStats::itemStats(std::string nboard_id, std::string ntype,int nid, double nx, double ny, double nscenex, double nsceney, std::string ntext, QColor nrgb)
 {
 	board_id = nboard_id;
 	type = ntype;
 	id = nid;
 	x = nx;
 	y = ny;
+    scenex = nscenex;
+    sceney = nsceney;
 	text = ntext;
 	outline = nrgb;
 }

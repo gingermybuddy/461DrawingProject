@@ -42,7 +42,7 @@ struct itemStats
 	itemStats(std::string board_id, QGraphicsItem* item);
         itemStats(std::string board_id, std::string type, int id, double x, double y, double height, double width, double scenex, double sceney, QColor fill, QColor outline);
         itemStats(std::string board_id, std::string type, int id, double x, double y, double height, double width, double scenex, double sceney, QColor outline);
-	itemStats(std::string board_id, std::string type, int id, double x, double y, std::string text, QColor outline); //constructor for text items
+    itemStats(std::string board_id, std::string type, int id, double x, double y, double scenex, double sceney, std::string text, QColor outline); //constructor for text items
 	~itemStats();
 };
 
