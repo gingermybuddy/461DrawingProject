@@ -163,7 +163,6 @@ void Server::readSocket()
 	QJsonValue type = obj.value("shape");
 	QJsonObject dval  = obj.value("data").toObject();
 	if(type.toString() == "ellipse") {
-            inserter.prepare("INSERT INTO Ellipse(bid, scenePosX, scenePosY, id, x1, x2, y1, y2, fill, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
             inserter.bindValue(":scenePosX", dval.value("scenepos").toObject.value("x").toInt());
             inserter.bindValue(":scenePosY", dval.value("scenepos").toObject.value("y").toInt());
@@ -176,8 +175,16 @@ void Server::readSocket()
             inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
             inserter.exec();
-
-            std::cout << "Executed: " << inserter.executedQuery().toStdString() <<  std::endl;
+    	QSqlQuery *circle_query = new QSqlQuery;
+	if(circle_query->exec("SELECT * FROM Ellipse WHERE sid = :sid"){
+		inserter.prepare("UPDATE Ellipse SET (bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, fill, outline, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid) WHERE sid = :sid;"
+		inserter.exec();
+            	std::cout << "Executed: " << inserter.executedQuery().toStdString() <<  std::endl;
+    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+	}else{
+		inserter.prepare("INSERT INTO Ellipse(bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, fill, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
+            	inserter.exec();
+            	std::cout << "Executed: " << inserter.executedQuery().toStdString() <<  std::endl;
     		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 	
 	} else if (type.toString() == "line") {
