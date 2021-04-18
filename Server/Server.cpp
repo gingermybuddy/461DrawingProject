@@ -480,6 +480,8 @@ void Server::loadDB(QTcpSocket* socket, QByteArray data)
 	QJsonDocument doc = QJsonDocument::fromJson(data);
 	QJsonArray jsonArray = QJsonDocument::array(doc);
 
+	/*
+
 	int sizeOfArray = jsonArray.size();
 
 	int bid = -1;
@@ -499,12 +501,99 @@ void Server::loadDB(QTcpSocket* socket, QByteArray data)
 	string outline = "";
 	string code = "";
 	
-
+*/
 	for(int i = 0; i < size; ++i){
 
-	  if(jsonArray[i]["shape"] == "ellipse"){
-		
+		if(jsonArray[i]["shape"] == "ellipse") {
+            inserter.prepare("INSERT INTO Ellipse(bid, sid, x1, x2, y1, y2, fill, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
+    		inserter.bindValue(":bid", jsonArray[i]["bid"]);
+            inserter.bindValue(":sid", jsonArray[i]["sid"]);
+    		inserter.bindValue(":x1", jsonArray[i]["x1"]);
+    		inserter.bindValue(":x2", jsonArray[i]["x2"]);
+    		inserter.bindValue(":y1", jsonArray[i]["y1"]);
+    		inserter.bindValue(":y2", jsonArray[i]["y2"]);
+            inserter.bindValue(":fill", jsonArray[i]["fill"]);
+            inserter.bindValue(":outline", jsonArray[i]["outline"]);
+    		inserter.bindValue(":cid", jsonArray[i]["cid"]);
+            inserter.exec();
 
+            std::cout << "Executed: " << inserter.executedQuery().toStdString() <<  std::endl;
+    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+
+			} else if (jsonArray[i]["shape"] == "line") {
+            inserter.prepare("INSERT INTO Line(bid, sid, x1, x2, y1, y2, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :outline, :cid);");
+    		inserter.bindValue(":bid", jsonArray[i]["bid"]);
+            inserter.bindValue(":sid", jsonArray[i]["sid"]);
+            inserter.bindValue(":x1", jsonArray[i]["x1"]);
+    		inserter.bindValue(":x2", jsonArray[i]["x2"]);
+    		inserter.bindValue(":y1", jsonArray[i]["y1"]);
+    		inserter.bindValue(":y2", jsonArray[i]["y2"]);
+            inserter.bindValue(":outline", jsonArray[i]["outline"]);
+    		inserter.bindValue(":cid", jsonArray[i]["cid"]);
+            inserter.exec();
+
+    		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+	
+	} else if (jsonArray[i]["shape"] == "rect") {
+            inserter.prepare("INSERT INTO Rect(bid, sid, x, y, width, height, fill, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
+    		inserter.bindValue(":bid", jsonArray[i]["bid"]);
+            inserter.bindValue(":sid", jsonArray[i]["sid"]);
+            inserter.bindValue(":x", jsonArray[i]["x"]);
+    		inserter.bindValue(":width", jsonArray[i]["width"]);
+    		inserter.bindValue(":y", jsonArray[i]["y"]);
+    		inserter.bindValue(":height", jsonArray[i]["height"]);
+            inserter.bindValue(":fill", jsonArray[i]["fill"]);
+            inserter.bindValue(":outline", jsonArray[i]["outline");
+    		inserter.bindValue(":cid", jsonArray[i]["cid"]);
+            inserter.exec();
+    		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+	
+	} else if (jsonArray[i]["shape"] == "text") {
+            inserter.prepare("INSERT INTO Text(bid, sid, x, y, text, outline, cid) VALUES(:bid, :sid, :x, :y, :text, :outline, :cid);");
+    		inserter.bindValue(":bid", jsonArray[i]["bid"]);
+            inserter.bindValue(":sid", jsonArray[i]["sid"]);
+            inserter.bindValue(":x", jsonArray[i]["x"]);
+    		inserter.bindValue(":y", jsonArray[i]["y"]);
+            inserter.bindValue(":text", jsonArray[i]["text"]);
+            inserter.bindValue(":outline", jsonArray[i]["outline");
+    		inserter.bindValue(":cid", jsonArray[i]["cid"]);
+            inserter.exec();
+    		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+    		
+	} else if (jsonArray[i]["shape"] == "latex") {
+        	inserter.prepare("INSERT INTO Latex(bid, sid, x, y, code, color, cid) VALUES(:bid, :sid, :x, :y, :text, :color, :cid)");
+    		inserter.bindValue(":bid", jsonArray[i]["bid"]);
+            inserter.bindValue(":sid", jsonArray[i]["sid"]);
+            inserter.bindValue(":x", jsonArray[i]["x"]);
+    		inserter.bindValue(":y", jsonArray[i]["y"]);
+            inserter.bindValue(":text", jsonArray[i]["text"]);
+            inserter.bindValue(":color", jsonArray[i]["color"]);
+    		inserter.bindValue(":cid", jsonArray[i]["cid"]);
+            inserter.exec();
+    		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+	} else {
+		std::cout << "Something went wrong." << std::endl;
+	}
+
+	  /*if(jsonArray[i]["shape"] == "ellipse"){
+		bid = jsonArray[i]["bid"];
+		sid = jsonArray[i]["sid"];
+		x1 = jsonArray[i]["x1"];
+		x2 = jsonArray[i]["x2"];
+		y1 = jsonArray[i]["y1"];
+		y2 = jsonArray[i]["y2"];
+		fill = jsonArray[i]["fill"];
+		outline = jsonArray[i]["outline"];
+		cid = jsonArray[i]["cid"];
+		scenex = jsonArray[i]["scenex"];
+		sceney = jsonArray[i]["sceney"];
+
+
+*/
 
 
 
