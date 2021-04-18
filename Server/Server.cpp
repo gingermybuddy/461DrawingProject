@@ -164,91 +164,142 @@ void Server::readSocket()
 	QJsonObject dval  = obj.value("data").toObject();
 	if(type.toString() == "ellipse") {
     		inserter.bindValue(":bid", dval.value("bid").toString());
-            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
-            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
+            	inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
+            	inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
 		inserter.bindValue(":sid", dval.value("sid").toInt());
     		inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":y2", dval.value("end").toObject().value("y").toInt());
-            inserter.bindValue(":fill", dval.value("fill_color").toString());
-            inserter.bindValue(":outline", dval.value("outline_color").toString());
+            	inserter.bindValue(":fill", dval.value("fill_color").toString());
+            	inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-            inserter.exec();
-    	QSqlQuery *circle_query = new QSqlQuery;
-	if(circle_query->exec("SELECT * FROM Ellipse WHERE sid = :sid")){
-		inserter.prepare("UPDATE Ellipse SET (bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, fill, outline, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid) WHERE sid = :sid;");
-		inserter.exec();
-            	std::cout << "Executed: " << inserter.executedQuery().toStdString() <<  std::endl;
-    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
-	}else{
-		inserter.prepare("INSERT INTO Ellipse(bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, fill, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
-            	inserter.exec();
-            	std::cout << "Executed: " << inserter.executedQuery().toStdString() <<  std::endl;
-    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+    		QSqlQuery *ellipse_query = new QSqlQuery;
+		if(ellipse_query->exec("SELECT * FROM Ellipse WHERE sid = :sid;")){
+			inserter.prepare("UPDATE Ellipse SET (bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, fill, outline, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid) WHERE sid = :sid;");
+			inserter.exec();
+            		std::cout << "Executed: " << inserter.executedQuery().toStdString() <<  std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+		}else{
+			inserter.prepare("INSERT INTO Ellipse(bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, fill, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
+            		inserter.exec();
+            		std::cout << "Executed: " << inserter.executedQuery().toStdString() <<  std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 		}
 	} else if (type.toString() == "line") {
-            inserter.prepare("INSERT INTO Line(bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :outline, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
-            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
-            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
-            inserter.bindValue(":sid", dval.value("sid").toInt());
-            inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
+            	inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
+            	inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
+            	inserter.bindValue(":sid", dval.value("sid").toInt());
+            	inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":y2", dval.value("end").toObject().value("y").toInt());
-            inserter.bindValue(":outline", dval.value("outline_color").toString());
+            	inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-            inserter.exec();
-    		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
-    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
-	
-	} else if (type.toString() == "rect") {
-            inserter.prepare("INSERT INTO Rect(bid, scenePosX, scenePosY, sid, x, y, width, height, fill, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
+  		QSqlQuery *line_query = new QSqlQuery;
+		if(line_query->exec("SELECT * FROM Line WHERE sid = :sid;")){
+			inserter.prepare("UPDATE Line SET (bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, outline, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :outline, :cid) WHERE sid = :sid;");
+            		inserter.exec();
+    			std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+		}else{	
+			inserter.prepare("INSERT INTO Line(bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, outline, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :outline, :cid);");
+            		inserter.exec();
+    			std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+		}
+	} else if (type.toString() == "arrow") {
     		inserter.bindValue(":bid", dval.value("bid").toString());
-            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
-            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
-            inserter.bindValue(":sid", dval.value("sid").toInt());
-            inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
+            	inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
+            	inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
+            	inserter.bindValue(":sid", dval.value("sid").toInt());
+            	inserter.bindValue(":x1", dval.value("start").toObject().value("x").toInt());
+    		inserter.bindValue(":x2", dval.value("end").toObject().value("x").toInt());
+    		inserter.bindValue(":y1", dval.value("start").toObject().value("y").toInt());
+    		inserter.bindValue(":y2", dval.value("end").toObject().value("y").toInt());
+            	inserter.bindValue(":outline", dval.value("outline_color").toString());
+    		inserter.bindValue(":cid", socket->socketDescriptor());
+  		QSqlQuery *arrow_query = new QSqlQuery;
+		if(arrow_query->exec("SELECT * FROM Line WHERE sid = :sid;")){
+			inserter.prepare("UPDATE Line SET (bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, outline, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :outline, :cid) WHERE sid = :sid;");
+            		inserter.exec();
+    			std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+		}else{	
+			inserter.prepare("INSERT INTO Line(bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, outline, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :outline, :cid);");
+            		inserter.exec();
+    			std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+		}
+	} else if (type.toString() == "rect") {
+    		inserter.bindValue(":bid", dval.value("bid").toString());
+            	inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
+            	inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
+            	inserter.bindValue(":sid", dval.value("sid").toInt());
+            	inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":width", dval.value("end").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
     		inserter.bindValue(":height", dval.value("end").toObject().value("y").toInt());
-            inserter.bindValue(":fill", dval.value("fill_color").toString());
-            inserter.bindValue(":outline", dval.value("outline_color").toString());
+            	inserter.bindValue(":fill", dval.value("fill_color").toString());
+            	inserter.bindValue(":outline", dval.value("outline_color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-            inserter.exec();
-    		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
-    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
-	
+            	QSqlQuery *rect_query = new QSqlQuery;
+		if(rect_query->exec("SELECT * FROM Rect WHERE sid = :sid;")){
+			inserter.prepare("UPDATE Rect SET (bid, scenePosX, scenePosY, sid, x, width, y, height, fill, outline, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x, :width, :y, :height, :fill, :outline, :cid) WHERE sid = :sid;");  
+            		inserter.exec();
+    			std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+		}else{
+			inserter.prepare("INSERT INTO Rect(bid, scenePosX, scenePosY, sid, x, y, width, height, fill, outline, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
+            		inserter.exec();
+    			std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+		}
 	} else if (type.toString() == "text") {
-            inserter.prepare("INSERT INTO Text(bid, scenePosX, scenePosY, sid, x, y, text, color, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x, :y, :text, :color, :cid);");
     		inserter.bindValue(":bid", dval.value("bid").toString());
-            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
-            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
-            inserter.bindValue(":sid", dval.value("sid").toInt());
+            	inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
+            	inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
+            	inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
 		inserter.bindValue(":text", dval.value("text").toString());
-            inserter.bindValue(":color", dval.value("color").toString());
+            	inserter.bindValue(":color", dval.value("color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-            inserter.exec();
-    		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
-    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
-    		
+            	QSqlQuery *text_query = new QSqlQuery;
+		if(text_query->exec("SELECT * FROM Text WHERE sid = :sid;")){
+			inserter.prepare("UPDATE Text SET (bid, scenePosX, scenePosY, sid, x, y, text, color, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x, :y, :text, :color, :cid) WHERE sid = :sid;");
+			inserter.exec();
+    			std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+		}else{
+			inserter.prepare("INSERT INTO Text(bid, scenePosX, scenePosY, sid, x, y, text, color, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x, :y, :text, :color, :cid);");
+            		inserter.exec();
+    			std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+		}    		
 	} else if (type.toString() == "latex") {
-        	inserter.prepare("INSERT INTO Latex(bid, scenePosX, scenePosY, sid, x, y, text, color, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x, :y, :text, :color, :cid)");
     		inserter.bindValue(":bid", dval.value("bid").toString());
-            inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
-            inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
-            inserter.bindValue(":sid", dval.value("sid").toInt());
+            	inserter.bindValue(":scenePosX", dval.value("scenepos").toObject().value("x").toInt());
+            	inserter.bindValue(":scenePosY", dval.value("scenepos").toObject().value("y").toInt());
+            	inserter.bindValue(":sid", dval.value("sid").toInt());
    		inserter.bindValue(":x", dval.value("start").toObject().value("x").toInt());
     		inserter.bindValue(":y", dval.value("start").toObject().value("y").toInt());
 		inserter.bindValue(":text", dval.value("text").toString());
-            inserter.bindValue(":color", dval.value("color").toString());
+            	inserter.bindValue(":color", dval.value("color").toString());
     		inserter.bindValue(":cid", socket->socketDescriptor());
-            inserter.exec();
-    		std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
-    		std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+            	QSqlQuery *latex_query = new QSqlQuery;
+		if(latex_query->exec("SELECT * FROM Latex WHERE sid = :sid;")){
+			inserter.prepare("UPDATE Latex SET (bid, scenePosX, scenePosY, sid, x, y, text, color, cid) VALUES (:bid, :scenePosX, :scenePosY, :sid, :x, :y, :text, :color, :cid) WHERE sid = :sid;");
+			inserter.exec();
+    			std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+		}else{
+			inserter.prepare("INSERT INTO Latex(bid, scenePosX, scenePosY, sid, x, y, text, color, cid) VALUES(:bid, :scenePosX, :scenePosY, :sid, :x, :y, :text, :color, :cid);");
+            		inserter.exec();
+    			std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
+    			std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
+		}    		
 	} else {
 		std::cout << "Something went wrong." << std::endl;
 	}
