@@ -319,16 +319,16 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
     //Loop through and repeat for whole Ellipse table
     while(circle_query->next()){
         	std::string bid = circle_query->value(0).toString().toStdString();
+        	qreal scenex = circle_query->value(1).toDouble();
+        	qreal sceney = circle_query->value(2).toDouble(); //Add these to the SQL stuff...
 		std::string shape = "ellipse";
-		int sid = circle_query->value(1).toInt();
-		double x1 = circle_query->value(2).toDouble();
-        	double x2 = circle_query->value(4).toDouble();
-        	double y1 = circle_query->value(3).toDouble();
-		double y2 = circle_query->value(5).toDouble();
-		QColor fillColor = QColor(circle_query->value(6).toString());
-		QColor outlineColor = QColor(circle_query->value(7).toString());
-        	qreal scenex = 0;
-        	qreal sceney = 0; //Add these to the SQL stuff...
+		int sid = circle_query->value(3).toInt();
+		double x1 = circle_query->value(4).toDouble();
+        	double x2 = circle_query->value(5).toDouble();
+        	double y1 = circle_query->value(6).toDouble();
+		double y2 = circle_query->value(7).toDouble();
+		QColor fillColor = QColor(circle_query->value(8).toString());
+		QColor outlineColor = QColor(circle_query->value(9).toString());
         	itemStats temp(bid, shape, sid, x1, y1, x2, y2, scenex, sceney, fillColor, outlineColor);
         	shapes.push_back(temp);
 	}
@@ -339,16 +339,16 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
   
 	while(rect_query->next()){
         	std::string bid = rect_query->value(0).toString().toStdString();
+        	qreal scenex = rect_query->value(1).toDouble();
+        	qreal sceney = rect_query->value(2).toDouble(); //Add these to the SQL stuff...
 		std::string shape = "rect";
-		int sid = rect_query->value(1).toInt();
-		double x1 = rect_query->value(2).toDouble();
-        	double x2 = rect_query->value(4).toDouble();
-        	double y1 = rect_query->value(3).toDouble();
-		double y2 = rect_query->value(5).toDouble();
-        	qreal scenex = 0;
-        	qreal sceney = 0; //Add these to the SQL stuff...
-		QColor fillColor = QColor(circle_query->value(6).toString());
-		QColor outlineColor = QColor(circle_query->value(7).toString());
+		int sid = rect_query->value(3).toInt();
+		double x1 = rect_query->value(4).toDouble();
+        	double x2 = rect_query->value(5).toDouble();
+        	double y1 = rect_query->value(6).toDouble();
+		double y2 = rect_query->value(7).toDouble();
+		QColor fillColor = QColor(circle_query->value(8).toString());
+		QColor outlineColor = QColor(circle_query->value(9).toString());
         	itemStats temp(bid, shape, sid, x1, y1, x2, y2, scenex, sceney, fillColor, outlineColor);
         	shapes.push_back(temp);
 	}
@@ -359,15 +359,15 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
     
 	while(line_query->next()){
         	std::string bid = line_query->value(0).toString().toStdString();
+        	qreal scenex = line_query->value(1).toDouble();
+        	qreal sceney = line_query->value(2).toDouble(); //Add these to the SQL stuff...
 		std::string shape = "line";
-		int sid = line_query->value(1).toInt();
-		double x1 = line_query->value(2).toDouble();
-		double x2 = line_query->value(3).toDouble();
-		double y1 = line_query->value(4).toDouble();
-		double y2 = line_query->value(5).toDouble();
-        	qreal scenex = 0;
-        	qreal sceney = 0; //Add these to the SQL stuff...
-		QColor outlineColor = QColor(circle_query->value(6).toString());
+		int sid = line_query->value(3).toInt();
+		double x1 = line_query->value(4).toDouble();
+		double x2 = line_query->value(5).toDouble();
+		double y1 = line_query->value(6).toDouble();
+		double y2 = line_query->value(7).toDouble();
+		QColor outlineColor = QColor(circle_query->value(8).toString());
         	itemStats temp(bid, shape, sid, x1, y1, x2, y2, scenex, sceney, outlineColor);
         	shapes.push_back(temp);
 	}
@@ -378,14 +378,14 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
     
 	while(text_query->next()){
 		std::string bid = text_query->value(0).toString().toStdString();
+        	qreal scenex = text_query->value(1).toDouble();
+        	qreal sceney = text_query->value(2).toDouble(); //Add these to the SQL stuff...
 		std::string shape = "text";
-		int sid = text_query->value(1).toInt();
-		double x = text_query->value(2).toDouble();
-		double y = text_query->value(3).toDouble();
-        	std::string text = text_query->value(4).toString().toStdString();
-		QColor color = QColor(text_query->value(5).toString());
-        	qreal scenex = 0;
-        	qreal sceney = 0; //Add these to the SQL stuff...
+		int sid = text_query->value(3).toInt();
+		double x = text_query->value(4).toDouble();
+		double y = text_query->value(5).toDouble();
+        	std::string text = text_query->value(6).toString().toStdString();
+		QColor color = QColor(text_query->value(7).toString());
         	itemStats temp(bid, shape, sid, x, y, scenex, sceney, text, color);
         	shapes.push_back(temp);
 	}
@@ -395,14 +395,14 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
     
 	while(latex_query->next()){
         	std::string bid = latex_query->value(0).toString().toStdString();
+        	qreal scenex = latex_query->value(1).toDouble();
+        	qreal sceney = latex_query->value(2).toDouble(); //Add these to the SQL stuff...
 		std::string shape = "latex";
-		int sid = latex_query->value(1).toInt();
-		double x = latex_query->value(2).toDouble();
-		double y = latex_query->value(3).toDouble();
-        	std::string text = latex_query->value(4).toString().toStdString();
-		QColor color = QColor(latex_query->value(5).toString());
-        	qreal scenex = 0;
-        	qreal sceney = 0; //Add these to the SQL stuff...
+		int sid = latex_query->value(3).toInt();
+		double x = latex_query->value(4).toDouble();
+		double y = latex_query->value(5).toDouble();
+        	std::string text = latex_query->value(6).toString().toStdString();
+		QColor color = QColor(latex_query->value(7).toString());
         	itemStats temp(bid, shape, sid, x, y, scenex, sceney, text, color);
         	shapes.push_back(temp);
     }
@@ -413,15 +413,15 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
     
 	while(arrow_query->next()){
         	std::string bid = arrow_query->value(0).toString().toStdString();
+        	qreal scenex = arrow_query->value(1).toDouble();
+        	qreal sceney = arrow_query->value(2).toDouble(); //Add these to the SQL stuff...
 		std::string shape = "arrow";
-		int sid = arrow_query->value(1).toInt();
-		double x1 = arrow_query->value(2).toDouble();
-		double x2 = arrow_query->value(3).toDouble();
-		double y1 = arrow_query->value(4).toDouble();
-		double y2 = arrow_query->value(5).toDouble();
-        	qreal scenex = 0;
-        	qreal sceney = 0; //Add these to the SQL stuff...
-		QColor outlineColor = QColor(circle_query->value(6).toString());
+		int sid = arrow_query->value(3).toInt();
+		double x1 = arrow_query->value(4).toDouble();
+		double x2 = arrow_query->value(5).toDouble();
+		double y1 = arrow_query->value(6).toDouble();
+		double y2 = arrow_query->value(7).toDouble();
+		QColor outlineColor = QColor(circle_query->value(8).toString());
         	itemStats temp(bid, shape, sid, x1, y1, x2, y2, scenex, sceney, outlineColor);
         	shapes.push_back(temp);
 	}
