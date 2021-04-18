@@ -295,11 +295,15 @@ void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
                 qreal midx = (x+x2)/2;
                 qreal midy = (y+y2)/2;
 
-                qreal tempx = x2-midx;
-                qreal tempy = y2-midy;
+                qreal slopex = x2-midx;
+                qreal slopey = y2-midy;
 
-                qreal cx = midx - tempy;
-                qreal cy = midy + tempx;
+                qreal cx = midx - 25*sin(atan(slopey/slopex));
+                qreal cy = midy + 25*cos(atan(slopey/slopex));
+
+                if (x2 < x){
+                    cy = midy - 25*cos(atan(slopey/slopex));
+                }
 
                 // XXX do transformation
                 path.quadTo(cx, cy ,x2,y2);
