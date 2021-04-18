@@ -470,7 +470,7 @@ void Server::saveDB(QTcpSocket* socket)
   socketstream << everything;
 }
 
-void Server::loadDB(QTcpSocket* socket, QByteArray data)
+void Server::loadDB(QByteArray data)
 {
 
   QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
@@ -478,12 +478,13 @@ void Server::loadDB(QTcpSocket* socket, QByteArray data)
   db.open();
 
   QJsonDocument doc = QJsonDocument::fromJson(data);
-  QJsonArray jsonArray = QJsonDocument::array(doc);
+  QJsonArray jsonArray = doc.array();
 
-  /*
+  QSqlQuery inserter;
+
 
 	 int sizeOfArray = jsonArray.size();
-
+/*
 	 int bid = -1;
 	 int sid = -1;
 	 int cid = -1;
@@ -502,76 +503,77 @@ void Server::loadDB(QTcpSocket* socket, QByteArray data)
 	 string code = "";
 
    */
-  for(int i = 0; i < size; ++i){
+  for(int i = 0; i < sizeOfArray; ++i){
+      QJsonObject curObject = jsonArray[i].toObject();
 
-	if(jsonArray[i]["shape"] == "ellipse") {
+    if(curObject["shape"] == "ellipse") {
 	  inserter.prepare("INSERT INTO Ellipse(bid, sid, x1, x2, y1, y2, fill, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
-	  inserter.bindValue(":bid", jsonArray[i]["bid"]);
-	  inserter.bindValue(":sid", jsonArray[i]["sid"]);
-	  inserter.bindValue(":x1", jsonArray[i]["x1"]);
-	  inserter.bindValue(":x2", jsonArray[i]["x2"]);
-	  inserter.bindValue(":y1", jsonArray[i]["y1"]);
-	  inserter.bindValue(":y2", jsonArray[i]["y2"]);
-	  inserter.bindValue(":fill", jsonArray[i]["fill"]);
-	  inserter.bindValue(":outline", jsonArray[i]["outline"]);
-	  inserter.bindValue(":cid", jsonArray[i]["cid"]);
+      inserter.bindValue(":bid", curObject["bid"].toInt());
+      inserter.bindValue(":sid", curObject["sid"].toInt());
+      inserter.bindValue(":x1", curObject["x1"].toInt());
+      inserter.bindValue(":x2", curObject["x2"].toInt());
+      inserter.bindValue(":y1", curObject["y1"].toInt());
+      inserter.bindValue(":y2", curObject["y2"].toInt());
+      inserter.bindValue(":fill", curObject["fill"].toString());
+      inserter.bindValue(":outline", curObject["outline"].toString());
+      inserter.bindValue(":cid", curObject["cid"].toInt());
 	  inserter.exec();
 
 	  std::cout << "Executed: " << inserter.executedQuery().toStdString() <<  std::endl;
 	  std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 
-	} else if (jsonArray[i]["shape"] == "line") {
+    } else if (curObject["shape"] == "line") {
 	  inserter.prepare("INSERT INTO Line(bid, sid, x1, x2, y1, y2, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :outline, :cid);");
-	  inserter.bindValue(":bid", jsonArray[i]["bid"]);
-	  inserter.bindValue(":sid", jsonArray[i]["sid"]);
-	  inserter.bindValue(":x1", jsonArray[i]["x1"]);
-	  inserter.bindValue(":x2", jsonArray[i]["x2"]);
-	  inserter.bindValue(":y1", jsonArray[i]["y1"]);
-	  inserter.bindValue(":y2", jsonArray[i]["y2"]);
-	  inserter.bindValue(":outline", jsonArray[i]["outline"]);
-	  inserter.bindValue(":cid", jsonArray[i]["cid"]);
+      inserter.bindValue(":bid", curObject["bid"].toInt());
+      inserter.bindValue(":sid", curObject["sid"].toInt());
+      inserter.bindValue(":x1", curObject["x1"].toInt());
+      inserter.bindValue(":x2", curObject["x2"].toInt());
+      inserter.bindValue(":y1", curObject["y1"].toInt());
+      inserter.bindValue(":y2", curObject["y2"].toInt());
+      inserter.bindValue(":outline", curObject["outline"].toString());
+      inserter.bindValue(":cid", curObject["cid"].toInt());
 	  inserter.exec();
 
 	  std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
 	  std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 
-	} else if (jsonArray[i]["shape"] == "rect") {
+    } else if (curObject["shape"] == "rect") {
 	  inserter.prepare("INSERT INTO Rect(bid, sid, x, y, width, height, fill, outline, cid) VALUES(:bid, :sid, :x1, :x2, :y1, :y2, :fill, :outline, :cid);");
-	  inserter.bindValue(":bid", jsonArray[i]["bid"]);
-	  inserter.bindValue(":sid", jsonArray[i]["sid"]);
-	  inserter.bindValue(":x", jsonArray[i]["x"]);
-	  inserter.bindValue(":width", jsonArray[i]["width"]);
-	  inserter.bindValue(":y", jsonArray[i]["y"]);
-	  inserter.bindValue(":height", jsonArray[i]["height"]);
-	  inserter.bindValue(":fill", jsonArray[i]["fill"]);
-	  inserter.bindValue(":outline", jsonArray[i]["outline"]);
-	  inserter.bindValue(":cid", jsonArray[i]["cid"]);
+      inserter.bindValue(":bid", curObject["bid"].toInt());
+      inserter.bindValue(":sid", curObject["sid"].toInt());
+      inserter.bindValue(":x", curObject["x"].toInt());
+      inserter.bindValue(":width", curObject["width"].toInt());
+      inserter.bindValue(":y", curObject["y"].toInt());
+      inserter.bindValue(":height", curObject["height"].toInt());
+      inserter.bindValue(":fill", curObject["fill"].toString());
+      inserter.bindValue(":outline", curObject["outline"].toString());
+      inserter.bindValue(":cid", curObject["cid"].toInt());
 	  inserter.exec();
 	  std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
 	  std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 
-	} else if (jsonArray[i]["shape"] == "text") {
+    } else if (curObject["shape"] == "text") {
 	  inserter.prepare("INSERT INTO Text(bid, sid, x, y, text, outline, cid) VALUES(:bid, :sid, :x, :y, :text, :outline, :cid);");
-	  inserter.bindValue(":bid", jsonArray[i]["bid"]);
-	  inserter.bindValue(":sid", jsonArray[i]["sid"]);
-	  inserter.bindValue(":x", jsonArray[i]["x"]);
-	  inserter.bindValue(":y", jsonArray[i]["y"]);
-	  inserter.bindValue(":text", jsonArray[i]["text"]);
-	  inserter.bindValue(":outline", jsonArray[i]["outline"]);
-	  inserter.bindValue(":cid", jsonArray[i]["cid"]);
+      inserter.bindValue(":bid", curObject["bid"].toInt());
+      inserter.bindValue(":sid", curObject["sid"].toInt());
+      inserter.bindValue(":x", curObject["x"].toInt());
+      inserter.bindValue(":y", curObject["y"].toInt());
+      inserter.bindValue(":text", curObject["text"].toString());
+      inserter.bindValue(":outline", curObject["outline"].toString());
+      inserter.bindValue(":cid", curObject["cid"].toInt());
 	  inserter.exec();
 	  std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
 	  std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
 
-	} else if (jsonArray[i]["shape"] == "latex") {
+    } else if (curObject["shape"] == "latex") {
 	  inserter.prepare("INSERT INTO Latex(bid, sid, x, y, code, color, cid) VALUES(:bid, :sid, :x, :y, :text, :color, :cid)");
-	  inserter.bindValue(":bid", jsonArray[i]["bid"]);
-	  inserter.bindValue(":sid", jsonArray[i]["sid"]);
-	  inserter.bindValue(":x", jsonArray[i]["x"]);
-	  inserter.bindValue(":y", jsonArray[i]["y"]);
-	  inserter.bindValue(":text", jsonArray[i]["text"]);
-	  inserter.bindValue(":color", jsonArray[i]["color"]);
-	  inserter.bindValue(":cid", jsonArray[i]["cid"]);
+      inserter.bindValue(":bid", curObject["bid"].toInt());
+      inserter.bindValue(":sid", curObject["sid"].toInt());
+      inserter.bindValue(":x", curObject["x"].toInt());
+      inserter.bindValue(":y", curObject["y"].toInt());
+      inserter.bindValue(":text", curObject["text"].toString());
+      inserter.bindValue(":color", curObject["color"].toString());
+      inserter.bindValue(":cid", curObject["cid"].toInt());
 	  inserter.exec();
 	  std::cout << "Executed: " << inserter.executedQuery().toStdString() << std::endl;
 	  std::cout << "Errors: " << inserter.lastError().text().toStdString() << std::endl;
