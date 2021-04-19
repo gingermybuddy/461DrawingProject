@@ -28,6 +28,11 @@ public slots:
     void connected();
 
     void testGoodEllipse();
+    void testGoodLine();
+    void testGoodFill();
+    void testGoodText();
+    void testGoodLatex();
+    void testGoodRectangle();
 private:
     QTcpSocket *socket;
 
