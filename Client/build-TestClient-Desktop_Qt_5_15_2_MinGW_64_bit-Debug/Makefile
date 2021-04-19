@@ -223,6 +223,7 @@ Makefile: ../TestClient/TestClient.pro C:/Qt/5.15.2/mingw81_64/mkspecs/win32-g++
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/qt_config.prf \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/win32-g++/qmake.conf \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/exclusive_builds.prf \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/toolchain.prf \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/default_pre.prf \
@@ -239,6 +240,7 @@ Makefile: ../TestClient/TestClient.pro C:/Qt/5.15.2/mingw81_64/mkspecs/win32-g++
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/testlib_defines.prf \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/win32/console.prf \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/win32/opengl.prf \
+		C:/Qt/5.15.2/mingw81_64/mkspecs/features/uic.prf \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/qml_debug.prf \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/precompile_header.prf \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/qmake_use.prf \
@@ -248,10 +250,12 @@ Makefile: ../TestClient/TestClient.pro C:/Qt/5.15.2/mingw81_64/mkspecs/win32-g++
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/yacc.prf \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/lex.prf \
 		../TestClient/TestClient.pro \
+		C:/Qt/5.15.2/mingw81_64/lib/Qt5Widgets.prl \
 		C:/Qt/5.15.2/mingw81_64/lib/Qt5Gui.prl \
 		C:/Qt/5.15.2/mingw81_64/lib/Qt5Test.prl \
+		C:/Qt/5.15.2/mingw81_64/lib/Qt5Network.prl \
+		C:/Qt/5.15.2/mingw81_64/lib/Qt5Sql.prl \
 		C:/Qt/5.15.2/mingw81_64/lib/Qt5Core.prl \
-		.qmake.stash \
 		C:/Qt/5.15.2/mingw81_64/mkspecs/features/build_pass.prf
 	$(QMAKE) -o Makefile ..\TestClient\TestClient.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug"
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/spec_pre.prf:
@@ -407,6 +411,7 @@ C:/Qt/5.15.2/mingw81_64/mkspecs/features/qt_functions.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/qt_config.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/win32-g++/qmake.conf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/exclusive_builds.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/toolchain.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/default_pre.prf:
@@ -423,6 +428,7 @@ C:/Qt/5.15.2/mingw81_64/mkspecs/features/moc.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/testlib_defines.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/win32/console.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/win32/opengl.prf:
+C:/Qt/5.15.2/mingw81_64/mkspecs/features/uic.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/qml_debug.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/precompile_header.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/qmake_use.prf:
@@ -432,10 +438,12 @@ C:/Qt/5.15.2/mingw81_64/mkspecs/features/exceptions.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/yacc.prf:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/lex.prf:
 ../TestClient/TestClient.pro:
+C:/Qt/5.15.2/mingw81_64/lib/Qt5Widgets.prl:
 C:/Qt/5.15.2/mingw81_64/lib/Qt5Gui.prl:
 C:/Qt/5.15.2/mingw81_64/lib/Qt5Test.prl:
+C:/Qt/5.15.2/mingw81_64/lib/Qt5Network.prl:
+C:/Qt/5.15.2/mingw81_64/lib/Qt5Sql.prl:
 C:/Qt/5.15.2/mingw81_64/lib/Qt5Core.prl:
-.qmake.stash:
 C:/Qt/5.15.2/mingw81_64/mkspecs/features/build_pass.prf:
 qmake: FORCE
 	@$(QMAKE) -o Makefile ..\TestClient\TestClient.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug"
