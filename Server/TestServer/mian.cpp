@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    //Server m;
+//    Server m;
 
     TestServer cTest;
     cTest.Connect();

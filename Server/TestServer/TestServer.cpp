@@ -102,6 +102,7 @@ void TestServer::Test()
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(bytesWritten(qint64)));
+    connect(socket, SIGNAL(testGoodEllipse()), this, SLOT(testGoodEllipse()));
 
     qDebug() << "Connecting,..";
 
@@ -118,7 +119,7 @@ void TestServer::connected()
 {
     qDebug() << "Connected!";
 
-    socket->write("HEAD / HTTP/1.0\r\n\r\n\r\n\r\n");
+    //socket->write();
 }
 
 void TestServer::disconnected()
@@ -135,4 +136,17 @@ void TestServer::readyRead()
 {
     qDebug() << "Reading...";
     qDebug() << socket->readAll();
+}
+
+void TestServer::testGoodEllipse()
+{
+    //std::string answer;
+    qDebug() << "Testing Ellispe";
+    if(false){
+        //answer = "";
+        qDebug() << "";
+
+    }else{
+        qDebug() << "Failed ellipse data ";
+    }
 }

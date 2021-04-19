@@ -10,6 +10,7 @@ class TestServer : public QObject
     Q_OBJECT
 public:
     explicit TestServer(QObject *parent = 0);
+    void Test();
 
     void Connect();
     void initTestCase();
@@ -25,8 +26,8 @@ public slots:
     void bytesWritten(qint64 bytes);
     void readyRead();
     void connected();
-    void Test();
 
+    void testGoodEllipse();
 private:
     QTcpSocket *socket;
 

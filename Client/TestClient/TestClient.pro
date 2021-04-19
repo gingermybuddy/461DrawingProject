@@ -10,6 +10,7 @@ CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
-HEADERS += ProjectView.h ProjectScene.h toolBar.h itemStats.h window.h
+HEADERS += #../ProjectView.h ../ProjectScene.h ../toolBar.h ../itemStats.h ../window.h
 
-SOURCES +=  tst_testclient.cpp
+SOURCES +=  \
+    TestClient.cpp

@@ -16,3 +16,4 @@ SOURCES +=  \
 
 HEADERS += \
     TestServer.h
+    ../Server.h
