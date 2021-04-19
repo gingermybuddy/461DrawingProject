@@ -1,6 +1,10 @@
 {
   "data": {
-    "bid": "<board ID>", 
+    "bid": "<board ID>",
+	"scenepos": {
+	  "x": "<scenex>",
+	  "y": "<sceney>"
+	}	
     "fill_color": "<a color in HEX>", 
     "outline_color": "<a color in HEX>", 
     "end": {

@@ -19,6 +19,8 @@
 #include <QMouseEvent>
 #include <QPen>
 
+using namespace std;
+
 ProjectScene::ProjectScene() 
 {
 	setSceneRect(0, 0, 800, 800);
@@ -73,7 +75,7 @@ void ProjectScene::readSocket()
 	}
 	//Right now all it does is pass received data into a string and outputs it
 	//to the console.
-	std::cout << "Received " << buf.toStdString() << std::endl;
+    std::cout << "Received " <<  QJsonDocument::fromJson(buf).toJson(QJsonDocument::Compact).toStdString() << std::endl;
 	//Passes the byte array into some JSON objects that we can use later.
         QJsonDocument doc = QJsonDocument::fromJson(buf);
         QJsonObject obj = doc.object();
@@ -87,7 +89,7 @@ void ProjectScene::readSocket()
         foreach(QString str, obj.keys()) {
             shapes.push_back(obj.value(str).toObject());
         }
-        fullUpdate(shapes);
+        updateCanvas(shapes);
         for(QGraphicsItem* i : items()){
             m_tracked_items.push_back(itemStats(m_board_id, i));
         }
@@ -112,66 +114,207 @@ void ProjectScene::disconnect()
 void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
 {
     for(QJsonObject obj : objects) {
-        for(QGraphicsItem* i : items()) {
-            if(obj.value("data").toObject().value("sid").toInt() == i->data(0).toInt()) {
-                delete i;
-            }
-        }
         QJsonObject d = obj.value("data").toObject();
         std::string type = obj.value("shape").toString().toStdString();
-        if(type == "line") {
-            QPen pen(QColor(d.value("color").toString()));
-            pen.setWidth(2);
+        QJsonObject start = d.value("start").toObject();
 
-            QJsonObject start = d.value("start").toObject();
-            QJsonObject end = d.value("end").toObject();
-            QLineF line(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
-            QGraphicsLineItem* l = addLine(line, pen);
-            l->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
-            l->setCursor(Qt::PointingHandCursor);
-            l->setData(0, d.value("sid").toInt());
-            l->setData(1, "line");
+        QJsonObject scenepos = d.value("scenepos").toObject();
+        qreal newx = scenepos.value("scenex").toDouble();
+        qreal newy = scenepos.value("sceney").toDouble();
+        bool found = false;
+        for(QGraphicsItem* i : items()) {
+            if(obj.value("data").toObject().value("sid").toInt() == i->data(0).toInt()) {
+                if (i->data(1) == "arrow") {
+                    QGraphicsPolygonItem* header = (QGraphicsPolygonItem*)i->data(3).toULongLong();
+                    delete header;
+                }
 
-        } else if (type == "rect") {
-            QPen pen(QColor(d.value("outline_color").toString()));
-            pen.setWidth(2);
+                //Time to check what might have changed...
 
-            QBrush brush(QColor(d.value("fill_color").toString()));
-            QJsonObject start = d.value("start").toObject();
-            QJsonObject end = d.value("end").toObject();
-            QRectF rect(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
-            QGraphicsRectItem* r = addRect(rect, pen, brush);
-            r->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
-            r->setCursor(Qt::PointingHandCursor);
-            r->setData(0, d.value("sid").toInt());
-            r->setData(1, "rect");
+                if(newx != i->x() || newy != i->y()) {
+                    i->setPos(newx, newy);
+                }
+                if(type == "rect") {
+                    QGraphicsRectItem* r = (QGraphicsRectItem*)i;
+                    if(QColor(d.value("fill_color").toString()) != r->brush().color()) {
+                        r->setBrush(QColor(d.value("fill_color").toString()));
+                    }
+                } else if (type == "ellipse") {
+                    QGraphicsEllipseItem* e = (QGraphicsEllipseItem*)i;
+                    if(QColor(d.value("fill_color").toString()) != e->brush().color()) {
+                        e->setBrush(QColor(d.value("fill_color").toString()));
+                    }
+                }
+                found = true;
+                break;
+             }
+        }
 
-        } else if (type == "ellipse") {
-            QPen pen(QColor(d.value("outline_color").toString()));
-            pen.setWidth(2);
+        if(!found) {
+            if(type == "line") {
+                QPen pen(QColor(d.value("color").toString()));
+                pen.setWidth(2);
+                QJsonObject start = d.value("start").toObject();
+                QJsonObject end = d.value("end").toObject();
+                QLineF line(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
+                QGraphicsLineItem* l = addLine(line, pen);
+                l->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+                l->setCursor(Qt::PointingHandCursor);
+                l->setData(0, d.value("sid").toInt());
+                l->setData(1, "line");
+                QJsonObject pos = d.value("scenepos").toObject();
 
-            QBrush brush(QColor(d.value("fill_color").toString()));
-            QJsonObject start = d.value("start").toObject();
-            QJsonObject end = d.value("end").toObject();
-            QRectF rect(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
-            QGraphicsEllipseItem* e = addEllipse(rect, pen, brush);
-            e->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
-            e->setCursor(Qt::PointingHandCursor);
-            e->setData(0, d.value("sid").toInt());
-            e->setData(1, "ellipse");
+            } else if (type == "rect") {
+                QPen pen(QColor(d.value("outline_color").toString()));
+                pen.setWidth(2);
 
-        } else if (type == "text") {
-            QString text = d.value("text").toString();
-            QGraphicsTextItem* t = addText(text);
-            QJsonObject start = d.value("start").toObject();
-            t->setPos(start.value("x").toDouble(), start.value("y").toDouble());
-            t->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
-            t->setCursor(Qt::PointingHandCursor);
-            t->setData(0, d.value("sid").toInt());
-            t->setData(1, "text");
+                QBrush brush(QColor(d.value("fill_color").toString()));
+                QJsonObject start = d.value("start").toObject();
+                QJsonObject end = d.value("end").toObject();
+                QRectF rect(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
+                QGraphicsRectItem* r = addRect(rect, pen, brush);
+                r->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+                r->setCursor(Qt::PointingHandCursor);
+                r->setData(0, d.value("sid").toInt());
+                r->setData(1, "rect");
+                QJsonObject pos = d.value("scenepos").toObject();
 
-        } else if (type == "latex") {
-            std::cout << "CHAD HELP ME" << std::endl;
+            } else if (type == "ellipse") {
+                QPen pen(QColor(d.value("outline_color").toString()));
+                pen.setWidth(2);
+
+                QBrush brush(QColor(d.value("fill_color").toString()));
+                QJsonObject start = d.value("start").toObject();
+                QJsonObject end = d.value("end").toObject();
+                QRectF rect(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
+                QGraphicsEllipseItem* e = addEllipse(rect, pen, brush);
+                e->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+                e->setCursor(Qt::PointingHandCursor);
+                e->setData(0, d.value("sid").toInt());
+                e->setData(1, "ellipse");
+                QJsonObject pos = d.value("scenepos").toObject();
+
+            } else if (type == "text") {
+                QString text = d.value("text").toString();
+                QGraphicsTextItem* t = addText(text);
+                QJsonObject start = d.value("start").toObject();
+                t->setPos(start.value("x").toDouble(), start.value("y").toDouble());
+                t->setDefaultTextColor(QColor(d.value("color").toString()));
+                t->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+                t->setCursor(Qt::PointingHandCursor);
+                t->setData(0, d.value("sid").toInt());
+                t->setData(1, "text");
+                QJsonObject pos = d.value("scenepos").toObject();
+
+            } else if (type == "latex") {
+                std::cout << "CHAD HELP ME" << std::endl;
+                string doc = "\\documentclass{standalone}\n\\begin{document}\n\\Huge $" + d.value("text").toString().toStdString() + "$\n\\end{document}";
+                system("touch temp.tex");
+                // pipe into file
+                std::string echo = "echo '" + doc + "' > temp.tex";
+                system(echo.c_str());
+                // pdflatex
+                int isGood = system("pdflatex -interaction=nonstopmode temp.tex");
+                std::cout << "RETURNVALUE WAS: "<< isGood << std::endl;
+
+                // convert to a png
+                system("pdftoppm -png -r 500 temp.pdf > temp.png");
+                // open file in qt
+                QPixmap pix(QString("./temp.png"));
+                std::cout << pix.isNull() << std::endl;
+                // pix = pix.scaled(2 * pix.width(), 2 * pix.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+                // remove file
+                system("rm temp.png");
+                system("rm temp.tex");
+                system("rm temp.pdf");
+                system("rm temp.fls");
+                system("rm temp.log");
+                system("rm temp.aux");
+
+                if (isGood == 0){
+                    // The latex was valid!
+                    std::cout << "WAS GOOD!"<< std::endl;
+                    QGraphicsPixmapItem* text = addPixmap(pix);
+                    text->setPos(start.value("x").toDouble(), start.value("y").toDouble());
+                    text->setFlag(QGraphicsItem::ItemIsSelectable, true);
+                    text->setFlag(QGraphicsItem::ItemIsMovable, true);
+                    text->setCursor(Qt::PointingHandCursor);
+                    text->setData(0, d.value("sid").toInt());
+                    text->setData(1, "latex");
+                    text->setData(2, d.value("text").toString());
+                } else {
+                    // otherwise, it was invalid latex
+                    std::cout << "WAS NOT GOOD!"<< std::endl;
+                    QGraphicsTextItem* text = addText(d.value("text").toString());
+                    text->setDefaultTextColor(Qt::black);
+                    text->setPos(start.value("x").toDouble(), start.value("y").toDouble());
+                    text->setFlag(QGraphicsItem::ItemIsSelectable, true);
+                    text->setFlag(QGraphicsItem::ItemIsMovable, true);
+                    text->setCursor(Qt::PointingHandCursor);
+                    text->setData(0, d.value("sid").toInt());
+                    text->setData(1, "text");
+                }
+                // text->setTextInteractionFlags(Qt::TextEditorInteraction);
+
+            } else if (type == "arrow") {
+                QPen pen(QColor(d.value("color").toString()));
+                pen.setWidth(2);
+                QJsonObject start = d.value("start").toObject();
+                QJsonObject end = d.value("end").toObject();
+                QLineF line(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
+
+                qreal arrowSize = 20;
+                double angle = std::atan2(-line.dy(), line.dx());
+                QPointF arrowP1 = line.p1() + QPointF(sin(angle + M_PI / 3) * arrowSize,
+                                                        cos(angle + M_PI / 3) * arrowSize);
+                QPointF arrowP2 = line.p1() + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
+                                                        cos(angle + M_PI - M_PI / 3) * arrowSize);
+                QPolygonF arrowHead;
+                std::cout << "Placing an arrow from: " << line.p1().x() << " " << line.p1().y() << " to " << line.p2().x() << " " << line.p2().y() << std::endl;
+                arrowHead << arrowP1 << arrowP2 << line.p1() << line.p2() << line.p1();
+                QGraphicsPolygonItem* head = addPolygon(arrowHead,pen);
+                head->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+                head->setCursor(Qt::PointingHandCursor);
+                head->setData(0, -1);
+                head->setData(1, "arrow");
+
+            } else if (type == "bezier") {
+                QPen pen(QColor(d.value("color").toString()));
+                pen.setWidth(2);
+                QJsonObject start = d.value("start").toObject();
+                QJsonObject end = d.value("end").toObject();
+                qreal x = start.value("x").toDouble();
+                qreal y = start.value("y").toDouble();
+                qreal x2 = end.value("x").toDouble();
+                qreal y2 = end.value("y").toDouble();
+
+                QPainterPath path;
+                // move path to start
+                path.moveTo(x,y);
+                // XXX calculate midpoint
+                qreal midx = (x+x2)/2;
+                qreal midy = (y+y2)/2;
+
+                qreal slopex = x2-midx;
+                qreal slopey = y2-midy;
+
+                qreal cx = midx - 25*sin(atan(slopey/slopex));
+                qreal cy = midy + 25*cos(atan(slopey/slopex));
+
+                if (x2 < x){
+                    cy = midy - 25*cos(atan(slopey/slopex));
+                }
+
+                // XXX do transformation
+                path.quadTo(cx, cy ,x2,y2);
+
+                QGraphicsPathItem* line = addPath(path, pen);
+                line->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+                line->setCursor(Qt::PointingHandCursor);
+                line->setData(0, -1);
+                line->setData(1, "bezier");
+
+            }
         }
     }
 }
@@ -182,7 +325,11 @@ int ProjectScene::trackItem(QGraphicsItem* item)
 	QString type = item->data(1).toString();
 	int id = m_tracked_items.size();
 	item->setData(0, id);
-	m_tracked_items.push_back(itemStats(m_board_id, item));
+    itemStats tracker = itemStats(m_board_id, item);
+    m_tracked_items.push_back(tracker);
+    cout << "TRACKER \n" << "QGraphicsItem pos: " << item->x() << " " << item->y() << endl;
+    cout << "ItemStats pos: " << tracker.x << " " << tracker.y << endl;
+    //item->setPos(tracker.x, tracker.y);
 	return id;
 	//Returns the id of the newly-tracked item.
 }
@@ -194,19 +341,18 @@ void ProjectScene::checkPos()
 		itemStats x = m_tracked_items[j];
 		for(QGraphicsItem* i : items()) {
 			if (i->data(0).toInt() == x.id) { // Same item.
-				if(i->x() == 0 && i->y() == 0) continue; //It's set to 0 when the item hasn't moved. Wack.
+                //if(i->x() == 0 && i->y() == 0) continue;
+
 				if(x.type == "line") {
 					QGraphicsLineItem* l = (QGraphicsLineItem*)i;
-					QLineF chk = l->line();
-					if(x.x == chk.x1() && x.y == chk.y1() && x.height == chk.y2() && x.width == chk.x2() && x.outline == l->pen().color()) continue;
+                    if(x.scenex == l->pos().x() && x.sceney == l->pos().y() && x.outline == l->pen().color()) continue;
                     std::cout << "Something changed about a line item" << std::endl;
 
 					itemStats package(m_board_id, i);
 					m_tracked_items[j] = package;
-					QDataStream socketstream(m_socket);
-                    socketstream.startTransaction();
-					socketstream << package.byteData();
-                    socketstream.commitTransaction();
+
+                    sendItem(package);
+
 				} else if (x.type == "text") {
 					QGraphicsTextItem* t = (QGraphicsTextItem*)i;
 					if(x.x == t->x() && x.y == t->y() && x.outline == t->defaultTextColor() && x.text == t->toPlainText().toStdString()) continue;
@@ -214,96 +360,62 @@ void ProjectScene::checkPos()
 
 					itemStats package(m_board_id, i);
 					m_tracked_items[j] = package;
-					QDataStream socketstream(m_socket);
-                    socketstream.startTransaction();
-					socketstream << package.byteData();
-                    socketstream.commitTransaction();
-				} else {
+
+                    sendItem(package);
+
+                } else if (x.type == "latex") {
+                    QGraphicsPixmapItem* t = (QGraphicsPixmapItem*)i;
+                    if(x.x == t->x() && x.y == t->y() && x.text == t->data(2).toString().toStdString()) continue;
+                    std::cout << "Something changed about a latex item" << std::endl;
+                    itemStats package(m_board_id, i);
+                    m_tracked_items[j] = package;
+
+                    sendItem(package);
+
+                } else if (x.type == "rect" || x.type == "ellipse") {
 					QGraphicsRectItem* r = (QGraphicsRectItem*)i;
-					QRectF chk = r->rect();
-					if(x.x == r->x() && x.y == r->y() && x.width == chk.width() && x.height == chk.height() && x.outline == r->pen().color() && x.fill == r->brush().color()) continue;
+                    QRectF chk = r->rect();
+                    if(x.scenex == r->x() && x.sceney == r->y() && x.width == chk.width() && x.height == chk.height() && x.outline == r->pen().color() && x.fill == r->brush().color()) continue;
+
                     std::cout << "Something changed about a rect/ellipse item" << std::endl;
-					std::cout << x.x << " " << x.y << " " << r->x() << " " << r->y() << std::endl;
+                    std::cout << "Tracker pos / graphics pos: " << x.x << " " << x.y << " " << r->x() << " " << r->y() << std::endl;
+                    std::cout << "Scene pos: " << r->sceneBoundingRect().x() << " " << r->sceneBoundingRect().y() << std::endl;
+
 					itemStats package(m_board_id, i);
-                    package.x = r->x();
-                    package.y = r->y();
-                    std::cout << package.x << " " << package.y <<  " " << package.fill.name().toStdString() <<  std::endl;
 					m_tracked_items[j] = package;
-					std::cout << m_tracked_items[j].x << " " << m_tracked_items[j].y << std::endl;
-					QDataStream socketstream(m_socket);
-                    std::cout << QJsonDocument(package.toJson()).toJson(QJsonDocument::Compact).toStdString() << std::endl;
-                    socketstream.startTransaction();
-					socketstream << package.byteData();
-                    socketstream.commitTransaction();
-				}
+
+                    sendItem(package);
+                } else if (x.type == "arrow") {
+
+                    QGraphicsPolygonItem* a = (QGraphicsPolygonItem*)i;
+                    if(x.scenex == a->pos().x() && x.sceney == a->pos().y() && x.outline == a->pen().color()) continue;
+                    std::cout << "Something changed about an arrow item" << std::endl;
+
+                    itemStats package(m_board_id, i);
+                    m_tracked_items[j] = package;
+                    sendItem(package);
+                } else if (x.type == "bezier") {
+                    QGraphicsPathItem* p = (QGraphicsPathItem*)i;
+                    if(x.scenex == p->pos().x() && x.sceney == p->pos().y() && x.outline == p->pen().color()) continue;
+                    std::cout << "Something changed about a bezier curve" << std::endl;
+
+                    itemStats package(m_board_id, i);
+                    m_tracked_items[j] = package;
+                    sendItem(package);
+                }
 			}
 		}
 	}
 }
 
-void ProjectScene::fullUpdate(std::vector<QJsonObject> objects)
+void ProjectScene::sendItem(itemStats package) //Convenience function to avoid duplicating too much code
 {
-	//This should only be called once, right when the scene boots up, to grab a list of items
-	//from the server itself. That'll catch it up to speed with everything else.
-    for(QJsonObject obj : objects) {
-        QJsonObject d = obj.value("data").toObject();
-        std::string type = obj.value("shape").toString().toStdString();
-        if(type == "line") {
-            QPen pen(QColor(d.value("color").toString()));
-            pen.setWidth(2);
-
-            QJsonObject start = d.value("start").toObject();
-            QJsonObject end = d.value("end").toObject();
-            QLineF line(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
-            QGraphicsLineItem* l = addLine(line, pen);
-            l->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
-            l->setCursor(Qt::PointingHandCursor);
-            l->setData(0, d.value("sid").toInt());
-            l->setData(1, "line");
-
-        } else if (type == "rect") {
-            QPen pen(QColor(d.value("outline_color").toString()));
-            pen.setWidth(2);
-
-            QBrush brush(QColor(d.value("fill_color").toString()));
-            QJsonObject start = d.value("start").toObject();
-            QJsonObject end = d.value("end").toObject();
-            QRectF rect(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
-            QGraphicsRectItem* r = addRect(rect, pen, brush);
-            r->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
-            r->setCursor(Qt::PointingHandCursor);
-            r->setData(0, d.value("sid").toInt());
-            r->setData(1, "rect");
-
-        } else if (type == "ellipse") {
-            QPen pen(QColor(d.value("outline_color").toString()));
-            pen.setWidth(2);
-
-            QBrush brush(QColor(d.value("fill_color").toString()));
-            QJsonObject start = d.value("start").toObject();
-            QJsonObject end = d.value("end").toObject();
-            QRectF rect(start.value("x").toDouble(), start.value("y").toDouble(), end.value("x").toDouble(), end.value("y").toDouble());
-            QGraphicsEllipseItem* e = addEllipse(rect, pen, brush);
-            e->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
-            e->setCursor(Qt::PointingHandCursor);
-            e->setData(0, d.value("sid").toInt());
-            e->setData(1, "ellipse");
-
-        } else if (type == "text") {
-            QString text = d.value("text").toString();
-            QGraphicsTextItem* t = addText(text);
-            QJsonObject start = d.value("start").toObject();
-            t->setPos(start.value("x").toDouble(), start.value("y").toDouble());
-            t->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
-            t->setCursor(Qt::PointingHandCursor);
-            t->setData(0, d.value("sid").toInt());
-            t->setData(1, "text");
-
-        } else if (type == "latex") {
-            std::cout << "CHAD HELP ME" << std::endl;
-        }
-    }
-
+    QDataStream socketstream(m_socket);
+    std::cout << QJsonDocument(package.toJson()).toJson(QJsonDocument::Compact).toStdString() << std::endl;
+    //above cout statement for debugging purposes
+    socketstream.startTransaction();
+    socketstream << package.byteData();
+    socketstream.commitTransaction();
 }
 
 //sends the data about the object that was on the scene to the server. 
@@ -320,46 +432,13 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
     for (QGraphicsItem* i : changed_items) {
 
         if(i->data(0).toInt() == -1) {
-		//Is this a fresh item?
+        //Is this a fresh item?
 		int new_id = trackItem(i);
 		std::cout << "Fresh item! ID: " << new_id << std::endl;
 		//Immediately tracks the item if it's fresh
 		//Sets the ID as well
     }
-         else { /*
-            itemStats checker;
-            for(itemStats j : m_tracked_items) {
-                if(j.id == i->data(0).toInt()) {
-                    checker = j;
-                    break;
-                } //Finds the item with matching ID from the internally tracked things.
-            }
-
-            //This if statement is going to be nasty. All it's going to do is check the item's current state with its last-known state. It does this by checking every variable in the itemStats class against what it presently is in the scene.
-            //It should be accurate to find out which item is changed.
-	    if(i->data(0).toString() != "line") {
-		    QGraphicsRectItem* r = (QGraphicsRectItem*)i;
-		    QRectF chk = r->rect();
-		    if((chk.x() == checker.x) && (chk.y() == checker.y) && (chk.height() == checker.height) && (chk.width() == checker.width)) { 
-			    //If nothing changed... 
-			    //Currently does not check color
-			    continue;
-            	}
-	    } else {
-		    QGraphicsLineItem* l = (QGraphicsLineItem*)i;
-		    QLineF chk = l->line();
-		    if((chk.x1() == checker.x) && (chk.y1() == checker.y) && (chk.y2() == checker.height) && (chk.x2() == checker.width)) { 
-			    continue;
-	    }
-		    //To do:
-		    //The above functions also need to check if the color changed.
-		    //The above if statements will also need to be updated as we add more variables to the item.
-		    //Right now, for whatever reason, the above if statements do not trigger if the item is moved.
-		    //Needs to be debugged.
-
-        } */
-        continue;
-    }
+         else {continue;}
 
 	//So if it's made it to this point, something has changed about
 	//the item. It's time to send it out to the server.
