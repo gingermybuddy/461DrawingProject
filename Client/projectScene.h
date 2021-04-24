@@ -8,6 +8,7 @@
 #include <QString>
 #include <QGraphicsItem>
 #include <QNetworkReply>
+#include <QHostAddress>
 #include <QTimer>
 #include <QTcpSocket>
 #include <string>
@@ -35,6 +36,7 @@ class ProjectScene : public QGraphicsScene
         int trackItem(QGraphicsItem* item);
         void updateCanvas(std::vector<QJsonObject> objects);
         void sendItem(itemStats package);
+        bool connectToBoard(QHostAddress ip, int port, std::string board_id);
 
 		ProjectScene();
 		~ProjectScene();
