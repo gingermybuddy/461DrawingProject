@@ -31,7 +31,8 @@ class ProjectScene : public QGraphicsScene
 		void checkPos();
 		void readSocket();
 		void disconnect();
-	signals:	
+
+    signals:
 	public:
         int trackItem(QGraphicsItem* item);
         void updateCanvas(std::vector<QJsonObject> objects);

@@ -17,6 +17,9 @@ class Window : public QMainWindow //Extension on the base QMainWindow class
 
 	private: //Menus and features of the window
 		ToolBar* m_bar;
+        QToolBar* m_menu_bar;
+        QAction* m_save_img;
+        QAction* m_save_canvas;
 		QDockWidget* m_tool_dock;
 		ProjectScene* m_scene;
 		ProjectView* m_view;

@@ -18,12 +18,14 @@
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QPen>
+#include <QFileDialog>
+#include <QInputDialog>
 
 using namespace std;
 
 ProjectScene::ProjectScene() 
 {
-	setSceneRect(0, 0, 800, 800);
+    //setSceneRect(0, 0, 800, 800);
 }
 
 bool ProjectScene::connectToBoard(QHostAddress ip, int port, std::string board_id)
