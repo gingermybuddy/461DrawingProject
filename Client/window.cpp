@@ -8,6 +8,8 @@
 #include <QLineEdit>
 #include <QDialogButtonBox>
 #include <iostream>
+#include <QFileDialog>
+#include <QCoreApplication>
 
 Window::Window() : QMainWindow()
 {
@@ -40,8 +42,8 @@ void Window::setup_window()
 
     m_tool_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
     connect(m_scene, SIGNAL(changed(const QList<QRectF>&)), m_scene, SLOT(sceneChanged(const QList<QRectF>&)));
-    connect(m_save_img, SIGNAL(triggered()), m_view, SLOT(saveToImage()));
-    connect(m_save_canvas, SIGNAL(triggered()), m_view, SLOT(saveCanvas()));
+    connect(m_save_img, SIGNAL(triggered()), this, SLOT(saveToImage()));
+    connect(m_save_canvas, SIGNAL(triggered()), this, SLOT(saveCanvas()));
     setCentralWidget(m_view);
     addDockWidget(Qt::LeftDockWidgetArea, m_tool_dock);
 }
@@ -106,6 +108,67 @@ void Window::join_canvas()
 
 void Window::load_canvas()
 {
+    QJsonDocument doc;
+    QString fileName= QFileDialog::getOpenFileName(this, "Load file", QCoreApplication::applicationDirPath(), "Project Files (*.cmsc)" );
+    if (!fileName.isNull()) {
+        QFile jsonFile(fileName);
+        jsonFile.open(QFile::ReadOnly);
+        doc = QJsonDocument(QJsonDocument::fromJson(jsonFile.readAll()));
+    } else {
+        return;
+    }
+
+    QDialog params_window(this);
+    QFormLayout submit(&params_window);
+    QLineEdit* ip = new QLineEdit(&params_window);
+    QLineEdit* port = new QLineEdit(&params_window);
+    QLineEdit* board_id = new QLineEdit(&params_window);
+
+    submit.addRow(tr("IP:"), ip);
+    submit.addRow(tr("Port:"), port);
+    submit.addRow(tr("Board ID:"), board_id);
+    QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &params_window);
+    submit.addRow(&buttons);
+    QObject::connect(&buttons, SIGNAL(accepted()), &params_window, SLOT(accept()));
+    QObject::connect(&buttons, SIGNAL(rejected()), &params_window, SLOT(reject()));
+
+    if(params_window.exec() == QDialog::Accepted) {
+        setup_window();
+        QHostAddress host;
+        if(ip->text() == "localhost") {
+            host = QHostAddress::LocalHost;
+        } else {
+            host = QHostAddress(ip->text());
+        }
+        if(!m_scene->connectToBoard(host, port->text().toInt(), board_id->text().toStdString())) {
+            QDialog error(this);
+            error.setWindowTitle("Failed");
+            QFormLayout errorlayout(&error);
+            QLabel* errormsg = new QLabel("Could not connect to the server. Would you like to load this canvas in offline mode?");
+            errorlayout.addRow(errormsg);
+            QDialogButtonBox ebuttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &error);
+            errorlayout.addRow(&ebuttons);
+            QObject::connect(&ebuttons, SIGNAL(accepted()), &error, SLOT(accept()));
+            QObject::connect(&ebuttons, SIGNAL(rejected()), &error, SLOT(reject()));
+
+            if(error.exec() == QDialog::Accepted) {
+                m_start_menu->close();
+                m_scene->loadFile(doc);
+                this->show();
+            } else {
+                delete m_scene;
+                delete m_view;
+                delete m_bar;
+                delete m_tool_dock;
+            }
+        } else {
+            m_start_menu->close();
+            this->show();
+        }
+    }
+    delete ip;
+    delete port;
+    delete board_id;
 
 }
 
@@ -189,3 +252,27 @@ void Window::popup()
 	//Pretty much what it says on the tin.
 }
 
+void Window::saveToImage()
+{
+    QString fileName= QFileDialog::getSaveFileName(this, "Save image", QCoreApplication::applicationDirPath(), "BMP Files (*.bmp);;JPEG (*.JPEG);;PNG (*.png)" );
+        if (!fileName.isNull())
+        {
+            QImage image(m_scene->sceneRect().size().toSize(), QImage::Format_ARGB32);
+            QPainter painter(&image);
+            painter.setRenderHint(QPainter::Antialiasing);
+            m_scene->render(&painter);
+            image.save(fileName);
+        }
+}
+
+void Window::saveCanvas()
+{
+    QJsonDocument doc(m_scene->exportToFile());
+    QString fileName= QFileDialog::getSaveFileName(this, "Save canvas", QCoreApplication::applicationDirPath(), "Project Files (*.cmsc)");
+        if (!fileName.isNull())
+        {
+            QFile jsonFile(fileName);
+            jsonFile.open(QFile::WriteOnly);
+            jsonFile.write(doc.toJson());
+        }
+}

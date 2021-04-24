@@ -38,6 +38,8 @@ class ProjectScene : public QGraphicsScene
         void updateCanvas(std::vector<QJsonObject> objects);
         void sendItem(itemStats package);
         bool connectToBoard(QHostAddress ip, int port, std::string board_id);
+        QJsonObject exportToFile();
+        void loadFile(QJsonDocument doc);
 
 		ProjectScene();
 		~ProjectScene();

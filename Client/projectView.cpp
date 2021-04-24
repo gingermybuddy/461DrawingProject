@@ -327,21 +327,3 @@ void ProjectView::mouseReleaseEvent(QMouseEvent *event)
 	//Set up color selection so it takes a color parameter (or takes whatever color is currently selected according to some var in ProjectView)
 
 }
-
-void ProjectView::saveToImage()
-{
-    QString fileName= QFileDialog::getSaveFileName(this, "Save image", QCoreApplication::applicationDirPath(), "BMP Files (*.bmp);;JPEG (*.JPEG);;PNG (*.png)" );
-        if (!fileName.isNull())
-        {
-            QImage image(scene()->sceneRect().size().toSize(), QImage::Format_ARGB32);
-            QPainter painter(&image);
-            painter.setRenderHint(QPainter::Antialiasing);
-            scene()->render(&painter);
-            image.save(fileName);
-        }
-}
-
-void ProjectView::saveCanvas()
-{
-
-}

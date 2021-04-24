@@ -452,3 +452,26 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
     socketstream.commitTransaction();
     	}
 }
+
+QJsonObject ProjectScene::exportToFile()
+{
+    QJsonObject returnval;
+    for(QGraphicsItem* i : items()) {
+        itemStats item = itemStats(m_board_id, i);
+        returnval.insert(QString::number(item.id), item.toJson());
+    }
+    return returnval;
+}
+
+void ProjectScene::loadFile(QJsonDocument doc)
+{
+    QJsonObject obj = doc.object();
+    std::vector<QJsonObject> shapes;
+    foreach(QString str, obj.keys()) {
+        shapes.push_back(obj.value(str).toObject());
+    }
+    updateCanvas(shapes);
+    for(QGraphicsItem* i : items()){
+        m_tracked_items.push_back(itemStats(m_board_id, i));
+    }
+}
