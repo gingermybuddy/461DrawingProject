@@ -18,7 +18,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # Input
-HEADERS += ProjectView.h ProjectScene.h toolBar.h itemStats.h window.h
-SOURCES += main.cpp ProjectView.cpp ProjectScene.cpp toolBar.cpp itemStats.cpp window.cpp
+HEADERS += ProjectView.h ProjectScene.h toolBar.h itemStats.h window.h \
+    StartWindow.h
+SOURCES += main.cpp ProjectView.cpp ProjectScene.cpp toolBar.cpp itemStats.cpp window.cpp \
+    StartWindow.cpp
 QT += gui widgets 
 QT += network

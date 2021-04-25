@@ -10,4 +10,10 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES +=  tst_servershapetest.cpp
+SOURCES +=  \
+    TestServer.cpp \
+    mian.cpp
+
+HEADERS += \
+    TestServer.h
+    ../Server.h

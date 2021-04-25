@@ -18,8 +18,7 @@ class ProjectView : public QGraphicsView
                 //QBrush m_fill;
 
         QPointF firstClick;
-	private slots:
-
+    public slots:
 	public:
         int get_m_tool();
         int get_m_color_r();

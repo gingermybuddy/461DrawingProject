@@ -18,44 +18,49 @@
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QPen>
+#include <QFileDialog>
+#include <QInputDialog>
 
 using namespace std;
 
 ProjectScene::ProjectScene() 
 {
-	setSceneRect(0, 0, 800, 800);
+    //setSceneRect(0, 0, 800, 800);
+}
 
-	//Sets up the socket that will be connected to the server.
-        m_socket = new QTcpSocket(this);
-	m_timer = new QTimer(this);
-	connect(m_timer, SIGNAL(timeout()), this, SLOT(checkPos()));
-	m_timer->start(2000);
-	
-	//Connects signals from the socket to functions on the client.
-	//readyRead signals that the socket has received data and is ready
-	//to read it. Disconnect is exactly what it says on the tin.
-	connect(m_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
-	connect(m_socket, SIGNAL(disconnected()), this, SLOT(disconnect()));
+bool ProjectScene::connectToBoard(QHostAddress ip, int port, std::string board_id)
+{
+    //Sets up the socket that will be connected to the server.
+    m_socket = new QTcpSocket(this);
+    m_timer = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(checkPos()));
+    m_timer->start(2000);
 
-	//Connects the socket to the host. Host IP and port are currently fixed,
-	//but we can set them to variables later.
-        m_socket->connectToHost(QHostAddress::LocalHost, 5000);
+    //Connects signals from the socket to functions on the client.
+    //readyRead signals that the socket has received data and is ready
+    //to read it. Disconnect is exactly what it says on the tin.
+    connect(m_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
+    connect(m_socket, SIGNAL(disconnected()), this, SLOT(disconnect()));
+
+    //Connects the socket to the host. Host IP and port are currently fixed,
+    //but we can set them to variables later.
+        m_socket->connectToHost(ip, port);
         if(m_socket->waitForConnected()){
                 std::cout << "Connected." << std::endl;
         } else {
-		std::cout << "Failed to connect to server." << std::endl;
-	}
-	//Board ID is also fixed right now.
-	m_board_id = "CMSC461";
+        std::cout << "Failed to connect to server." << std::endl;
+        return false;
+    }
+    m_board_id = board_id;
 
-	QByteArray request;
-	QString fup = "fullUpdate";
-	QDataStream sockstream(m_socket);
-	request = fup.toUtf8();
-	sockstream << request;
-
-
+    QByteArray request;
+    QString fup = "fullUpdate";
+    QDataStream sockstream(m_socket);
+    request = fup.toUtf8();
+    sockstream << request;
+    return true;
 }
+
 ProjectScene::~ProjectScene() 
 {
 	delete m_socket;
@@ -124,13 +129,7 @@ void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
         bool found = false;
         for(QGraphicsItem* i : items()) {
             if(obj.value("data").toObject().value("sid").toInt() == i->data(0).toInt()) {
-                if (i->data(1) == "arrow") {
-                    QGraphicsPolygonItem* header = (QGraphicsPolygonItem*)i->data(3).toULongLong();
-                    delete header;
-                }
-
                 //Time to check what might have changed...
-
                 if(newx != i->x() || newy != i->y()) {
                     i->setPos(newx, newy);
                 }
@@ -295,11 +294,15 @@ void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
                 qreal midx = (x+x2)/2;
                 qreal midy = (y+y2)/2;
 
-                qreal tempx = x2-midx;
-                qreal tempy = y2-midy;
+                qreal slopex = x2-midx;
+                qreal slopey = y2-midy;
 
-                qreal cx = midx - tempy;
-                qreal cy = midy + tempx;
+                qreal cx = midx - 25*sin(atan(slopey/slopex));
+                qreal cy = midy + 25*cos(atan(slopey/slopex));
+
+                if (x2 < x){
+                    cy = midy - 25*cos(atan(slopey/slopex));
+                }
 
                 // XXX do transformation
                 path.quadTo(cx, cy ,x2,y2);
@@ -448,4 +451,27 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 	socketstream << data;
     socketstream.commitTransaction();
     	}
+}
+
+QJsonObject ProjectScene::exportToFile()
+{
+    QJsonObject returnval;
+    for(QGraphicsItem* i : items()) {
+        itemStats item = itemStats(m_board_id, i);
+        returnval.insert(QString::number(item.id), item.toJson());
+    }
+    return returnval;
+}
+
+void ProjectScene::loadFile(QJsonDocument doc)
+{
+    QJsonObject obj = doc.object();
+    std::vector<QJsonObject> shapes;
+    foreach(QString str, obj.keys()) {
+        shapes.push_back(obj.value(str).toObject());
+    }
+    updateCanvas(shapes);
+    for(QGraphicsItem* i : items()){
+        m_tracked_items.push_back(itemStats(m_board_id, i));
+    }
 }
