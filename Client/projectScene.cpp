@@ -25,6 +25,7 @@ using namespace std;
 
 ProjectScene::ProjectScene() 
 {
+    m_starting_file = nullptr;
     //setSceneRect(0, 0, 800, 800);
 }
 
@@ -52,12 +53,17 @@ bool ProjectScene::connectToBoard(QHostAddress ip, int port, std::string board_i
         return false;
     }
     m_board_id = board_id;
+    QJsonObject boardcon;
+    boardcon.insert("board_connection", QJsonValue(QString::fromStdString(board_id)));
 
-    QByteArray request;
-    QString fup = "fullUpdate";
+    if(m_starting_file != nullptr) {
+        QJsonDocument loader = *m_starting_file;
+        boardcon.insert("load_file", QJsonValue(loader.object()));
+    }
+    QByteArray boardreq = QJsonDocument(boardcon).toJson();
     QDataStream sockstream(m_socket);
-    request = fup.toUtf8();
-    sockstream << request;
+
+    sockstream << boardreq;
     return true;
 }
 
@@ -89,6 +95,10 @@ void ProjectScene::readSocket()
 	QJsonValue fup = obj.value("fullUpdate");
 	if(fup.toString() == "test") {
 		std::cout << "This is a full update; we should parse this." << std::endl;
+        if(m_starting_file != nullptr) {
+            emit file_already_loaded();
+            return;
+        }
         obj.remove("fullUpdate");
         std::vector<QJsonObject> shapes;
         foreach(QString str, obj.keys()) {
@@ -465,6 +475,7 @@ QJsonObject ProjectScene::exportToFile()
 
 void ProjectScene::loadFile(QJsonDocument doc)
 {
+    m_starting_file = new QJsonDocument(doc);
     QJsonObject obj = doc.object();
     std::vector<QJsonObject> shapes;
     foreach(QString str, obj.keys()) {

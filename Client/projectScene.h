@@ -26,6 +26,8 @@ class ProjectScene : public QGraphicsScene
 		std::string m_board_id;
 		QTimer* m_timer;
 
+        QJsonDocument* m_starting_file;
+
 	public slots:
 		void sceneChanged(const QList<QRectF> &region);
 		void checkPos();
@@ -33,6 +35,8 @@ class ProjectScene : public QGraphicsScene
 		void disconnect();
 
     signals:
+        void file_already_loaded();
+
 	public:
         int trackItem(QGraphicsItem* item);
         void updateCanvas(std::vector<QJsonObject> objects);
