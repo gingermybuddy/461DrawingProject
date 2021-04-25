@@ -35,6 +35,8 @@ class Window : public QMainWindow //Extension on the base QMainWindow class
         void load_canvas();
         void saveToImage();
         void saveCanvas();
+        void fileLoadingError();
+
 	public:
         ToolBar* get_m_bar();
         QDockWidget* get_m_tool_dock();

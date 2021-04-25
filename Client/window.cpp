@@ -44,6 +44,8 @@ void Window::setup_window()
     connect(m_scene, SIGNAL(changed(const QList<QRectF>&)), m_scene, SLOT(sceneChanged(const QList<QRectF>&)));
     connect(m_save_img, SIGNAL(triggered()), this, SLOT(saveToImage()));
     connect(m_save_canvas, SIGNAL(triggered()), this, SLOT(saveCanvas()));
+    connect(m_scene, SIGNAL(file_already_loaded()), this, SLOT(fileLoadingError()));
+    connect(m_view, SIGNAL(itemDeleted(int)), m_scene, SLOT(deleteItem(int)));
     setCentralWidget(m_view);
     addDockWidget(Qt::LeftDockWidgetArea, m_tool_dock);
 }
@@ -134,6 +136,7 @@ void Window::load_canvas()
 
     if(params_window.exec() == QDialog::Accepted) {
         setup_window();
+        m_scene->loadFile(doc);
         QHostAddress host;
         if(ip->text() == "localhost") {
             host = QHostAddress::LocalHost;
@@ -153,13 +156,14 @@ void Window::load_canvas()
 
             if(error.exec() == QDialog::Accepted) {
                 m_start_menu->close();
-                m_scene->loadFile(doc);
                 this->show();
             } else {
                 delete m_scene;
                 delete m_view;
                 delete m_bar;
                 delete m_tool_dock;
+                delete m_save_img;
+                delete m_save_canvas;
             }
         } else {
             m_start_menu->close();
@@ -215,6 +219,8 @@ void Window::create_canvas()
                 delete m_view;
                 delete m_bar;
                 delete m_tool_dock;
+                delete m_save_img;
+                delete m_save_canvas;
             }
         } else {
             m_start_menu->close();
@@ -226,6 +232,21 @@ void Window::create_canvas()
     delete board_id;
 }
 
+void Window::fileLoadingError()
+{
+    QMessageBox errormsg;
+    errormsg.setWindowTitle("Error loading file");
+    errormsg.setText("The file could not be loaded because the board you are trying to load it to already exists. Please try again with a different name.");
+    errormsg.exec();
+    delete m_scene;
+    delete m_view;
+    delete m_bar;
+    delete m_tool_dock;
+    delete m_save_img;
+    delete m_save_canvas;
+    show_start();
+    this->hide();
+}
 ToolBar* Window::get_m_bar()
 {
     return m_bar;

@@ -25,6 +25,8 @@ using namespace std;
 
 ProjectScene::ProjectScene() 
 {
+    m_starting_file = nullptr;
+    id_increment = 0;
     //setSceneRect(0, 0, 800, 800);
 }
 
@@ -52,12 +54,17 @@ bool ProjectScene::connectToBoard(QHostAddress ip, int port, std::string board_i
         return false;
     }
     m_board_id = board_id;
+    QJsonObject boardcon;
+    boardcon.insert("board_connection", QJsonValue(QString::fromStdString(board_id)));
 
-    QByteArray request;
-    QString fup = "fullUpdate";
+    if(m_starting_file != nullptr) {
+        QJsonDocument loader = *m_starting_file;
+        boardcon.insert("load_file", QJsonValue(loader.object()));
+    }
+    QByteArray boardreq = QJsonDocument(boardcon).toJson();
     QDataStream sockstream(m_socket);
-    request = fup.toUtf8();
-    sockstream << request;
+
+    sockstream << boardreq;
     return true;
 }
 
@@ -89,16 +96,41 @@ void ProjectScene::readSocket()
 	QJsonValue fup = obj.value("fullUpdate");
 	if(fup.toString() == "test") {
 		std::cout << "This is a full update; we should parse this." << std::endl;
+        if(m_starting_file != nullptr) {
+            emit file_already_loaded();
+            return;
+        }
         obj.remove("fullUpdate");
+
+        int largest_id = 0;
         std::vector<QJsonObject> shapes;
         foreach(QString str, obj.keys()) {
             shapes.push_back(obj.value(str).toObject());
         }
         updateCanvas(shapes);
         for(QGraphicsItem* i : items()){
+            if(i->data(0).toInt() > largest_id){
+                largest_id = i->data(0).toInt();
+            }
             m_tracked_items.push_back(itemStats(m_board_id, i));
+            id_increment = largest_id;
         }
 		return;
+    }
+
+    if(obj.value("delete_item") != QJsonValue::Undefined) {
+        int del_id = obj.value("delete_item").toInt();
+        for(auto it = m_tracked_items.begin(); it != m_tracked_items.end(); ++it) {
+            if(it->id == del_id) {
+                m_tracked_items.erase(it);
+            }
+        }
+        for(QGraphicsItem* i : items()) {
+            if(i->data(0).toInt() == del_id) {
+                delete i;
+            }
+        }
+        return;
     }
     //If it's not a full update it's just some kind of other shape update
     //Either a new shape got added or an existing one is updated.
@@ -322,15 +354,34 @@ int ProjectScene::trackItem(QGraphicsItem* item)
 {
 
 	QString type = item->data(1).toString();
-	int id = m_tracked_items.size();
-	item->setData(0, id);
+    ++id_increment;
+    item->setData(0, id_increment);
     itemStats tracker = itemStats(m_board_id, item);
     m_tracked_items.push_back(tracker);
     cout << "TRACKER \n" << "QGraphicsItem pos: " << item->x() << " " << item->y() << endl;
     cout << "ItemStats pos: " << tracker.x << " " << tracker.y << endl;
     //item->setPos(tracker.x, tracker.y);
-	return id;
+    return id_increment;
 	//Returns the id of the newly-tracked item.
+}
+
+void ProjectScene::deleteItem(int did)
+{
+    for(auto it = m_tracked_items.begin(); it != m_tracked_items.end(); ++it) {
+        if(it->id == did) {
+            m_tracked_items.erase(it);
+            QJsonObject deldata;
+            deldata.insert("delete", QJsonValue(did));
+            deldata.insert("del_board_id", QJsonValue(QString::fromStdString(m_board_id)));
+
+            QByteArray delreq = QJsonDocument(deldata).toJson();
+            QDataStream socketstream(m_socket);
+            socketstream.startTransaction();
+            socketstream << deldata;
+            socketstream.commitTransaction();
+
+        }
+    }
 }
 
 void ProjectScene::checkPos()
@@ -465,6 +516,7 @@ QJsonObject ProjectScene::exportToFile()
 
 void ProjectScene::loadFile(QJsonDocument doc)
 {
+    m_starting_file = new QJsonDocument(doc);
     QJsonObject obj = doc.object();
     std::vector<QJsonObject> shapes;
     foreach(QString str, obj.keys()) {

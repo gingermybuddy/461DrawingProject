@@ -7,18 +7,19 @@
 #include <stdio.h>
 #include <string>
 
-Server::Server() : QMainWindow()
+using namespace std;
+
+Server::Server(int port) : QMainWindow()
 {
 	//Sets up the server itself.
 	m_server = new QTcpServer();
 
 	//Sets up the address and port number to listen on.
-
-
+    m_port = port;
 	//Both numbers are currently fixed, but we can make it
 	//an input later.
-	if(m_server->listen(QHostAddress::LocalHost, 5000)) {
-		std::cout << "Server is listening." << std::endl;
+    if(m_server->listen(QHostAddress::LocalHost, port)) {
+        std::cout << "Server is listening on port " << port << std::endl;
 	}
 	else {
 		std::cout << "Failed." << std::endl;
@@ -117,11 +118,11 @@ void Server::readSocket()
 		std::cout << "Awaiting additional data." << std::endl;
 		return;
 	}
+
     if(buf.toStdString() == "createBoard"){
         createBoard(socket);
     } else if (buf.toStdString() == "fullUpdate") {
-        std::cout << "Full update requested!" << std::endl;
-        fullUpdate("CMSC461.db", socket);
+        std::cout << "Full update requested on board!" << std::endl;
         return;
     }
 	//If it gets to here, the data has been received and is
@@ -134,19 +135,85 @@ void Server::readSocket()
 
 	QJsonDocument doc = QJsonDocument::fromJson(buf);
 	QJsonObject obj = doc.object();
+
+    //Creates a new board if the board does not exist
+    if(obj.value("board_connection") == QJsonValue::Undefined) {
+      cout << "not a fresh connection" << endl;
+
+    } else if(m_boards.count(obj.value("board_connection").toString().toStdString()) == 0) {
+        string b = obj.value("board_connection").toString().toStdString();
+        m_boards[b] = new vector<QJsonObject>;
+        m_connected_to_board[b].push_back(socket);
+        cout << "Client " << socket->socketDescriptor() << " has created and connected to board " << b << ". " << endl;
+
+        if(obj.value("load_file") != QJsonValue::Undefined) {
+            cout << "Client has also loaded a file for their new board." << endl;
+            QJsonObject loader = obj.value("load_file").toObject();
+            foreach(QString str, loader.keys()) {
+                m_boards[b]->push_back(loader.value(str).toObject());
+            }
+        }
+        return;
+
+    } else if (m_boards.count(obj.value("board_connection").toString().toStdString()) == 1) {
+        string b = obj.value("board_connection").toString().toStdString();
+        m_connected_to_board[b].push_back(socket);
+        cout << "Client " << socket->socketDescriptor() << " has connected to board " << b << ". " << endl;
+        if(obj.value("load_file") != QJsonValue::Undefined) {
+            cout << "Client also attempted to load a file for their connection, but the board already exists." << endl;
+        }
+        fullUpdate(obj.value("board_connection").toString(), socket);
+        return;
+    }
+
     std::cout << "Received: " << QJsonDocument(obj).toJson(QJsonDocument::Compact).toStdString() << std::endl;
+
+    if(obj.value("delete") != QJsonValue::Undefined) {
+        cout << "Item with id " << obj.value("delete").toInt() << " needs to be deleted." << endl;
+        if(m_boards.count(obj.value("del_board_id").toString().toStdString()) != 1) {
+            cout << "...but the board it's being deleted from does not exist. Ignoring." << endl;
+            return;
+        }
+        vector<QJsonObject>* delboard_shapes = m_boards[obj.value("del_board_id").toString().toStdString()];
+        for(auto it = delboard_shapes->begin(); it != delboard_shapes->end(); ++it) {
+            if(it->value("data").toObject().value("sid").toInt() == obj.value("delete").toInt()) {
+                delboard_shapes->erase(it);
+                cout << "Deleted item " << obj.value("delete").toInt() << " from board " << obj.value("del_board_id").toString().toStdString() << endl;
+                for(QTcpSocket* socker : m_connected_to_board[obj.value("del_board_id").toString().toStdString()]) {
+                    QJsonObject delmsg;
+                    delmsg.insert("delete_item", obj.value("delete").toInt());
+                    QByteArray delbuf = QJsonDocument(delmsg).toJson();
+                    QDataStream sockstream(socker);
+                    sockstream.startTransaction();
+                    sockstream << delbuf;
+                    sockstream.commitTransaction();
+                }
+                return;
+            }
+        }
+    }
     bool found = false;
-    for(int i = 0; i < m_shapes.size(); ++i){
-        if(obj.value("data").toObject().value("sid").toInt() == m_shapes[i].value("data").toObject().value("sid").toInt()) {
-            m_shapes[i] = obj;
+    string incoming_board_id;
+    if(m_boards.count(obj.value("data").toObject().value("bid").toString().toStdString()) == 1) {
+        incoming_board_id = obj.value("data").toObject().value("bid").toString().toStdString();
+    } else {
+        cout << "Board from this object doesn't exist. Ignoring." << endl;
+        return;
+    }
+    //Finds the board that the object is on
+    vector<QJsonObject>* board_shapes = m_boards[incoming_board_id];
+
+    for(int i = 0; i < board_shapes->size(); ++i){
+        if(obj.value("data").toObject().value("sid").toInt() == board_shapes->at(i).value("data").toObject().value("sid").toInt()) {
+            board_shapes->at(i) = obj;
             found = true;
             break;
         }
     }
     if(!found) {
-        m_shapes.push_back(obj);
+        board_shapes->push_back(obj);
     }
-    for(QTcpSocket* sock : connected) {
+    for(QTcpSocket* sock : m_connected_to_board[incoming_board_id]) {
         if (sock == socket) continue;
         QJsonDocument sent_doc(obj);
         QByteArray package = sent_doc.toJson();
@@ -157,7 +224,8 @@ void Server::readSocket()
         sockstream << package;
         sockstream.commitTransaction();
     }
-    std::cout << m_shapes.size() << std::endl;
+    std::cout << board_shapes->size() << std::endl;
+    //Sends out any board updates to all clients connected to said board
 
     QSqlQuery inserter;
 	QJsonValue type = obj.value("shape");
@@ -444,9 +512,11 @@ void Server::fullUpdate(QString databasename, QTcpSocket* socket)
         std::cout << " added" << std::endl;
         full_board.insert(QString::number(temp.id), temp.toJson());
     }*/
+    vector<QJsonObject>* board_shapes = m_boards[databasename.toStdString()];
 
-    std::cout << m_shapes.size() << std::endl;
-    for (QJsonObject j : m_shapes) {
+    std::cout << board_shapes->size() << std::endl;
+    for (int i = 0; i < board_shapes->size(); ++i) {
+        QJsonObject j = board_shapes->at(i);
         std::cout << QJsonDocument(j).toJson(QJsonDocument::Compact).toStdString() << std::endl;
         QJsonObject data = j.value("data").toObject();
         int id = data.value("sid").toInt();
