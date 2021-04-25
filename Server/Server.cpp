@@ -167,6 +167,31 @@ void Server::readSocket()
     }
 
     std::cout << "Received: " << QJsonDocument(obj).toJson(QJsonDocument::Compact).toStdString() << std::endl;
+
+    if(obj.value("delete") != QJsonValue::Undefined) {
+        cout << "Item with id " << obj.value("delete").toInt() << " needs to be deleted." << endl;
+        if(m_boards.count(obj.value("del_board_id").toString().toStdString()) != 1) {
+            cout << "...but the board it's being deleted from does not exist. Ignoring." << endl;
+            return;
+        }
+        vector<QJsonObject>* delboard_shapes = m_boards[obj.value("del_board_id").toString().toStdString()];
+        for(auto it = delboard_shapes->begin(); it != delboard_shapes->end(); ++it) {
+            if(it->value("data").toObject().value("sid").toInt() == obj.value("delete").toInt()) {
+                delboard_shapes->erase(it);
+                cout << "Deleted item " << obj.value("delete").toInt() << " from board " << obj.value("del_board_id").toString().toStdString() << endl;
+                for(QTcpSocket* socker : m_connected_to_board[obj.value("del_board_id").toString().toStdString()]) {
+                    QJsonObject delmsg;
+                    delmsg.insert("delete_item", obj.value("delete").toInt());
+                    QByteArray delbuf = QJsonDocument(delmsg).toJson();
+                    QDataStream sockstream(socker);
+                    sockstream.startTransaction();
+                    sockstream << delbuf;
+                    sockstream.commitTransaction();
+                }
+                return;
+            }
+        }
+    }
     bool found = false;
     string incoming_board_id;
     if(m_boards.count(obj.value("data").toObject().value("bid").toString().toStdString()) == 1) {
@@ -175,7 +200,6 @@ void Server::readSocket()
         cout << "Board from this object doesn't exist. Ignoring." << endl;
         return;
     }
-
     //Finds the board that the object is on
     vector<QJsonObject>* board_shapes = m_boards[incoming_board_id];
 

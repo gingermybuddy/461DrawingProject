@@ -23,6 +23,7 @@ class ProjectScene : public QGraphicsScene
 	private:
 		QTcpSocket* m_socket;
 		std::vector<itemStats> m_tracked_items;
+        int id_increment;
 		std::string m_board_id;
 		QTimer* m_timer;
 
@@ -33,6 +34,7 @@ class ProjectScene : public QGraphicsScene
 		void checkPos();
 		void readSocket();
 		void disconnect();
+        void deleteItem(int id);
 
     signals:
         void file_already_loaded();

@@ -45,6 +45,7 @@ void Window::setup_window()
     connect(m_save_img, SIGNAL(triggered()), this, SLOT(saveToImage()));
     connect(m_save_canvas, SIGNAL(triggered()), this, SLOT(saveCanvas()));
     connect(m_scene, SIGNAL(file_already_loaded()), this, SLOT(fileLoadingError()));
+    connect(m_view, SIGNAL(itemDeleted(int)), m_scene, SLOT(deleteItem(int)));
     setCentralWidget(m_view);
     addDockWidget(Qt::LeftDockWidgetArea, m_tool_dock);
 }

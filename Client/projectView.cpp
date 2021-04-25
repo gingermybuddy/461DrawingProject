@@ -327,3 +327,15 @@ void ProjectView::mouseReleaseEvent(QMouseEvent *event)
 	//Set up color selection so it takes a color parameter (or takes whatever color is currently selected according to some var in ProjectView)
 
 }
+
+void ProjectView::keyPressEvent(QKeyEvent* event)
+{
+    if(event->key() == Qt::Key_Delete) {
+        QList<QGraphicsItem*> selected = scene()->selectedItems();
+        for(QGraphicsItem* i : selected) {
+            int id = i->data(0).toInt();
+            delete i;
+            emit itemDeleted(id);
+        }
+    }
+}
