@@ -551,11 +551,13 @@ void Server::createBoard(QTcpSocket* socket)
     //bid = Board ID
     //sid = Shape ID
     //cid = Client/User ID
-    dbQuery->exec("CREATE TABLE Ellipse (bid string, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
-    dbQuery->exec("CREATE TABLE Line (bid string, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
-    dbQuery->exec("CREATE TABLE Rect (bid string, sid int, x int, y int, width int, height int, fill string, outline string, cid int);");
-    dbQuery->exec("CREATE TABLE Latex (bid string, sid int, x int, y int, code string, color string, cid int;");
-    dbQuery->exec("CREATE TABLE Text (bid string, sid int, x int, y int, code string, color string, cid int;");
+	//(bid, scenePosX, scenePosY, sid, x1, x2, y1, y2, fill, outline, cid) 
+    dbQuery->exec("CREATE TABLE Ellipse (bid string, scenePosX double, scenePosY double, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
+    dbQuery->exec("CREATE TABLE Line (bid string, scenePosX double, scenePosY double, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
+    dbQuery->exec("CREATE TABLE Arrow (bid string, scenePosX double, scenePosY double, sid int, x1 int, x2 int, y1 int, y2 int, fill string, outline string, cid int);");
+    dbQuery->exec("CREATE TABLE Rect (bid string, scenePosX double, scenePosY double, sid int, x int, y int, width int, height int, fill string, outline string, cid int);");
+    dbQuery->exec("CREATE TABLE Latex (bid string, scenePosX double, scenePosY double, sid int, x int, y int, code string, color string, cid int;");
+    dbQuery->exec("CREATE TABLE Text (bid string, scenePosX double, scenePosY double, sid int, x int, y int, code string, color string, cid int;");
 
     ownedDB newDB;
     newDB.id = socket->socketDescriptor();
@@ -574,55 +576,121 @@ void Server::saveDB(QTcpSocket* socket)
 	everything.append("[\n");
 
 	std::string board = "CMSC461";
-	QSqlQuery elQuery("SELECT * FROM Ellipse");
-	while(elQuery.next()){
+	QSqlQuery circle_query("SELECT * FROM Ellipse");
+	while(circle_query.next()){
+        	std::string bid = circle_query.value(0).toString().toStdString();
+        	qreal scenex = circle_query.value(1).toDouble();
+        	qreal sceney = circle_query.value(2).toDouble();
 		std::string shape = "ellipse";
-        QByteArray data = itemStats(board,shape,elQuery.value(1).toInt(),elQuery.value(2).toDouble(),elQuery.value(3).toDouble(),elQuery.value(4).toDouble(),elQuery.value(5).toDouble(),elQuery.value(9).toDouble(),elQuery.value(10).toDouble(),QColor(elQuery.value(6).toString()),QColor(elQuery.value(7).toString())).byteData();
+		int sid = circle_query.value(3).toInt();
+		double x1 = circle_query.value(4).toDouble();
+        	double x2 = circle_query.value(5).toDouble();
+        	double y1 = circle_query.value(6).toDouble();
+		double y2 = circle_query.value(7).toDouble();
+		QColor fillColor = QColor(circle_query.value(8).toString());
+		QColor outlineColor = QColor(circle_query.value(9).toString());
+        	QByteArray data = itemStats(bid, shape, sid, x1, y1, x2, y2, scenex, sceney, fillColor, outlineColor).byteData();
+//		std::string shape = "ellipse";
+//      	QByteArray data = itemStats(board,shape,elQuery.value(1).toInt(),elQuery.value(2).toDouble(),elQuery.value(3).toDouble(),elQuery.value(4).toDouble(),elQuery.value(5).toDouble(),elQuery.value(9).toDouble(),elQuery.value(10).toDouble(),QColor(elQuery.value(6).toString()),QColor(elQuery.value(7).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
 	}
 
-	QSqlQuery liQuery("SELECT * FROM Line");
-	while(liQuery.next()){
+	QSqlQuery line_query("SELECT * FROM Line");
+	while(line_query.next()){
+        	std::string bid = line_query.value(0).toString().toStdString();
+        	qreal scenex = line_query.value(1).toDouble();
+        	qreal sceney = line_query.value(2).toDouble();
 		std::string shape = "line";
-        QByteArray data = itemStats(board,shape,liQuery.value(1).toInt(),liQuery.value(2).toDouble(),liQuery.value(3).toDouble(),liQuery.value(4).toDouble(),liQuery.value(5).toDouble(),liQuery.value(9).toDouble(),liQuery.value(10).toDouble(),QColor(liQuery.value(7).toString())).byteData();
+		int sid = line_query.value(3).toInt();
+		double x1 = line_query.value(4).toDouble();
+		double x2 = line_query.value(5).toDouble();
+		double y1 = line_query.value(6).toDouble();
+		double y2 = line_query.value(7).toDouble();
+		QColor outlineColor = QColor(line_query.value(8).toString());
+        	QByteArray data = itemStats(bid, shape, sid, x1, y1, x2, y2, scenex, sceney, outlineColor).byteData();
+//		std::string shape = "line";
+//        	QByteArray data = itemStats(board,shape,liQuery.value(1).toInt(),liQuery.value(2).toDouble(),liQuery.value(3).toDouble(),liQuery.value(4).toDouble(),liQuery.value(5).toDouble(),liQuery.value(9).toDouble(),liQuery.value(10).toDouble(),QColor(liQuery.value(7).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
 	}
 
-	QSqlQuery reQuery("SELECT * FROM Rect");
-	while(reQuery.next()){
+	QSqlQuery rect_query("SELECT * FROM Rect");
+	while(rect_query.next()){
+        	std::string bid = rect_query.value(0).toString().toStdString();
+        	qreal scenex = rect_query.value(1).toDouble();
+        	qreal sceney = rect_query.value(2).toDouble(); //Add these to the SQL stuff...
 		std::string shape = "rect";
-        QByteArray data = itemStats(board,shape,reQuery.value(1).toInt(),reQuery.value(2).toDouble(),reQuery.value(3).toDouble(),reQuery.value(4).toDouble(),reQuery.value(5).toDouble(),reQuery.value(9).toDouble(),reQuery.value(10).toDouble(),QColor(reQuery.value(6).toString()),QColor(reQuery.value(7).toString())).byteData();
+		int sid = rect_query.value(3).toInt();
+		double x1 = rect_query.value(4).toDouble();
+        	double x2 = rect_query.value(5).toDouble();
+        	double y1 = rect_query.value(6).toDouble();
+		double y2 = rect_query.value(7).toDouble();
+		QColor fillColor = QColor(rect_query.value(8).toString());
+		QColor outlineColor = QColor(rect_query.value(9).toString());
+        	QByteArray data = itemStats(bid, shape, sid, x1, y1, x2, y2, scenex, sceney, fillColor, outlineColor).byteData();
+//		std::string shape = "rect";
+//	        QByteArray data = itemStats(board,shape,reQuery.value(1).toInt(),reQuery.value(2).toDouble(),reQuery.value(3).toDouble(),reQuery.value(4).toDouble(),reQuery.value(5).toDouble(),reQuery.value(9).toDouble(),reQuery.value(10).toDouble(),QColor(reQuery.value(6).toString()),QColor(reQuery.value(7).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
 	}
 
-	QSqlQuery txQuery("SELECT * FROM Text");
-	while(txQuery.next()){
+	QSqlQuery text_query("SELECT * FROM Text");
+	while(text_query.next()){
+		std::string bid = text_query.value(0).toString().toStdString();
+        	qreal scenex = text_query.value(1).toDouble();
+        	qreal sceney = text_query.value(2).toDouble();
 		std::string shape = "text";
-		QByteArray data = itemStats(board,shape,txQuery.value(1).toInt(),txQuery.value(2).toDouble(),txQuery.value(3).toDouble(),txQuery.value(7).toDouble(),txQuery.value(8).toDouble(),txQuery.value(4).toString().toStdString(),QColor(txQuery.value(5).toString())).byteData();
+		int sid = text_query.value(3).toInt();
+		double x = text_query.value(4).toDouble();
+		double y = text_query.value(5).toDouble();
+        	std::string text = text_query.value(6).toString().toStdString();
+		QColor color = QColor(text_query.value(7).toString());
+        	QByteArray data = itemStats(bid, shape, sid, x, y, scenex, sceney, text, color).byteData();
+//		std::string shape = "text";
+//		QByteArray data = itemStats(board,shape,txQuery.value(1).toInt(),txQuery.value(2).toDouble(),txQuery.value(3).toDouble(),txQuery.value(7).toDouble(),txQuery.value(8).toDouble(),txQuery.value(4).toString().toStdString(),QColor(txQuery.value(5).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
 	}
 
-	QSqlQuery laQuery("SELECT * FROM Latex");
-	while(laQuery.next()){
+	QSqlQuery latex_query("SELECT * FROM Latex");
+	while(latex_query.next()){
+        	std::string bid = latex_query.value(0).toString().toStdString();
+        	qreal scenex = latex_query.value(1).toDouble();
+        	qreal sceney = latex_query.value(2).toDouble();
 		std::string shape = "latex";
-		QByteArray data = itemStats(board,shape,laQuery.value(1).toInt(),laQuery.value(2).toDouble(),laQuery.value(3).toDouble(),laQuery.value(7).toDouble(),laQuery.value(8).toDouble(),laQuery.value(4).toString().toStdString(),QColor(laQuery.value(5).toString())).byteData();
+		int sid = latex_query.value(3).toInt();
+		double x = latex_query.value(4).toDouble();
+		double y = latex_query.value(5).toDouble();
+        	std::string text = latex_query.value(6).toString().toStdString();
+		QColor color = QColor(latex_query.value(7).toString());
+        	QByteArray data = itemStats(bid, shape, sid, x, y, scenex, sceney, text, color).byteData();
+//		std::string shape = "latex";
+//		QByteArray data = itemStats(board,shape,laQuery.value(1).toInt(),laQuery.value(2).toDouble(),laQuery.value(3).toDouble(),laQuery.value(7).toDouble(),laQuery.value(8).toDouble(),laQuery.value(4).toString().toStdString(),QColor(laQuery.value(5).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
 	}
 
-	QSqlQuery arQuery("SELECT * FROM Arrow");
-	while(arQuery.next()){
+	QSqlQuery arrow_query("SELECT * FROM Arrow");
+	while(arrow_query.next()){
+        	std::string bid = arrow_query->value(0).toString().toStdString();
+        	qreal scenex = arrow_query.value(1).toDouble();
+        	qreal sceney = arrow_query.value(2).toDouble();
 		std::string shape = "arrow";
-        QByteArray data = itemStats(board,shape,arQuery.value(1).toInt(),arQuery.value(2).toDouble(),arQuery.value(3).toDouble(),arQuery.value(4).toDouble(),arQuery.value(5).toDouble(),arQuery.value(9).toDouble(),arQuery.value(10).toDouble(),QColor(arQuery.value(6).toString()),QColor(arQuery.value(7).toString())).byteData();
+		int sid = arrow_query.value(3).toInt();
+		double x1 = arrow_query.value(4).toDouble();
+		double x2 = arrow_query.value(5).toDouble();
+		double y1 = arrow_query.value(6).toDouble();
+		double y2 = arrow_query.value(7).toDouble();
+		QColor outlineColor = QColor(arrow_query.value(8).toString());
+        	DByteArray data = itemStats(bid, shape, sid, x1, y1, x2, y2, scenex, sceney, outlineColor).byteData();
+//		std::string shape = "arrow";
+//		QByteArray data = itemStats(board,shape,arQuery.value(1).toInt(),arQuery.value(2).toDouble(),arQuery.value(3).toDouble(),arQuery.value(4).toDouble(),arQuery.value(5).toDouble(),arQuery.value(9).toDouble(),arQuery.value(10).toDouble(),QColor(arQuery.value(6).toString()),QColor(arQuery.value(7).toString())).byteData();
 		QJsonDocument doc = QJsonDocument::fromJson(data);
 		data = doc.toJson();
 		everything += data;
