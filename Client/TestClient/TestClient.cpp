@@ -3,7 +3,7 @@
 #include <QPushButton>
 #include <QString>
 #include <QtTest>
-/*
+
 #include <QCoreApplication>
 #include <QApplication>
 #include "../projectScene.h"
@@ -11,7 +11,7 @@
 #include "../projectView.h"
 #include "../window.h"
 #include "../itemStats.h"
-*/
+
 
 // add necessary includes here
 

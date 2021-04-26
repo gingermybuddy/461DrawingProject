@@ -10,6 +10,13 @@ CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
+INCLUDEPATH += \
+                                ../
+
+LIBS += \
+                -L../461DrawingProject \
+                -l461DrawingProject
+
 HEADERS += #../ProjectView.h ../ProjectScene.h ../toolBar.h ../itemStats.h ../window.h
 
 SOURCES +=  \

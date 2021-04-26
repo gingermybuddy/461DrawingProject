@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 //    Server m;
 
     TestServer cTest;
-    cTest.Connect();
+    cTest.badDataConnect();
     cTest.Test();
 
     return a.exec();

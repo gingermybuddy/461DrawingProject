@@ -12,7 +12,7 @@ public:
     explicit TestServer(QObject *parent = 0);
     void Test();
 
-    void Connect();
+    void badDataConnect();
     void initTestCase();
     void cleanupTestCase();
     void testConstructor();

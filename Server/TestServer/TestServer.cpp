@@ -60,7 +60,7 @@ void TestServer::testConstructor()
     delete ser;
 }
 */
-void TestServer::Connect()
+void TestServer::badDataConnect()
 {
     socket = new QTcpSocket(this);
     socket->connectToHost(QHostAddress::LocalHost, 5000);
