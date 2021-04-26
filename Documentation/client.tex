@@ -1,5 +1,6 @@
 \chapter{Client}
-  The following is an explanation of the client side of the 461 Drawing Project \linebreak \linebreak
+The following is an explanation of the client side of the 461 Drawing Project.
+\bigskip  
 
 \section{ItemStats}
 \subsection{.h}
@@ -19,18 +20,24 @@ struct itemStats
 	//Lines get tracked the same as everything else.
 	//Set the width/height variables to x2 and y2, respectively.
 	std::string board_id;
-        std::string type;
-        int id;
-        double x;
-        double y;
-        double height;
-        double width;
-        QColor rgb;
+    std::string type;
+    std::string text;
+    int id;
+    double x;
+    double y;
+    double height;
+    double width;
+
+    double scenex;
+    double sceney;
+
+    QColor outline;
+    QColor fill;
+
 
 	//Functions to turn the thing into a QJsonObject
 	//and a QByteArray that can be sent directly over a socket.
-
-  QJsonObject toJson();
+	QJsonObject toJson();
 	QByteArray byteData();
 
 	//Several different constructors for a couple of different
@@ -39,9 +46,10 @@ struct itemStats
 	//insert.
 	itemStats();
 	itemStats(std::string board_id, QGraphicsItem* item);
-	itemStats(std::string board_id, std::string type, int id, double x, double y, \
-  double height, double width, QColor rgb);
-  ~itemStats();
+        itemStats(std::string board_id, std::string type, int id, double x, double y, double height, double width, double scenex, double sceney, QColor fill, QColor outline);
+        itemStats(std::string board_id, std::string type, int id, double x, double y, double height, double width, double scenex, double sceney, QColor outline);
+	itemStats(std::string board_id, std::string type, int id, double x, double y, std::string text, QColor outline); //constructor for text items
+	~itemStats();
 };
 \end{minted}
 
@@ -123,21 +131,30 @@ fontsize=\footnotesize,
 ]
 {cpp}
   ProjectScene::ProjectScene()
-    //A constructor for the ProjectScene class
+    /*Sets up the socket that will be connected to the server. Connects signals from the socket to functions on the client, Connects the socket to the host.*/
 
   ProjectScene::~ProjectScene()
     //A destructor for the ProjectScene class
 
   ProjectScene::readSocket()
-    //Reads in data that is received from the server into a JSON object
+    //Reads in QByteArray data that is received from the server into a JSON object
 
   ProjectScene::disconnect()
     /*Deletes the socket from the scene, effectively removing the connection from
       the server.*/
 
+  ProjectScene::updateCanvas()
+    //Checks what has changed between different canvas' and updates them all if different
+
   ProjectScene::trackItem()
     /*Pushes back all the data from a received graphics item into an internal list
       of graphics items.*/
+
+  ProjectScene::checkPos()
+    //no comments in function
+
+  ProjectScene::sceneChanged()
+    //checks to see if items on the canvas have changed in any way and passes the change to the server
 
   ProjectScene::sceneChanged()
     /*When something in the scene changes, this event is triggered. What we do is
@@ -165,21 +182,31 @@ class ProjectView : public QGraphicsView
 		int m_color_r;
 		int m_color_g;
 		int m_color_b;
+                //QBrush m_fill;
 
         QPointF firstClick;
 	private slots:
 
 	public:
-		void change_tool(int tool);
-		void change_color(int r, int g, int b);
+        int get_m_tool();
+        int get_m_color_r();
+        int get_m_color_g();
+        int get_m_color_b();
 
-        void circle_tool(qreal x, qreal y,qreal x2, qreal y2);
+	void change_tool(int tool);
+	void change_color(int r, int g, int b);
+        void fill();
+	void text_tool(qreal x, qreal y);
+	void latex_tool(qreal x, qreal y);
+        void arrow_tool(qreal x, qreal y, qreal x2, qreal y2);
+	void circle_tool(qreal x, qreal y,qreal x2, qreal y2);
         void line_tool(qreal x, qreal y, qreal x2, qreal y2);
-		void rect_tool(qreal x, qreal y, qreal x2, qreal y2);
-		void mousePressEvent(QMouseEvent* event);
-		void mouseReleaseEvent(QMouseEvent* event);
-		ProjectView();
-		~ProjectView();
+        void bezier_tool(qreal x, qreal y, qreal x2, qreal y2);
+	void rect_tool(qreal x, qreal y, qreal x2, qreal y2);
+        void mousePressEvent(QMouseEvent* event);
+	void mouseReleaseEvent(QMouseEvent* event);
+	ProjectView();
+	~ProjectView();
 };
 \end{minted}
 
@@ -204,7 +231,33 @@ ProjectView::change_tool(int tool)
   //Change the current tool based on an integer parameter
 
 ProjectView::change_color(int r, int g, int b)
-    //Change the current tool's color based on 3 integer parameters, r, g, and b.
+  //Change the current tool's color based on 3 integer parameters, r, g, and b.
+
+ProjectView::get_m_tool()
+  //no comments in file
+
+ProjectView::get_m_color_r()
+  //no comments in file
+
+ProjectView::get_m_color_g()
+  //no comments in file
+
+ProjectView::get_m_color_b()
+  //no comments in file
+
+ProjectView::fill()
+  //no useful comments in file
+
+ProjectView::text_tool()
+  //no useful comments in file
+
+ProjectView::latex_tool()
+  //could use better comments i dont want to guess
+
+ProjectView::arrow_tool()
+  //no comments in file
+
+
 
 ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
   /*Draw a circle on the canvas using two points, (x,y) and (x2,y2). This allows
@@ -215,6 +268,9 @@ ProjectView::circle_tool(qreal x, qreal y, qreal x2, qreal y2)
 ProjectView::line_tool(qreal x, qreal y, qreal x2, qreal y2)
     /*Draw a line on the canvas using two points, (x,y) and (x2,y2).
     (x,y) is the first location the user clicked, and (x2,y2) is the second.*/
+
+ProjectView::bezier_tool()
+  //no useful comments
 
 ProjectView::rect_tool(qreal x, qreal y, qreal x2, qreal y2)
     /*Draw a rectangle on the canvas using two points, (x,y) and (x2,y2).
@@ -257,22 +313,31 @@ class ToolBar : public QWidget
 		QPushButton* m_blue;
 		QPushButton* m_color_picker;
 		QVBoxLayout* m_layout;
+		QPushButton* m_fill;
+		QPushButton* m_text;
+		QPushButton* m_latex;
+		QPushButton* m_arrow;
+		QPushButton* m_bezier;
 		ProjectView* m_view;
 	public slots:
 		// set default
-        	void set_default();
-        	// shapes
-        	void place_rectangle();
-        	void set_line();
-        	void set_circle();
-        	// colors
-        	void set_color_black();
-        	void set_color_red();
-        	void set_color_green();
-        	void set_color_yellow();
-        	void set_color_blue();
-        	void set_color_custom();
-
+        void set_default();
+        // shapes
+        void place_rectangle();
+        void set_line();
+        void set_circle();
+        // colors
+        void set_color_black();
+        void set_color_red();
+        void set_color_green();
+        void set_color_yellow();
+        void set_color_blue();
+        void set_color_custom();
+        void fill();
+	void set_text();
+	void set_latex();
+	void set_arrow();
+	void set_bezier();
 	public:
 		ToolBar();
 		~ToolBar();
@@ -326,11 +391,27 @@ ToolBar::set_color_yellow()
 ToolBar::set_color_blue()
   //Sets the tool's color to be blue
 
-
-
 ToolBar::set_color_custom()
   /*Brings up a color picker menu for the user to set their own color using a
     graphical interface, rgb, hexadeicimal, or cmyk.*/
+
+ToolBar::place_rectangle()
+  //no comments
+
+ToolBar::fill()
+  //no comments
+
+ToolBar::set_text()
+  //no comments
+
+ToolBar::set_latex()
+  //no comments
+
+ToolBar::set_arrow()
+  //no comments
+
+ToolBar::set_bezier()
+  //no comments
 \end{minted}
 
 \section{Window}
@@ -361,6 +442,11 @@ class Window : public QMainWindow //Extension on the base QMainWindow class
         // make a popup window
 		void popup();
 	public:
+        ToolBar* get_m_bar();
+        QDockWidget* get_m_tool_dock();
+        ProjectScene* get_m_scene();
+        ProjectView* get_m_view();
+
 		Window();
 		~Window();
 };
@@ -381,6 +467,21 @@ Window::Window()
 
 Window::~Window()
   //A destructor for the Window class.
+
+Window::get_m_bar()
+  //no comments
+
+Window::get_m_tool_dock()
+  //no comments
+
+Window::get_m_scene()
+  //no comments
+
+Window::get_m_view()
+  //no commments
+
+Window::popup()
+  //no comments
 \end{minted}
 
 \section{Main}

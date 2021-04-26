@@ -1,6 +1,10 @@
 \chapter{Server}
   The server is run off of a Qt framework using Qt sockets. Clients can connect to the server via these Qt sockets, and are assigned unique identifiers using the socketDescriptor value of the connecting socket. By maintaining a constant connection, the server is able to receive and send the most current information about databases and shapes.
 
+\subsection*{Running the server}
+To run the server use the command \verb|./Server| followed by the port number you want it to run on. EX: \verb|./Server 5000|
+
+
 \section{Server}
 \subsection{.h}
 Server.h includes some tools to set up an item based on its data and turn it into a byte array. Also turn it into a QJsonObject.
@@ -12,10 +16,11 @@ baselinestretch=1.2,
 fontsize=\footnotesize,
 ]
 {cpp}
+/*This file includes tools to turn an item into a byte array based on its data, and also turn it into a QJsonObject.
 struct ownedDB{
     int id;
     QSqlDatabase db;
-} newDB;
+};
 
 class Server : public QMainWindow
 {
@@ -26,6 +31,8 @@ class Server : public QMainWindow
 		std::string m_board_id;
         QVector<ownedDB> databases;
 
+        std::vector<QJsonObject> m_shapes;
+
 	public slots:
 		void newConnection();
 		void readSocket();
@@ -35,7 +42,9 @@ class Server : public QMainWindow
 		~Server();
 		void appendSocket(QTcpSocket* sock);
         void createBoard(QTcpSocket* socket);
+		void saveDB(QTcpSocket* socket);
         void deleteDB(QTcpSocket* socket);
+        void fullUpdate(QString databaseName, QTcpSocket* socket);
 };
 \end{minted}
 
@@ -49,30 +58,32 @@ fontsize=\footnotesize,
 ]
 {cpp}
 Server::Server() : QMainWindow()
-  /*Sets up the server itself.
-  The server will give out a 'signal' when it receives a new connection.
+  /*Sets up the server itself. The server will give
+  out a 'signal' when it receives a new connection.
   This connects that signal to the function 'newConnection()'.*/
 
+Server::~Server(){
+  //Destructor for the Server
+
 void Server::newConnection()
-  /*Checks for pending connections, then calls the other function that actually adds the socket
-	to the list of sockets we have.*/
+  /*Checks for pending connections, then calls the appendSocket() that actually adds the socket to the list of sockets we have.*/
 
 void Server::appendSocket(QTcpSocket* socket)
   //adds a new socket to all current clients are stored in the vector.
 
 void Server::disconnect()
-  //Black voodoo magic with a cast to determine which socket it was that needs to be disconnected.
+  //Determines which socket that needs to be disconnected.
 
 void Server::readSocket()
   /*There is a QByteArray array of bytes that the socket has just sent to the server.
   The array is formatted as a JSON object. The client sends out this JSON object in
-  the exact format that is specified in the jsonExamples folder. The data gets received and is
-  ready to be parsed and turned into a string and outputs it to console. Casts the byte array
-  into a Qt style JSON object. You can get keys and values out of this the same way
-	you would anything else. Qt documentation will have more specific info on:*/
+  the exact format that is specified in the jsonExamples folder. The data gets received and isvready to be parsed and turned into a string and outputs it to console. Casts the byte array into a Qt style JSON object. You can get keys and values out of this the same way you would anything else. Qt documentation will have more specific info on:*/
 
   QJsonDocument doc = QJsonDocument::fromJson(buf);
 	QJsonObject obj = doc.object();
+
+void Server::fullUpdate(QString databasename, QTcpSocket* socket){
+  /*This function keeps track of all shapes across all clients concurrently via a QByteArray of JSON objects. In order to acquire the information from the SQL database, the function calls queries on the Ellipse, Line, and Rect tables of the database "databaseName" that is passed in by the function call. It then converts them to JSON objects by using the itemStats constructor and then using the .toJson() method. Each JSON object is then placed into the QByteArray. This byte array is then sent to the socket that requested the fullUpdate.*/
 
 void Server::createBoard(QTcpSocket* socket)
       /*Create a QSqlDatabase, either connect to the database named CMSC461.db or
@@ -80,44 +91,8 @@ void Server::createBoard(QTcpSocket* socket)
 
 void Server::deleteDB(QTcpSocket* socket)
 
-\end{minted}
-
-\subsection{.py}
-\begin{minted}
-[
-frame=lines,
-framesep=2mm,
-baselinestretch=1.2,
-fontsize=\footnotesize,
-]
-{python}
-  def getJsonFile():
-
-  def addCircle(bid,sid,r,x,y,color):
-    #Creates JSON-formatted circle data
-
-  def addLine(bid,sid,x1,y1,x2,y2,color):
-    #Creates JSON-formatted line data
-
-  def addRect (bid,sid,x,y,w,h,color):
-    #Creates JSON-formatted rectangle data
-
-  @app.route('/addShape', methods = ['POST', 'GET'])
-  def shapeType():
-    #Checks shape type received and calls matching function
-
-  @app.route('/saveFile', methods = ['POST', 'GET'])
-  def saveFile():
-    # A implementation of saveFile which allows the user to save the board that they are currently using.
-    # User will send this url to the server and server will reply back with an SVG file
-
-  @app.route('/fullUpdate', methods = ['POST', 'GET'])
-  def fullUpdate():
-    """This function keeps track of all shapes across all clients concurrently via a QByteArray of JSON objects. In order to acquire the information from the SQL database, the function calls queries on the Ellipse, Line, and Rect tables of the database "databaseName" that is passed in by the function call. It then converts them to JSON objects by using the itemStats constructor and then using the .toJson() method. Each JSON object is then placed into the QByteArray. This byte array is then sent to the socket that requested the fullUpdate."""
-
-  @app.route('/createBoard', methods = ['POST', 'GET'])
-  def createBoard():
-    # Create a new database for every new board that is created
+Server::saveDB(QTcpSocket* socket)
+/*Saves a massive JSON array of every shape in the database into a JSON object and sends it to a client who is about to disconnect. It sends the data to the client so they can pack it into a .json file before it fully disconnects.*/
 \end{minted}
 
 \section{Main}
@@ -130,5 +105,14 @@ baselinestretch=1.2,
 fontsize=\footnotesize,
 ]
 {cpp}
+#include <QApplication>
+#include "Server.h"
+#include <iostream>
+
 int main(int argc, char* argv[])
+{
+	QApplication new_window(argc, argv);
+	Server w;
+	return new_window.exec();
+}
 \end{minted}
