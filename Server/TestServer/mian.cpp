@@ -6,7 +6,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-//    Server m;
+  //  int port = 5000;
+   // Server m = Server(port);
 
     TestServer cTest;
     cTest.badDataConnect();

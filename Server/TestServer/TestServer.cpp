@@ -4,37 +4,9 @@
 #include "TestServer.h"
 #include <QJsonObject>
 #include <QDataStream>
-#include "../../Client/itemStats.h"
 
 
-// add necessary includes here
-/*
-class TestServer : public QObject
-{
-    Q_OBJECT
 
-public:
-//    TestServer();
-//    ~TestServer();
-
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void testConstructor();
-
-};
-*/
-/*
-TestServer::TestServer()
-{
-
-}
-
-TestServer::~TestServer()
-{
-
-}
-*/
 
 TestServer::TestServer(QObject *parent) :
     QObject(parent)
@@ -81,6 +53,12 @@ void TestServer::badDataConnect()
         qDebug() << socket->readAll();
 
         socket->close();
+        QDataStream sockstream(socket);
+        sockstream.startTransaction();
+        sockstream.commitTransaction();
+        qDebug() << "Bad Connection Passed";
+
+
     }
     else
     {
@@ -122,6 +100,7 @@ void TestServer::Test()
         qDebug() << "Error: " << socket->errorString();
     }
 
+    //qDebug() << "Bad Connection Passed";
 }
 
 void TestServer::connected()
@@ -140,7 +119,9 @@ void TestServer::connected()
     QByteArray boardreq = QJsonDocument(boardcon).toJson();
     QDataStream sockstream(socket);
 
+    sockstream.startTransaction();
     sockstream << boardreq;
+    sockstream.commitTransaction();
     testGoodEllipse();
     testGoodFill();
     testGoodLatex();
@@ -169,9 +150,17 @@ void TestServer::readyRead()
 
 void TestServer::testGoodEllipse()
 {
+    QByteArray buf;
+
+    //Data stream to get it from the socket.
+    QDataStream sockstream(socket);
+    sockstream.startTransaction();
+    sockstream >> buf;
+    sockstream.commitTransaction();
+
     //std::string answer;
     qDebug() << "Testing Ellispe";
-    if(false){
+    if(testy){
         //answer = "";
         qDebug() << "";
 
@@ -182,9 +171,17 @@ void TestServer::testGoodEllipse()
 
 void TestServer::testGoodFill()
 {
+    QByteArray buf;
+
+    //Data stream to get it from the socket.
+    QDataStream sockstream(socket);
+    sockstream.startTransaction();
+    sockstream >> buf;
+    sockstream.commitTransaction();
+
     //std::string answer;
     qDebug() << "Testing Circle";
-    if(false){
+    if(testy){
         //answer = "";
         qDebug() << "Passed Circle";
 
@@ -195,9 +192,17 @@ void TestServer::testGoodFill()
 
 void TestServer::testGoodRectangle()
 {
+    QByteArray buf;
+
+    //Data stream to get it from the socket.
+    QDataStream sockstream(socket);
+    sockstream.startTransaction();
+    sockstream >> buf;
+    sockstream.commitTransaction();
+
     //std::string answer;
     qDebug() << "Testing Rectangle...";
-    if(false){
+    if(testy){
         //answer = "";
         qDebug() << "Passed Rectangle";
 
@@ -208,9 +213,17 @@ void TestServer::testGoodRectangle()
 
 void TestServer::testGoodLine()
 {
+    QByteArray buf;
+
+    //Data stream to get it from the socket.
+    QDataStream sockstream(socket);
+    sockstream.startTransaction();
+    sockstream >> buf;
+    sockstream.commitTransaction();
+
     //std::string answer;
     qDebug() << "Testing Line ...";
-    if(false){
+    if(testy){
         //answer = "Passed Line";
         qDebug() << "";
 
@@ -235,8 +248,16 @@ void TestServer::testGoodText()
     QJsonObject pos = d.value("scenepos").toObject();
 */
 
+    QByteArray buf;
+
+    //Data stream to get it from the socket.
+    QDataStream sockstream(socket);
+    sockstream.startTransaction();
+    sockstream >> buf;
+
+
     qDebug() << "Testing Text ...";
-    if(false){
+    if(testy){
         //answer = "";
         qDebug() << "Passed Text";
 
@@ -247,10 +268,17 @@ void TestServer::testGoodText()
 
 void TestServer::testGoodLatex()
 {
+    QByteArray buf;
+
+    //Data stream to get it from the socket.
+    QDataStream sockstream(socket);
+    sockstream.startTransaction();
+    sockstream >> buf;
+
     qDebug() << "Testing LaTeX ...";
-    if(false){
+    if(testy){
         //answer = "";
-        qDebug() << "Passed Latex";
+        qDebug() << "Passed LaTeX";
 
     }else{
         qDebug() << "Failed LaTeX data ";

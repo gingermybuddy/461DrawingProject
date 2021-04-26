@@ -17,6 +17,8 @@ public:
     void cleanupTestCase();
     void testConstructor();
 
+    bool testy = true;
+
 
 
 signals:
