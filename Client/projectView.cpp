@@ -14,6 +14,8 @@
 #include <QJsonObject>
 #include <stdio.h>
 #include <stdlib.h>
+#include <QFileDialog>
+#include <QCoreApplication>
 
 ProjectView::ProjectView() : QGraphicsView(), m_tool{0}
 {
@@ -324,4 +326,16 @@ void ProjectView::mouseReleaseEvent(QMouseEvent *event)
 	//Create functions based on buttons for a selected tool (e.g. move the rectangle code to the 'Rectangle' button code)
 	//Set up color selection so it takes a color parameter (or takes whatever color is currently selected according to some var in ProjectView)
 
+}
+
+void ProjectView::keyPressEvent(QKeyEvent* event)
+{
+    if(event->key() == Qt::Key_Delete) {
+        QList<QGraphicsItem*> selected = scene()->selectedItems();
+        for(QGraphicsItem* i : selected) {
+            int id = i->data(0).toInt();
+            delete i;
+            emit itemDeleted(id);
+        }
+    }
 }

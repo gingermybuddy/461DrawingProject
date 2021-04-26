@@ -18,44 +18,56 @@
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QPen>
+#include <QFileDialog>
+#include <QInputDialog>
 
 using namespace std;
 
 ProjectScene::ProjectScene() 
 {
-	setSceneRect(0, 0, 800, 800);
+    m_starting_file = nullptr;
+    id_increment = 0;
+    //setSceneRect(0, 0, 800, 800);
+}
 
-	//Sets up the socket that will be connected to the server.
-        m_socket = new QTcpSocket(this);
-	m_timer = new QTimer(this);
-	connect(m_timer, SIGNAL(timeout()), this, SLOT(checkPos()));
-	m_timer->start(2000);
-	
-	//Connects signals from the socket to functions on the client.
-	//readyRead signals that the socket has received data and is ready
-	//to read it. Disconnect is exactly what it says on the tin.
-	connect(m_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
-	connect(m_socket, SIGNAL(disconnected()), this, SLOT(disconnect()));
+bool ProjectScene::connectToBoard(QHostAddress ip, int port, std::string board_id)
+{
+    //Sets up the socket that will be connected to the server.
+    m_socket = new QTcpSocket(this);
+    m_timer = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(checkPos()));
+    m_timer->start(2000);
 
-	//Connects the socket to the host. Host IP and port are currently fixed,
-	//but we can set them to variables later.
-        m_socket->connectToHost(QHostAddress::LocalHost, 5000);
+    //Connects signals from the socket to functions on the client.
+    //readyRead signals that the socket has received data and is ready
+    //to read it. Disconnect is exactly what it says on the tin.
+    connect(m_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
+    connect(m_socket, SIGNAL(disconnected()), this, SLOT(disconnect()));
+
+    //Connects the socket to the host. Host IP and port are currently fixed,
+    //but we can set them to variables later.
+        m_socket->connectToHost(ip, port);
         if(m_socket->waitForConnected()){
                 std::cout << "Connected." << std::endl;
         } else {
-		std::cout << "Failed to connect to server." << std::endl;
-	}
-	//Board ID is also fixed right now.
-	m_board_id = "CMSC461";
+        std::cout << "Failed to connect to server." << std::endl;
+        return false;
+    }
+    m_board_id = board_id;
+    QJsonObject boardcon;
+    boardcon.insert("board_connection", QJsonValue(QString::fromStdString(board_id)));
 
-	QByteArray request;
-	QString fup = "fullUpdate";
-	QDataStream sockstream(m_socket);
-	request = fup.toUtf8();
-	sockstream << request;
+    if(m_starting_file != nullptr) {
+        QJsonDocument loader = *m_starting_file;
+        boardcon.insert("load_file", QJsonValue(loader.object()));
+    }
+    QByteArray boardreq = QJsonDocument(boardcon).toJson();
+    QDataStream sockstream(m_socket);
 
-
+    sockstream << boardreq;
+    return true;
 }
+
 ProjectScene::~ProjectScene() 
 {
 	delete m_socket;
@@ -84,16 +96,41 @@ void ProjectScene::readSocket()
 	QJsonValue fup = obj.value("fullUpdate");
 	if(fup.toString() == "test") {
 		std::cout << "This is a full update; we should parse this." << std::endl;
+        if(m_starting_file != nullptr) {
+            emit file_already_loaded();
+            return;
+        }
         obj.remove("fullUpdate");
+
+        int largest_id = 0;
         std::vector<QJsonObject> shapes;
         foreach(QString str, obj.keys()) {
             shapes.push_back(obj.value(str).toObject());
         }
         updateCanvas(shapes);
         for(QGraphicsItem* i : items()){
+            if(i->data(0).toInt() > largest_id){
+                largest_id = i->data(0).toInt();
+            }
             m_tracked_items.push_back(itemStats(m_board_id, i));
+            id_increment = largest_id;
         }
 		return;
+    }
+
+    if(obj.value("delete_item") != QJsonValue::Undefined) {
+        int del_id = obj.value("delete_item").toInt();
+        for(auto it = m_tracked_items.begin(); it != m_tracked_items.end(); ++it) {
+            if(it->id == del_id) {
+                m_tracked_items.erase(it);
+            }
+        }
+        for(QGraphicsItem* i : items()) {
+            if(i->data(0).toInt() == del_id) {
+                delete i;
+            }
+        }
+        return;
     }
     //If it's not a full update it's just some kind of other shape update
     //Either a new shape got added or an existing one is updated.
@@ -124,13 +161,7 @@ void ProjectScene::updateCanvas(std::vector<QJsonObject> objects)
         bool found = false;
         for(QGraphicsItem* i : items()) {
             if(obj.value("data").toObject().value("sid").toInt() == i->data(0).toInt()) {
-                if (i->data(1) == "arrow") {
-                    QGraphicsPolygonItem* header = (QGraphicsPolygonItem*)i->data(3).toULongLong();
-                    delete header;
-                }
-
                 //Time to check what might have changed...
-
                 if(newx != i->x() || newy != i->y()) {
                     i->setPos(newx, newy);
                 }
@@ -323,15 +354,34 @@ int ProjectScene::trackItem(QGraphicsItem* item)
 {
 
 	QString type = item->data(1).toString();
-	int id = m_tracked_items.size();
-	item->setData(0, id);
+    ++id_increment;
+    item->setData(0, id_increment);
     itemStats tracker = itemStats(m_board_id, item);
     m_tracked_items.push_back(tracker);
     cout << "TRACKER \n" << "QGraphicsItem pos: " << item->x() << " " << item->y() << endl;
     cout << "ItemStats pos: " << tracker.x << " " << tracker.y << endl;
     //item->setPos(tracker.x, tracker.y);
-	return id;
+    return id_increment;
 	//Returns the id of the newly-tracked item.
+}
+
+void ProjectScene::deleteItem(int did)
+{
+    for(auto it = m_tracked_items.begin(); it != m_tracked_items.end(); ++it) {
+        if(it->id == did) {
+            m_tracked_items.erase(it);
+            QJsonObject deldata;
+            deldata.insert("delete", QJsonValue(did));
+            deldata.insert("del_board_id", QJsonValue(QString::fromStdString(m_board_id)));
+
+            QByteArray delreq = QJsonDocument(deldata).toJson();
+            QDataStream socketstream(m_socket);
+            socketstream.startTransaction();
+            socketstream << deldata;
+            socketstream.commitTransaction();
+
+        }
+    }
 }
 
 void ProjectScene::checkPos()
@@ -452,4 +502,28 @@ void ProjectScene::sceneChanged(const QList<QRectF> &region)
 	socketstream << data;
     socketstream.commitTransaction();
     	}
+}
+
+QJsonObject ProjectScene::exportToFile()
+{
+    QJsonObject returnval;
+    for(QGraphicsItem* i : items()) {
+        itemStats item = itemStats(m_board_id, i);
+        returnval.insert(QString::number(item.id), item.toJson());
+    }
+    return returnval;
+}
+
+void ProjectScene::loadFile(QJsonDocument doc)
+{
+    m_starting_file = new QJsonDocument(doc);
+    QJsonObject obj = doc.object();
+    std::vector<QJsonObject> shapes;
+    foreach(QString str, obj.keys()) {
+        shapes.push_back(obj.value(str).toObject());
+    }
+    updateCanvas(shapes);
+    for(QGraphicsItem* i : items()){
+        m_tracked_items.push_back(itemStats(m_board_id, i));
+    }
 }

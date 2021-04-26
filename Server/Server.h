@@ -5,7 +5,7 @@
 #include <QJsonDocument>
 #include <string>
 #include <QSqlDatabase>
-
+#include <map>
 
 #include "../Client/itemStats.h"
 //Take a look at this file; it includes some tools to
@@ -13,9 +13,6 @@
 //byte array. Also turn it into a QJsonObject.
 #ifndef __SERVER_H
 #define __SERVER_H
-
-//The window is kind of decorative. Doesn't have anything in it.
-//But it could!
 
 struct ownedDB{
     int id;
@@ -30,15 +27,17 @@ class Server : public QMainWindow
 		QSet<QTcpSocket*> connected;
 		std::string m_board_id;
         QVector<ownedDB> databases;
+        int m_port;
 
-        std::vector<QJsonObject> m_shapes;
+        std::map<std::string, std::vector<QJsonObject>*> m_boards;
+        std::map<std::string, std::vector<QTcpSocket*>> m_connected_to_board;
 
 	public slots:
 		void newConnection();
 		void readSocket();
 		void disconnect();
 	public:
-		Server();
+        Server(int port);
 		~Server();
 		void appendSocket(QTcpSocket* sock);
         void createBoard(QTcpSocket* socket);
