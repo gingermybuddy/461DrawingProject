@@ -24,10 +24,12 @@ public:
     ~TestClient();
 
  //   QApplication new_window(argc, argv);
- //   Window w;
+    Window w;
+
+private:
 
 private slots:
-    void test_case1();
+    void test_cases();
 //    int argc = 1;
 //    char* argv;
 };
@@ -43,9 +45,10 @@ TestClient::~TestClient()
 
 }
 
-void TestClient::test_case1()
+void TestClient::test_cases()
 {
 
+    QVERIFY(true);
 }
 
 QTEST_MAIN(TestClient)

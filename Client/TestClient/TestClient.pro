@@ -13,11 +13,9 @@ TEMPLATE = app
 INCLUDEPATH += \
                                 ../
 
-LIBS += \
-                -L../461DrawingProject \
-                -l461DrawingProject
+#LIBS += \-L../461DrawingProject \
+           #-l461DrawingProject
 
-HEADERS += #../ProjectView.h ../ProjectScene.h ../toolBar.h ../itemStats.h ../window.h
+HEADERS += ../ProjectView.h ../ProjectScene.h ../toolBar.h ../itemStats.h ../window.h ../StartWindow.h
 
-SOURCES +=  \
-    TestClient.cpp
+SOURCES += TestClient.cpp ../ProjectView.cpp ../ProjectScene.cpp ../toolBar.cpp ../itemStats.cpp ../window.cpp ../StartWindow.cpp

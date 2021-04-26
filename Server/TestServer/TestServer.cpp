@@ -2,6 +2,9 @@
 #include <QtTest>
 #include <QCoreApplication>
 #include "TestServer.h"
+#include <QJsonObject>
+#include <QDataStream>
+#include "../../Client/itemStats.h"
 
 
 // add necessary includes here
@@ -45,7 +48,7 @@ void TestServer::initTestCase()
 
 void TestServer::cleanupTestCase()
 {
-
+    delete socket;
 }
 /*
 void TestServer::testConstructor()
@@ -81,6 +84,7 @@ void TestServer::badDataConnect()
     }
     else
     {
+        qDebug() << "Server Down :(";
         qDebug() << "Not connected!";
     }
 
@@ -102,13 +106,13 @@ void TestServer::Test()
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(bytesWritten(qint64)));
-    connect(socket, SIGNAL(testGoodEllipse()), this, SLOT(testGoodEllipse()));
+/*    connect(socket, SIGNAL(namespace::TestServer::testGoodEllipse()), this, SLOT(testGoodEllipse()));
     connect(socket, SIGNAL(testGoodRectangle()), this, SLOT(testGoodRectangle()));
     connect(socket, SIGNAL(testGoodFill()), this, SLOT(testGoodFill()));
     connect(socket, SIGNAL(testGoodLine()), this, SLOT(testGoodLine()));
     connect(socket, SIGNAL(testGoodLatex()), this, SLOT(testGoodLatex()));
     connect(socket, SIGNAL(testGoodText()), this, SLOT(testGoodText()));
-
+*/
     qDebug() << "Connecting,..";
 
     socket->connectToHost(QHostAddress::LocalHost, 5000);
@@ -122,7 +126,27 @@ void TestServer::Test()
 
 void TestServer::connected()
 {
+    //QJsonDocument* m_starting_file;
+
     qDebug() << "Connected!";
+    QJsonObject boardcon;
+    boardcon.insert("board_connection", QJsonValue(QString::fromStdString("CMSC461")));
+/*
+    if(m_starting_file != nullptr) {
+        QJsonDocument loader = *m_starting_file;
+        boardcon.insert("load_file", QJsonValue(loader.object()));
+    }
+*/
+    QByteArray boardreq = QJsonDocument(boardcon).toJson();
+    QDataStream sockstream(socket);
+
+    sockstream << boardreq;
+    testGoodEllipse();
+    testGoodFill();
+    testGoodLatex();
+    testGoodLine();
+    testGoodRectangle();
+    testGoodText();
 
     //socket->write();
 }
@@ -162,7 +186,7 @@ void TestServer::testGoodFill()
     qDebug() << "Testing Circle";
     if(false){
         //answer = "";
-        qDebug() << "";
+        qDebug() << "Passed Circle";
 
     }else{
         qDebug() << "Failed circle data ";
@@ -175,7 +199,7 @@ void TestServer::testGoodRectangle()
     qDebug() << "Testing Rectangle...";
     if(false){
         //answer = "";
-        qDebug() << "";
+        qDebug() << "Passed Rectangle";
 
     }else{
         qDebug() << "Failed rectangle data ";
@@ -187,7 +211,7 @@ void TestServer::testGoodLine()
     //std::string answer;
     qDebug() << "Testing Line ...";
     if(false){
-        //answer = "";
+        //answer = "Passed Line";
         qDebug() << "";
 
     }else{
@@ -197,10 +221,24 @@ void TestServer::testGoodLine()
 
 void TestServer::testGoodText()
 {
+/*
+    QJsonObject d;
+    QString text = d.value("text").toString();
+    QGraphicsTextItem* t = addText(text);
+    QJsonObject start = d.value("start").toObject();
+    t->setPos(start.value("x").toDouble(), start.value("y").toDouble());
+    t->setDefaultTextColor(QColor(d.value("color").toString()));
+    t->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+    t->setCursor(Qt::PointingHandCursor);
+    t->setData(0, d.value("sid").toInt());
+    t->setData(1, "text");
+    QJsonObject pos = d.value("scenepos").toObject();
+*/
+
     qDebug() << "Testing Text ...";
     if(false){
         //answer = "";
-        qDebug() << "";
+        qDebug() << "Passed Text";
 
     }else{
         qDebug() << "Failed text data ";
@@ -212,7 +250,7 @@ void TestServer::testGoodLatex()
     qDebug() << "Testing LaTeX ...";
     if(false){
         //answer = "";
-        qDebug() << "";
+        qDebug() << "Passed Latex";
 
     }else{
         qDebug() << "Failed LaTeX data ";

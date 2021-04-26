@@ -13,7 +13,11 @@ TEMPLATE = app
 SOURCES +=  \
     TestServer.cpp \
     mian.cpp
+    ../Server.cpp
+    ../../Client/itemStats.h
 
 HEADERS += \
     TestServer.h
     ../Server.h
+    ../../Client/itemStats.h
+
